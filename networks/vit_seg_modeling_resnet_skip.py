@@ -1,6 +1,8 @@
 import math
 
-from os.path import join as pjoin
+from os.path import join, sep
+def pjoin(*args, **kwargs):
+    return join(*args, **kwargs).replace(sep, '/')
 from collections import OrderedDict
 
 import torch

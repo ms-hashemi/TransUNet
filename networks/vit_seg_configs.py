@@ -1,5 +1,6 @@
 import ml_collections
 
+
 def get_b16_config():
     """Returns the ViT-B/16 configuration."""
     config = ml_collections.ConfigDict()
@@ -24,6 +25,58 @@ def get_b16_config():
     return config
 
 
+def get_b16_3D_config():
+    """Returns the ViT-B/16 configuration."""
+    # The simplest Tran-V-Net for the 3D image segmentation 
+    # No feature extraction via additional CNN encoder and no skip connections to the decoder cup
+    config = ml_collections.ConfigDict()
+    config.patches = ml_collections.ConfigDict({'size': (16, 16, 16)})
+    config.hidden_size = 768
+    config.transformer = ml_collections.ConfigDict()
+    config.transformer.mlp_dim = 3072
+    config.transformer.num_heads = 12
+    config.transformer.num_layers = 12
+    config.transformer.attention_dropout_rate = 0.0
+    config.transformer.dropout_rate = 0.1
+
+    config.classifier = 'seg'
+    config.representation_size = None
+    config.resnet_pretrained_path = None
+    config.pretrained_path = '../model/vit_checkpoint/imagenet21k/ViT-B_16.npz'
+
+    config.decoder_channels = (512, 256, 128, 64, 16)
+    config.n_classes = 2
+    return config
+
+
+def get_conv_b16_3D_config():
+    """Returns the Conv + ViT-B/16 configuration."""
+    # The suggested Tran-V-Net for the 3D image segmentation 
+    # Feature extraction via additional CNN encoder and skip connections from the CNN encoder to the decoder cup
+    config = ml_collections.ConfigDict()
+    config.patches = ml_collections.ConfigDict({'size': (8, 8, 8)})
+    config.patches.grid = (5, 5, 5)
+    config.hidden_size = 768
+    config.transformer = ml_collections.ConfigDict()
+    config.transformer.mlp_dim = 3072
+    config.transformer.num_heads = 12
+    config.transformer.num_layers = 12
+    config.transformer.attention_dropout_rate = 0.0
+    config.transformer.dropout_rate = 0.1
+
+    config.classifier = 'seg'
+    config.representation_size = None
+    config.resnet_pretrained_path = None
+    config.pretrained_path = '../model/vit_checkpoint/imagenet21k/ViT-B_16.npz'
+
+    config.encoder_channels = (3, 8, 16) # For the encoder blocks associated with 1/1, 1/2, and 1/4 of input image size
+    config.number_down_scaled = 2 # The number of half down scaling after the last encoder block by nn.MaxPool3D(2) without any convolutions
+    config.decoder_channels = (128, 32, 16, 8, 3) # First one is the first number of decoder input channels or head_channels
+    config.skip_channels = (16, 16, 16, 8, 3) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
+    config.n_classes = 3 # Number of classes for the image segmentation
+    return config
+
+
 def get_testing():
     """Returns a minimal configuration for testing."""
     config = ml_collections.ConfigDict()
@@ -38,6 +91,7 @@ def get_testing():
     config.classifier = 'token'
     config.representation_size = None
     return config
+
 
 def get_r50_b16_config():
     """Returns the Resnet50 + ViT-B/16 configuration."""
