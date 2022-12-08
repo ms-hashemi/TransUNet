@@ -32,5 +32,5 @@
 module load miniconda3
 source activate mytorch
 CUDA_VISIBLE_DEVICES=0,1,2,3
-srun python train_deg.py --dataset Degradation
-# python train_deg.py --dataset Degradation
+# srun python train_deg.py --dataset Degradation
+python train_deg.py --dataset Degradation
