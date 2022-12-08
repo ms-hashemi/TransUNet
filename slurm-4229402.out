@@ -1,0 +1,29 @@
+export TMOUT=5400
+export TMPDIR=/mnt/bgfs/mhashemi/4229402
+export PTMPDIR=/mnt/bgfs/mhashemi/4229402/ptmp
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 103, in <module>
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 103, in <module>
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 103, in <module>
+    os.makedirs(snapshot_path)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/os.py", line 225, in makedirs
+    os.makedirs(snapshot_path)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/os.py", line 225, in makedirs
+    os.makedirs(snapshot_path)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/os.py", line 225, in makedirs
+    mkdir(name, mode)
+    mkdir(name, mode)
+FileExistsError: [Errno 17] File exists: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]'
+FileExistsError: [Errno 17] File exists: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]'
+    mkdir(name, mode)
+FileExistsError: [Errno 17] File exists: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]'
+srun: error: novagpu012: tasks 0-2: Exited with exit code 1
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 149, in <module>
+    raise NotImplementedError("Only DistributedDataParallel is supported.")
+NotImplementedError: Only DistributedDataParallel is supported.
+srun: error: novagpu012: task 3: Exited with exit code 1

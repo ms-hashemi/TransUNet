@@ -1,7 +1,9 @@
 import argparse
 import logging
 import os
-os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+# os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+import sys
+import builtins
 import random
 import numpy as np
 import torch
@@ -14,7 +16,7 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('--root_path', type=str,
 #                     default='../data/deg/train_npz', help='root dir for data')
 parser.add_argument('--root_path', type=str,
-                    default='../../work/sheidaei/mhashemi/data/deg', help='root dir for data')
+                    default='/work/sheidaei/mhashemi/data/deg', help='root dir for data')
 parser.add_argument('--dataset', type=str,
                     default='Degradation', help='experiment_name')
 parser.add_argument('--list_dir', type=str,
@@ -22,12 +24,22 @@ parser.add_argument('--list_dir', type=str,
 parser.add_argument('--num_classes', type=int,
                     default=2, help='output channel of network')
 parser.add_argument('--max_iterations', type=int,
-                    default=2880, help='maximum iteration number to train')
+                    default=288, help='maximum iteration number to train')
 parser.add_argument('--max_epochs', type=int,
                     default=1, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int,
                     default=24, help='batch_size per gpu')
-parser.add_argument('--n_gpu', type=int, default=4, help='total gpu')
+parser.add_argument('--gpu', type=int, default=4, help='total gpu')
+parser.add_argument('--world-size', default=-1, type=int, 
+                    help='number of nodes for distributed training')
+parser.add_argument('--rank', default=-1, type=int, 
+                    help='node rank for distributed training')
+parser.add_argument('--dist-url', default='env://', type=str, 
+                    help='url used to set up distributed training')
+parser.add_argument('--dist-backend', default='nccl', type=str, 
+                    help='distributed backend')
+parser.add_argument('--local_rank', default=-1, type=int, 
+                    help='local rank for distributed training')
 parser.add_argument('--deterministic', type=int,  default=1,
                     help='whether use deterministic training')
 parser.add_argument('--base_lr', type=float,  default=0.01,
@@ -75,7 +87,7 @@ if __name__ == "__main__":
     args.root_path = dataset_config[dataset_name]['root_path']
     args.list_dir = dataset_config[dataset_name]['list_dir']
     args.is_pretrain = True
-    args.exp = 'TU_' + dataset_name + str(args.img_size)
+    args.exp = 'TV_' + dataset_name + str(args.img_size)
     snapshot_path = "../model/{}/{}".format(args.exp, 'TU')
     snapshot_path = snapshot_path + '_pretrain' if args.is_pretrain else snapshot_path
     snapshot_path += '_' + args.vit_name
@@ -95,9 +107,51 @@ if __name__ == "__main__":
     config_vit.n_skip = args.n_skip
     if args.vit_name.find('R50') != -1:
         config_vit.patches.grid = (int(args.img_size / args.vit_patches_size), int(args.img_size / args.vit_patches_size), int(args.img_size / args.vit_patches_size))
-    # net = ViT_seg(config_vit, img_size=args.img_size, num_classes=config_vit.n_classes).cuda()
-    net = ViT_seg(config_vit, img_size=args.img_size, num_classes=config_vit.n_classes)
-    net.load_from(weights=np.load(config_vit.pretrained_path))
+
+    # DDP setting
+    if "WORLD_SIZE" in os.environ:
+        args.world_size = int(os.environ["WORLD_SIZE"])
+    args.distributed = args.world_size > 1
+    ngpus_per_node = torch.cuda.device_count()
+
+    if args.distributed:
+        if args.local_rank != -1: # for torch.distributed.launch
+            args.rank = args.local_rank
+            args.gpu = args.local_rank
+        elif 'SLURM_PROCID' in os.environ: # for slurm scheduler
+            args.rank = int(os.environ['SLURM_PROCID'])
+            args.gpu = args.rank % torch.cuda.device_count()
+        torch.distributed.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
+                                world_size=args.world_size, rank=args.rank)
+
+    # suppress printing if not on master gpu
+    if args.rank!=0:
+        def print_pass(*args):
+            pass
+        builtins.print = print_pass
+
+    # model    
+    model = ViT_seg(config_vit, img_size=args.img_size, num_classes=config_vit.n_classes)
+    model.load_from(weights=np.load(config_vit.pretrained_path))
+    if args.distributed:
+        # For multiprocessing distributed, DistributedDataParallel constructor
+        # should always set the single device scope, otherwise,
+        # DistributedDataParallel will use all available devices.
+        if args.gpu is not None:
+            torch.cuda.set_device(args.gpu)
+            model.cuda(args.gpu)
+            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
+            model_without_ddp = model.module
+        else:
+            model.cuda()
+            model = torch.nn.parallel.DistributedDataParallel(model)
+            model_without_ddp = model.module
+    else:
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        model = torch.nn.DataParallel(model)
+        model.to(device)
+        # raise NotImplementedError("Only DistributedDataParallel is supported.")
 
     trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg}
-    trainer[dataset_name](args, net, snapshot_path)
+    trainer[dataset_name](args, model, snapshot_path)
+    sys.exit(0)

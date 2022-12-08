@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tensorboardX import SummaryWriter
 from torch.nn.modules.loss import CrossEntropyLoss
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, distributed
 from tqdm import tqdm
 from utils import DiceLoss
 from torchvision import transforms
@@ -108,7 +108,7 @@ def trainer_deg(args, model, snapshot_path):
     logging.info(str(args))
     base_lr = args.base_lr
     num_classes = args.num_classes
-    batch_size = args.batch_size * args.n_gpu
+    batch_size = args.batch_size * args.gpu
     # max_iterations = args.max_iterations
     db_train = Degradation_dataset(base_dir=args.root_path, list_dir=args.list_dir, split="train",
                                 transform=transforms.Compose(
@@ -118,12 +118,15 @@ def trainer_deg(args, model, snapshot_path):
     # g = torch.Generator()
     # g.manual_seed(args.seed)
 
-    trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True,
-                             worker_init_fn=seed_worker)
-    if args.n_gpu > 1:
-        model = nn.DataParallel(model)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    # train_sampler = distributed.DistributedSampler(db_train, shuffle=True)
+    # trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=(train_sampler is None), num_workers=8, 
+    #                         pin_memory=True, sampler=train_sampler, drop_last=True) #  worker_init_fn=seed_worker
+    trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=True, num_workers=8, 
+                            pin_memory=True, worker_init_fn=seed_worker)
+    # if args.n_gpu > 1:
+    #     model = nn.DataParallel(model)
+    # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    # model.to(device)
     model.train()
     ce_loss = CrossEntropyLoss()
     dice_loss = DiceLoss(num_classes)
@@ -136,6 +139,11 @@ def trainer_deg(args, model, snapshot_path):
     best_performance = 0.0
     iterator = tqdm(range(max_epoch), ncols=70)
     for epoch_num in iterator:
+        # np.random.seed(epoch_num)
+        # random.seed(epoch_num)
+        # # fix sampling seed such that each gpu gets different part of dataset
+        # if args.distributed: 
+        #     trainloader.sampler.set_epoch(epoch_num)
         for i_batch, sampled_batch in enumerate(trainloader):
             image_batch, time_batch, label_batch = sampled_batch['image'], sampled_batch['time'], sampled_batch['label']
             image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()

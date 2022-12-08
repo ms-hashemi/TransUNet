@@ -1,0 +1,93 @@
+NODELIST=novagpu016
+MASTER_ADDR=novagpu016
+export TMOUT=5400
+export TMPDIR=/mnt/bgfs/mhashemi/4229406
+export PTMPDIR=/mnt/bgfs/mhashemi/4229406/ptmp
+[W socket.cpp:426] [c10d] The server socket cannot be initialized on [::]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+[W socket.cpp:601] [c10d] The client socket cannot be initialized to connect to [novagpu016]:12349 (errno: 97 - Address family not supported by protocol).
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(root_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', list_dir='./lists/lists_Degradation', num_classes=2, max_iterations=288, max_epochs=1, batch_size=24, gpu=3, world_size=4, rank=3, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-B_16', vit_patches_size=8, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=True)
+Namespace(root_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', list_dir='./lists/lists_Degradation', num_classes=2, max_iterations=288, max_epochs=1, batch_size=24, gpu=1, world_size=4, rank=1, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-B_16', vit_patches_size=8, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=True)
+Namespace(root_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', list_dir='./lists/lists_Degradation', num_classes=2, max_iterations=288, max_epochs=1, batch_size=24, gpu=2, world_size=4, rank=2, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-B_16', vit_patches_size=8, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=True)
+Namespace(root_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', list_dir='./lists/lists_Degradation', num_classes=2, max_iterations=288, max_epochs=1, batch_size=24, gpu=0, world_size=4, rank=0, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-B_16', vit_patches_size=8, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=True)
+The length of train set is: 288
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 152, in <module>
+    trainer[dataset_name](args, model, snapshot_path)
+  File "/home/mhashemi/TransUNet/trainer.py", line 122, in trainer_deg
+    trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=(train_sampler is None), num_workers=8, 
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 350, in __init__
+Traceback (most recent call last):
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/record_writer.py", line 47, in directory_check
+Traceback (most recent call last):
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/record_writer.py", line 47, in directory_check
+    batch_sampler = BatchSampler(sampler, batch_size, drop_last)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/utils/data/sampler.py", line 232, in __init__
+    factory = REGISTERED_FACTORIES[prefix]
+KeyError: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]/log'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 152, in <module>
+    factory = REGISTERED_FACTORIES[prefix]
+KeyError: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]/log'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 152, in <module>
+    trainer[dataset_name](args, model, snapshot_path)
+  File "/home/mhashemi/TransUNet/trainer.py", line 132, in trainer_deg
+    writer = SummaryWriter(snapshot_path + '/log')
+    trainer[dataset_name](args, model, snapshot_path)
+  File "/home/mhashemi/TransUNet/trainer.py", line 132, in trainer_deg
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/writer.py", line 301, in __init__
+    writer = SummaryWriter(snapshot_path + '/log')
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/writer.py", line 301, in __init__
+1 iterations per epoch. 1 max iterations 
+    raise ValueError("batch_size should be a positive integer value, "
+ValueError: batch_size should be a positive integer value, but got batch_size=0
+    self._get_file_writer()
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/writer.py", line 349, in _get_file_writer
+    self._get_file_writer()
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/writer.py", line 349, in _get_file_writer
+    self.file_writer = FileWriter(logdir=self.logdir,
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/writer.py", line 105, in __init__
+    self.file_writer = FileWriter(logdir=self.logdir,
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/writer.py", line 105, in __init__
+    self.event_writer = EventFileWriter(
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/event_file_writer.py", line 104, in __init__
+    self.event_writer = EventFileWriter(
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/event_file_writer.py", line 104, in __init__
+    directory_check(self._logdir)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/record_writer.py", line 51, in directory_check
+    os.makedirs(path)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/os.py", line 225, in makedirs
+    directory_check(self._logdir)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/record_writer.py", line 51, in directory_check
+    mkdir(name, mode)
+FileExistsError: [Errno 17] File exists: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]/log'
+    os.makedirs(path)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/os.py", line 225, in makedirs
+    mkdir(name, mode)
+FileExistsError: [Errno 17] File exists: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]/log'
+srun: error: novagpu016: tasks 0,2: Exited with exit code 1
+srun: error: novagpu016: task 1: Exited with exit code 1
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 4229406.0 ON novagpu016 CANCELLED AT 2022-12-08T04:35:34 ***
+slurmstepd: error: *** JOB 4229406 ON novagpu016 CANCELLED AT 2022-12-08T04:35:34 ***

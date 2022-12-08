@@ -1,0 +1,10 @@
+export TMOUT=5400
+export TMPDIR=/mnt/bgfs/mhashemi/4229410
+export PTMPDIR=/mnt/bgfs/mhashemi/4229410/ptmp
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(root_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', list_dir='./lists/lists_Degradation', num_classes=2, max_iterations=288, max_epochs=1, batch_size=24, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-B_16', vit_patches_size=8, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+3 iterations per epoch. 3 max iterations 
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+  0%|                                           | 0/1 [00:00<?, ?it/s]slurmstepd: error: *** STEP 4229410.0 ON novagpu018 CANCELLED AT 2022-12-08T06:13:06 ***
+slurmstepd: error: *** JOB 4229410 ON novagpu018 CANCELLED AT 2022-12-08T06:13:06 ***
