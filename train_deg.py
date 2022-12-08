@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('--root_path', type=str,
 #                     default='../data/deg/train_npz', help='root dir for data')
 parser.add_argument('--root_path', type=str,
-                    default='../../Realization/x64/Release/150pixel_10threads', help='root dir for data')
+                    default='../../work/sheidaei/mhashemi/data/deg', help='root dir for data')
 parser.add_argument('--dataset', type=str,
                     default='Degradation', help='experiment_name')
 parser.add_argument('--list_dir', type=str,
@@ -22,12 +22,12 @@ parser.add_argument('--list_dir', type=str,
 parser.add_argument('--num_classes', type=int,
                     default=2, help='output channel of network')
 parser.add_argument('--max_iterations', type=int,
-                    default=38448, help='maximum iteration number to train')
+                    default=2880, help='maximum iteration number to train')
 parser.add_argument('--max_epochs', type=int,
-                    default=20, help='maximum epoch number to train')
+                    default=1, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int,
-                    default=3, help='batch_size per gpu')
-parser.add_argument('--n_gpu', type=int, default=1, help='total gpu')
+                    default=24, help='batch_size per gpu')
+parser.add_argument('--n_gpu', type=int, default=4, help='total gpu')
 parser.add_argument('--deterministic', type=int,  default=1,
                     help='whether use deterministic training')
 parser.add_argument('--base_lr', type=float,  default=0.01,
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         },
         'Degradation': {
             # 'root_path': '../data/deg/train_npz',
-            'root_path': '../../Realization/x64/Release/150pixel_10threads',
+            'root_path': '/work/sheidaei/mhashemi/data/deg',
             'list_dir': './lists/lists_Degradation',
             'num_classes': 2,
         },

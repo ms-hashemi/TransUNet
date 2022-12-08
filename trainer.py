@@ -122,6 +122,8 @@ def trainer_deg(args, model, snapshot_path):
                              worker_init_fn=seed_worker)
     if args.n_gpu > 1:
         model = nn.DataParallel(model)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    model.to(device)
     model.train()
     ce_loss = CrossEntropyLoss()
     dice_loss = DiceLoss(num_classes)
