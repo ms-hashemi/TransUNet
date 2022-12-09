@@ -1,0 +1,117 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(root_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', list_dir='./lists/lists_Degradation', num_classes=2, max_iterations=288, max_epochs=1, batch_size=24, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-B_16', vit_patches_size=8, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+300 iterations per epoch. 300 max iterations 
+  0%|                                           | 0/1 [00:00<?, ?it/s]iteration 1 : loss : 0.556507, loss_ce: 0.693167
+iteration 2 : loss : 0.547118, loss_ce: 0.679368
+iteration 3 : loss : 0.523925, loss_ce: 0.658294
+iteration 4 : loss : 0.506401, loss_ce: 0.626941
+iteration 5 : loss : 0.479241, loss_ce: 0.590829
+iteration 6 : loss : 0.451481, loss_ce: 0.550869
+iteration 7 : loss : 0.423886, loss_ce: 0.510791
+iteration 8 : loss : 0.395473, loss_ce: 0.475427
+iteration 9 : loss : 0.361262, loss_ce: 0.432691
+iteration 10 : loss : 0.335593, loss_ce: 0.398154
+iteration 11 : loss : 0.291534, loss_ce: 0.337039
+iteration 12 : loss : 0.278048, loss_ce: 0.320113
+iteration 13 : loss : 0.268101, loss_ce: 0.310448
+iteration 14 : loss : 0.255612, loss_ce: 0.287204
+iteration 15 : loss : 0.250304, loss_ce: 0.284648
+iteration 16 : loss : 0.233502, loss_ce: 0.256685
+iteration 17 : loss : 0.236245, loss_ce: 0.266997
+iteration 18 : loss : 0.228069, loss_ce: 0.254409
+iteration 19 : loss : 0.225521, loss_ce: 0.245998
+iteration 20 : loss : 0.232196, loss_ce: 0.258901
+iteration 21 : loss : 0.227944, loss_ce: 0.251050
+iteration 22 : loss : 0.214582, loss_ce: 0.227121
+iteration 23 : loss : 0.228433, loss_ce: 0.252321
+iteration 24 : loss : 0.218763, loss_ce: 0.240131
+iteration 25 : loss : 0.221224, loss_ce: 0.242850
+iteration 26 : loss : 0.207439, loss_ce: 0.216920
+iteration 27 : loss : 0.216083, loss_ce: 0.237457
+iteration 28 : loss : 0.198610, loss_ce: 0.209422
+iteration 29 : loss : 0.212126, loss_ce: 0.233850
+iteration 30 : loss : 0.204882, loss_ce: 0.221082
+iteration 31 : loss : 0.195058, loss_ce: 0.203526
+iteration 32 : loss : 0.212368, loss_ce: 0.236395
+iteration 33 : loss : 0.201413, loss_ce: 0.215130
+iteration 34 : loss : 0.207543, loss_ce: 0.227993
+iteration 35 : loss : 0.207272, loss_ce: 0.229744
+iteration 36 : loss : 0.195845, loss_ce: 0.214321
+iteration 37 : loss : 0.193555, loss_ce: 0.209055
+iteration 38 : loss : 0.191456, loss_ce: 0.208858
+iteration 39 : loss : 0.190405, loss_ce: 0.206663
+iteration 40 : loss : 0.191464, loss_ce: 0.204107
+iteration 41 : loss : 0.189280, loss_ce: 0.208558
+iteration 42 : loss : 0.199676, loss_ce: 0.221677
+iteration 43 : loss : 0.190491, loss_ce: 0.206935
+iteration 44 : loss : 0.187550, loss_ce: 0.205174
+iteration 45 : loss : 0.190802, loss_ce: 0.213853
+iteration 46 : loss : 0.176140, loss_ce: 0.184426
+iteration 47 : loss : 0.183479, loss_ce: 0.201549
+iteration 48 : loss : 0.198459, loss_ce: 0.225098
+iteration 49 : loss : 0.197790, loss_ce: 0.222835
+iteration 50 : loss : 0.180453, loss_ce: 0.200978
+iteration 51 : loss : 0.178928, loss_ce: 0.190885
+iteration 52 : loss : 0.180794, loss_ce: 0.201606
+iteration 53 : loss : 0.176689, loss_ce: 0.195211
+iteration 54 : loss : 0.173567, loss_ce: 0.189778
+iteration 55 : loss : 0.174279, loss_ce: 0.191369
+iteration 56 : loss : 0.180262, loss_ce: 0.205421
+iteration 57 : loss : 0.173115, loss_ce: 0.192095
+iteration 58 : loss : 0.167259, loss_ce: 0.190052
+iteration 59 : loss : 0.175047, loss_ce: 0.196911
+iteration 60 : loss : 0.168836, loss_ce: 0.190597
+iteration 61 : loss : 0.167857, loss_ce: 0.187954
+iteration 62 : loss : 0.174831, loss_ce: 0.195974
+iteration 63 : loss : 0.172484, loss_ce: 0.198913
+iteration 64 : loss : 0.175026, loss_ce: 0.202041
+iteration 65 : loss : 0.165146, loss_ce: 0.185560
+iteration 66 : loss : 0.168722, loss_ce: 0.192067
+iteration 67 : loss : 0.165130, loss_ce: 0.188945
+iteration 68 : loss : 0.155668, loss_ce: 0.176095
+iteration 69 : loss : 0.160806, loss_ce: 0.183240
+iteration 70 : loss : 0.168361, loss_ce: 0.188906
+iteration 71 : loss : 0.165046, loss_ce: 0.185864
+iteration 72 : loss : 0.155241, loss_ce: 0.176841
+iteration 73 : loss : 0.151289, loss_ce: 0.167896
+iteration 74 : loss : 0.166317, loss_ce: 0.192694
+iteration 75 : loss : 0.156777, loss_ce: 0.177394
+iteration 76 : loss : 0.162391, loss_ce: 0.185977
+iteration 77 : loss : 0.159923, loss_ce: 0.180472
+iteration 78 : loss : 0.154847, loss_ce: 0.178912
+iteration 79 : loss : 0.156816, loss_ce: 0.175916
+iteration 80 : loss : 0.157786, loss_ce: 0.182584
+iteration 81 : loss : 0.149737, loss_ce: 0.168966
+iteration 82 : loss : 0.148388, loss_ce: 0.169876
+iteration 83 : loss : 0.144122, loss_ce: 0.164271
+iteration 84 : loss : 0.158771, loss_ce: 0.184268
+iteration 85 : loss : 0.149010, loss_ce: 0.172823
+iteration 86 : loss : 0.144469, loss_ce: 0.167199
+iteration 87 : loss : 0.155012, loss_ce: 0.180727
+iteration 88 : loss : 0.148663, loss_ce: 0.171104
+iteration 89 : loss : 0.155109, loss_ce: 0.185445
+iteration 90 : loss : 0.141574, loss_ce: 0.160246
+iteration 91 : loss : 0.142849, loss_ce: 0.165523
+iteration 92 : loss : 0.147469, loss_ce: 0.174143
+iteration 93 : loss : 0.143000, loss_ce: 0.167158
+iteration 94 : loss : 0.158579, loss_ce: 0.191448
+iteration 95 : loss : 0.147768, loss_ce: 0.175622
+iteration 96 : loss : 0.145363, loss_ce: 0.167939
+iteration 97 : loss : 0.144692, loss_ce: 0.165860
+iteration 98 : loss : 0.145823, loss_ce: 0.163829
+iteration 99 : loss : 0.140631, loss_ce: 0.165683
+iteration 100 : loss : 0.135188, loss_ce: 0.157520
+  0%|                                         | 0/1 [1:02:17<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/train_deg.py", line 156, in <module>
+    trainer[dataset_name](args, model, snapshot_path)
+  File "/home/mhashemi/TransUNet/trainer.py", line 171, in trainer_deg
+    writer.add_image('train/Image', image, iter_num)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/writer.py", line 686, in add_image
+    summary = image(tag, img_tensor, dataformats=dataformats)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/summary.py", line 282, in image
+    tensor = convert_to_HWC(tensor, dataformats)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/tensorboardX/utils.py", line 110, in convert_to_HWC
+    assert(len(tensor.shape) == len(input_format)), "size of input tensor and input format are different. \
+AssertionError: size of input tensor and input format are different.         tensor shape: (1, 160, 160, 160), input_format: CHW
