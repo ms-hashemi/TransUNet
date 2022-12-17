@@ -15,6 +15,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
+#SBATCH --no-requeue
 
 ### change 5-digit MASTER_PORT as you wish, slurm will raise Error if duplicated with others
 ### change WORLD_SIZE as gpus/node * num_nodes
@@ -31,6 +32,7 @@
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
 module load miniconda3
 source activate mytorch
-CUDA_VISIBLE_DEVICES=0,1,2,3
+# CUDA_VISIBLE_DEVICES=0,1,2,3
 # srun python train_deg.py --dataset Degradation
-python train_deg.py --dataset Degradation
+# python train_deg.py --dataset Degradation
+python test_deg.py --dataset Degradation

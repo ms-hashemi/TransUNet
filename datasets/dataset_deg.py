@@ -51,6 +51,26 @@ class RandomGenerator(object):
         return sample
 
 
+class Resize(object):
+    def __init__(self, output_size):
+        self.output_size = output_size
+
+    def __call__(self, sample):
+        image, label = sample['image'], sample['label']
+
+        x, y, z = image.shape
+        if x != self.output_size[0] or y != self.output_size[1] or z != self.output_size[2]:
+            image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
+            image[image>1] = 1
+            label = zoom(label, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)
+            label[label>1] = 1
+        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+        label = torch.from_numpy(label.astype(np.uint8))
+        sample['image'] = image.byte()
+        sample['label'] = label.byte()
+        return sample
+
+
 class Degradation_dataset(Dataset):
     def __init__(self, base_dir, list_dir, split, transform=None):
         self.transform = transform  # using transform in torch!

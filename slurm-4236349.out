@@ -1,0 +1,12 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/test_deg.py", line 188, in <module>
+    model.load_state_dict(torch.load(snapshot))
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 771, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 270, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 251, in __init__
+    super(_open_file, self).__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '../model/TV_Degradation[160, 160, 160]/TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_epo1_bs24_[160, 160, 160]/epoch_0.pth'

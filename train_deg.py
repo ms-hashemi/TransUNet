@@ -154,4 +154,4 @@ if __name__ == "__main__":
 
     trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg}
     trainer[dataset_name](args, model, snapshot_path)
-    sys.exit(0)
+    # sys.exit(0)
