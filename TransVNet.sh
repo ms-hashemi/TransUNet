@@ -29,6 +29,7 @@
 # export MASTER_ADDR=$master_addr
 # echo "MASTER_ADDR="$MASTER_ADDR
 
+
 # LOAD MODULES, INSERT CODE, AND RUN YOUR PROGRAMS HERE
 module load miniconda3
 source activate mytorch
