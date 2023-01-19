@@ -133,13 +133,13 @@ def test_multiple_volumes(image, label, time, net, classes, patch_size=[160, 160
         out = torch.argmax(torch.softmax(net(image, time), dim=1), dim=1)
         prediction = out.cpu().detach().numpy()
         label = label.cpu().detach().numpy()
-    metric_list = []
-    metric_i = [0.0, 0.0]
+    metric_list = np.array([[0.0, 0.0]])
+    metric_i = np.array([0.0, 0.0])
     batch_size = prediction.shape[0]
     for i in range(1, classes):
         for batch_sample in range(batch_size):
-            metric_i += calculate_metric_percase(prediction[batch_sample, ...] == i, label[batch_sample, ...] == i)
-        metric_list.append(metric_i)
+            metric_i += np.array(calculate_metric_percase(prediction[batch_sample, ...] == i, label[batch_sample, ...] == i))
+        metric_list = np.append(metric_list, np.expand_dims(metric_i, axis=0), axis=0) # metric_list.append(metric_i)
 
     if test_save_path is not None:
         img_itk = sitk.GetImageFromArray(image.astype(np.float32))

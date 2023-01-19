@@ -70,6 +70,8 @@ def inference(args, model, test_save_path=None):
         image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
         metric_batch = test_multiple_volumes(image_batch, label_batch, time_batch, model, classes=args.num_classes, patch_size=args.img_size,
                                          test_save_path=test_save_path, case=case_name_batch, z_spacing=args.z_spacing)
+        for i in range(1, args.num_classes):
+            logging.info('i_batch %d mean_dice %f mean_hd95 %f' % (i_batch, metric_batch[i-1][0], metric_batch[i-1][1]))
         metric_list += np.array(metric_batch)
         # logging.info('idx %d case %s mean_dice %f mean_hd95 %f' % (i_batch, case_name, np.mean(metric_i, axis=0)[0], np.mean(metric_i, axis=0)[1]))
     metric_list = metric_list / len(db_test)
@@ -162,7 +164,7 @@ if __name__ == "__main__":
             pass
         builtins.print = print_pass
 
-    # model    
+    # model
     model = ViT_seg(config_vit, img_size=args.img_size, num_classes=config_vit.n_classes)
     model.load_from(weights=np.load(config_vit.pretrained_path))
     if args.distributed:

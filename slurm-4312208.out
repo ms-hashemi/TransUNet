@@ -1,0 +1,12 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+30 test iterations per epoch
+0it [00:00, ?it/s]0it [01:40, ?it/s]
+Traceback (most recent call last):
+  File "/home/mhashemi/TransUNet/test_deg.py", line 207, in <module>
+    inference(args, model, test_save_path)
+  File "/home/mhashemi/TransUNet/test_deg.py", line 74, in inference
+    logging.info('i_batch %d mean_dice %f mean_hd95 %f' % (i_batch, metric_batch[i-1][0], metric_batch[i-1][1]))
+IndexError: invalid index to scalar variable.

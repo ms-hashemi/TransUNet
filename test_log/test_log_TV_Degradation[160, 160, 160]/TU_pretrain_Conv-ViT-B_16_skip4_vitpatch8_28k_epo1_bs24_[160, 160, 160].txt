@@ -15,3 +15,56 @@
 [23:30:16.387] 30 test iterations per epoch
 [23:44:55.194] Mean class 1 mean_dice 0.000000 mean_hd95 0.000000
 [23:44:55.194] Testing performance in best val model: mean_dice : 0.000000 mean_hd95 : 0.000000
+[21:28:45.936] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[21:28:45.937] TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[21:28:45.939] 30 test iterations per epoch
+[08:25:31.290] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[08:25:31.290] TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[08:25:31.292] 30 test iterations per epoch
+[08:51:58.763] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[08:51:58.763] TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[08:51:58.764] 30 test iterations per epoch
+[15:20:21.816] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[15:20:21.817] TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[15:20:21.819] 30 test iterations per epoch
+[15:43:11.257] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[15:43:11.257] TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[15:43:11.258] 30 test iterations per epoch
+[16:41:27.202] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[16:41:27.202] TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[16:41:27.203] 30 test iterations per epoch
+[16:46:34.185] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[16:46:34.185] TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[16:46:34.186] 30 test iterations per epoch
+[16:48:15.989] i_batch 0 mean_dice 0.000000 mean_hd95 0.000000
+[16:48:44.022] i_batch 1 mean_dice 0.000000 mean_hd95 0.000000
+[16:49:11.999] i_batch 2 mean_dice 0.000000 mean_hd95 0.000000
+[16:49:40.481] i_batch 3 mean_dice 0.000000 mean_hd95 0.000000
+[16:50:08.514] i_batch 4 mean_dice 0.000000 mean_hd95 0.000000
+[16:50:36.222] i_batch 5 mean_dice 0.000000 mean_hd95 0.000000
+[16:51:03.716] i_batch 6 mean_dice 0.000000 mean_hd95 0.000000
+[16:51:29.717] i_batch 7 mean_dice 0.000000 mean_hd95 0.000000
+[16:51:55.864] i_batch 8 mean_dice 0.000000 mean_hd95 0.000000
+[16:52:23.669] i_batch 9 mean_dice 0.000000 mean_hd95 0.000000
+[16:52:51.319] i_batch 10 mean_dice 0.000000 mean_hd95 0.000000
+[16:53:16.976] i_batch 11 mean_dice 0.000000 mean_hd95 0.000000
+[16:53:42.656] i_batch 12 mean_dice 0.000000 mean_hd95 0.000000
+[16:54:07.348] i_batch 13 mean_dice 0.000000 mean_hd95 0.000000
+[16:54:30.793] i_batch 14 mean_dice 0.000000 mean_hd95 0.000000
+[16:54:59.121] i_batch 15 mean_dice 0.000000 mean_hd95 0.000000
+[16:55:27.152] i_batch 16 mean_dice 0.000000 mean_hd95 0.000000
+[16:55:55.012] i_batch 17 mean_dice 0.000000 mean_hd95 0.000000
+[16:56:22.941] i_batch 18 mean_dice 0.000000 mean_hd95 0.000000
+[16:56:50.926] i_batch 19 mean_dice 0.000000 mean_hd95 0.000000
+[16:57:19.184] i_batch 20 mean_dice 0.000000 mean_hd95 0.000000
+[16:57:47.373] i_batch 21 mean_dice 0.000000 mean_hd95 0.000000
+[16:58:14.775] i_batch 22 mean_dice 0.000000 mean_hd95 0.000000
+[16:58:41.462] i_batch 23 mean_dice 0.000000 mean_hd95 0.000000
+[16:59:09.416] i_batch 24 mean_dice 0.000000 mean_hd95 0.000000
+[16:59:37.108] i_batch 25 mean_dice 0.000000 mean_hd95 0.000000
+[17:00:03.129] i_batch 26 mean_dice 0.000000 mean_hd95 0.000000
+[17:00:28.909] i_batch 27 mean_dice 0.000000 mean_hd95 0.000000
+[17:00:53.311] i_batch 28 mean_dice 0.000000 mean_hd95 0.000000
+[17:01:17.081] i_batch 29 mean_dice 0.000000 mean_hd95 0.000000
+[17:01:17.137] Mean class 1 mean_dice 0.000000 mean_hd95 0.000000
+[17:01:17.137] Testing performance in best val model: mean_dice : 0.420367 mean_hd95 : 0.591514
