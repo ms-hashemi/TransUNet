@@ -1,5 +1,5 @@
-# TransUNet
-This repo holds code for [TransUNet: Transformers Make Strong Encoders for Medical Image Segmentation](https://arxiv.org/pdf/2102.04306.pdf)
+# TransVNet
+This repo holds code for [TransVNet: Hybrid architecture for 3D segmentation predictions](https://arxiv.org/pdf/TBD!)
 
 ## Usage
 
