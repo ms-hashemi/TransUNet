@@ -16,11 +16,11 @@ parser = argparse.ArgumentParser()
 # parser.add_argument('--root_path', type=str,
 #                     default='../data/deg/train_npz', help='root dir for data')
 parser.add_argument('--root_path', type=str,
-                    default='/work/sheidaei/mhashemi/data/deg', help='root dir for data')
+                    default='/work/sheidaei/mhashemi/data/mat', help='root dir for data')
 parser.add_argument('--dataset', type=str,
-                    default='Degradation', help='experiment_name')
+                    default='Design', help='experiment_name')
 parser.add_argument('--list_dir', type=str,
-                    default='./lists/lists_Degradation', help='list dir')
+                    default='./lists/lists_Design', help='list dir')
 parser.add_argument('--num_classes', type=int,
                     default=2, help='output channel of network')
 parser.add_argument('--max_iterations', type=int,
@@ -77,18 +77,22 @@ if __name__ == "__main__":
             'num_classes': 9,
         },
         'Degradation': {
-            # 'root_path': '../data/deg/train_npz',
             'root_path': '/work/sheidaei/mhashemi/data/deg',
             'list_dir': './lists/lists_Degradation',
             'num_classes': 2,
         },
+        'Design': {
+            'root_path': '/work/sheidaei/mhashemi/data/mat',
+            'list_dir': './lists/lists_Design',
+            'num_classes': 2,
+        }
     }
     args.num_classes = dataset_config[dataset_name]['num_classes']
     args.root_path = dataset_config[dataset_name]['root_path']
     args.list_dir = dataset_config[dataset_name]['list_dir']
     args.is_pretrain = True
     args.exp = 'TV_' + dataset_name + str(args.img_size)
-    snapshot_path = "../model/{}/{}".format(args.exp, 'TU')
+    snapshot_path = "../model/{}/{}".format(args.exp, 'TV')
     snapshot_path = snapshot_path + '_pretrain' if args.is_pretrain else snapshot_path
     snapshot_path += '_' + args.vit_name
     snapshot_path = snapshot_path + '_skip' + str(args.n_skip)
@@ -152,6 +156,6 @@ if __name__ == "__main__":
         model.to(device)
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
 
-    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg}
+    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_deg}
     trainer[dataset_name](args, model, snapshot_path)
     # sys.exit(0)

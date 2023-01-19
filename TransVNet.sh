@@ -35,4 +35,6 @@ source activate mytorch
 # CUDA_VISIBLE_DEVICES=0,1,2,3
 # srun python train_deg.py --dataset Degradation
 # python train_deg.py --dataset Degradation
-python test_deg.py --dataset Degradation
+# python test_deg.py --dataset Degradation
+python train_deg.py --dataset Design
+# python test_deg.py --dataset Design
