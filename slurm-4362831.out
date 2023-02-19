@@ -1,0 +1,38 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+TV_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+30 test iterations per epoch
+0it [00:00, ?it/s]i_batch 0 mean_dice 23.192929 mean_hd95 24.000000
+1it [01:49, 109.56s/it]i_batch 1 mean_dice 23.121115 mean_hd95 24.000000
+2it [02:17, 61.47s/it] i_batch 2 mean_dice 23.062417 mean_hd95 24.000000
+3it [02:45, 46.04s/it]i_batch 3 mean_dice 22.392249 mean_hd95 24.000000
+4it [03:13, 39.02s/it]i_batch 4 mean_dice 22.422785 mean_hd95 24.000000
+5it [03:41, 35.01s/it]i_batch 5 mean_dice 21.681434 mean_hd95 24.000000
+6it [04:08, 32.51s/it]i_batch 6 mean_dice 18.641973 mean_hd95 24.000000
+7it [04:36, 30.82s/it]i_batch 7 mean_dice 20.677137 mean_hd95 25.242641
+8it [05:02, 29.25s/it]i_batch 8 mean_dice 22.905503 mean_hd95 24.000000
+9it [05:28, 28.25s/it]i_batch 9 mean_dice 20.879942 mean_hd95 24.000000
+10it [05:55, 28.09s/it]i_batch 10 mean_dice 19.700061 mean_hd95 24.000000
+11it [06:23, 27.90s/it]i_batch 11 mean_dice 19.657028 mean_hd95 24.000000
+12it [06:48, 27.15s/it]i_batch 12 mean_dice 12.165100 mean_hd95 54.092475
+13it [07:14, 26.67s/it]i_batch 13 mean_dice 14.637811 mean_hd95 73.877533
+14it [07:38, 26.05s/it]i_batch 14 mean_dice 16.966375 mean_hd95 33.941125
+15it [08:02, 25.25s/it]i_batch 15 mean_dice 22.583258 mean_hd95 24.000000
+16it [08:30, 26.27s/it]i_batch 16 mean_dice 22.605358 mean_hd95 24.000000
+17it [08:59, 26.91s/it]i_batch 17 mean_dice 22.424290 mean_hd95 24.000000
+18it [09:27, 27.21s/it]i_batch 18 mean_dice 22.448380 mean_hd95 24.000000
+19it [09:55, 27.44s/it]i_batch 19 mean_dice 21.909115 mean_hd95 24.000000
+20it [10:23, 27.64s/it]i_batch 20 mean_dice 20.009923 mean_hd95 24.000000
+21it [10:51, 27.86s/it]i_batch 21 mean_dice 21.855254 mean_hd95 24.000000
+22it [11:20, 27.98s/it]i_batch 22 mean_dice 22.234398 mean_hd95 24.000000
+23it [11:47, 27.84s/it]i_batch 23 mean_dice 22.872613 mean_hd95 24.000000
+24it [12:14, 27.54s/it]i_batch 24 mean_dice 20.492266 mean_hd95 24.000000
+25it [12:42, 27.69s/it]i_batch 25 mean_dice 19.167781 mean_hd95 24.414214
+26it [13:10, 27.71s/it]i_batch 26 mean_dice 20.459739 mean_hd95 24.000000
+27it [13:36, 27.24s/it]i_batch 27 mean_dice 12.958018 mean_hd95 43.694801
+28it [14:02, 26.81s/it]i_batch 28 mean_dice 14.901865 mean_hd95 34.576800
+29it [14:26, 26.12s/it]i_batch 29 mean_dice 16.302286 mean_hd95 33.941125
+30it [14:50, 25.43s/it]30it [14:50, 29.68s/it]
+Mean class 1 mean_dice 0.840734 mean_hd95 1.183029
+Testing performance in best val model: mean_dice : 0.840734 mean_hd95 : 1.183029

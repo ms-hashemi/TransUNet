@@ -1,4 +1,0 @@
-  File "/home/mhashemi/TransUNet/test_deg.py", line 62
-    testloader = DataLoader(db_test, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker))
-                                                                                                                                           ^
-SyntaxError: unmatched ')'

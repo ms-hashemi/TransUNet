@@ -1,12 +1,0 @@
-/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
-  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
-Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
-TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
-30 test iterations per epoch
-0it [00:00, ?it/s]1it [01:47, 107.95s/it]2it [02:15, 60.90s/it] 3it [02:43, 45.77s/it]4it [03:12, 38.90s/it]5it [03:40, 34.97s/it]6it [04:07, 32.50s/it]7it [04:35, 30.83s/it]8it [05:01, 29.29s/it]9it [05:27, 28.29s/it]10it [05:54, 28.12s/it]11it [06:22, 28.01s/it]12it [06:48, 27.38s/it]13it [07:14, 26.85s/it]14it [07:38, 26.15s/it]15it [08:02, 25.27s/it]16it [08:30, 26.16s/it]17it [08:58, 26.70s/it]18it [09:25, 27.00s/it]19it [09:53, 27.27s/it]20it [10:21, 27.47s/it]21it [10:49, 27.69s/it]22it [11:18, 27.79s/it]23it [11:45, 27.65s/it]24it [12:12, 27.36s/it]25it [12:39, 27.51s/it]26it [13:07, 27.54s/it]27it [13:33, 27.06s/it]28it [13:59, 26.65s/it]29it [14:23, 25.96s/it]30it [14:47, 25.30s/it]30it [14:47, 29.58s/it]
-Traceback (most recent call last):
-  File "/home/mhashemi/TransUNet/test_deg.py", line 206, in <module>
-    inference(args, model, test_save_path)
-  File "/home/mhashemi/TransUNet/test_deg.py", line 78, in inference
-    logging.info('Mean class %d mean_dice %f mean_hd95 %f' % (i, metric_list[i-1][0], metric_list[i-1][1]))
-IndexError: invalid index to scalar variable.

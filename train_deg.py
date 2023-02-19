@@ -10,7 +10,7 @@ import torch
 import torch.backends.cudnn as cudnn
 from networks.vit_seg_modeling import VisionTransformer as ViT_seg
 from networks.vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg, CONFIGS3D as CONFIGS_ViT_seg_3D
-from trainer import trainer_synapse, trainer_deg
+from trainer import trainer_synapse, trainer_deg, trainer_mat
 
 parser = argparse.ArgumentParser()
 # parser.add_argument('--root_path', type=str,
@@ -156,6 +156,6 @@ if __name__ == "__main__":
         model.to(device)
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
 
-    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_deg}
+    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_mat}
     trainer[dataset_name](args, model, snapshot_path)
     # sys.exit(0)

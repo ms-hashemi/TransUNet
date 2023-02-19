@@ -48,11 +48,11 @@ class DiceLoss(nn.Module):
 def calculate_metric_percase(pred, gt):
     pred[pred > 0] = 1
     gt[gt > 0] = 1
-    if pred.sum() > 0 and gt.sum()>0:
+    if pred.sum() > 0 and gt.sum() > 0:
         dice = metric.binary.dc(pred, gt)
         hd95 = metric.binary.hd95(pred, gt)
         return dice, hd95
-    elif pred.sum() > 0 and gt.sum()==0:
+    elif pred.sum() > 0 and gt.sum() == 0:
         return 1, 0
     else:
         return 0, 0
@@ -96,7 +96,7 @@ def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_s
         img_itk.SetSpacing((1, 1, z_spacing))
         prd_itk.SetSpacing((1, 1, z_spacing))
         lab_itk.SetSpacing((1, 1, z_spacing))
-        sitk.WriteImage(prd_itk, test_save_path + '/'+case + "_pred.nii.gz")
+        sitk.WriteImage(prd_itk, test_save_path + '/'+ case + "_pred.nii.gz")
         sitk.WriteImage(img_itk, test_save_path + '/'+ case + "_img.nii.gz")
         sitk.WriteImage(lab_itk, test_save_path + '/'+ case + "_gt.nii.gz")
     return metric_list
@@ -133,13 +133,14 @@ def test_multiple_volumes(image, label, time, net, classes, patch_size=[160, 160
         out = torch.argmax(torch.softmax(net(image, time), dim=1), dim=1)
         prediction = out.cpu().detach().numpy()
         label = label.cpu().detach().numpy()
-    metric_list = np.array([[0.0, 0.0]])
+    metric_list = np.zeros(shape=(classes-1, 2)) # np.array([[0.0, 0.0]])
     metric_i = np.array([0.0, 0.0])
     batch_size = prediction.shape[0]
     for i in range(1, classes):
         for batch_sample in range(batch_size):
             metric_i += np.array(calculate_metric_percase(prediction[batch_sample, ...] == i, label[batch_sample, ...] == i))
-        metric_list = np.append(metric_list, np.expand_dims(metric_i, axis=0), axis=0) # metric_list.append(metric_i)
+        # metric_list = np.append(metric_list, np.expand_dims(metric_i, axis=0), axis=0) # metric_list.append(metric_i)
+        metric_list[i-1][:] = metric_i
 
     if test_save_path is not None:
         img_itk = sitk.GetImageFromArray(image.astype(np.float32))
@@ -148,7 +149,7 @@ def test_multiple_volumes(image, label, time, net, classes, patch_size=[160, 160
         img_itk.SetSpacing((1, 1, z_spacing))
         prd_itk.SetSpacing((1, 1, z_spacing))
         lab_itk.SetSpacing((1, 1, z_spacing))
-        sitk.WriteImage(prd_itk, test_save_path + '/'+case + "_pred.nii.gz")
+        sitk.WriteImage(prd_itk, test_save_path + '/'+ case + "_pred.nii.gz")
         sitk.WriteImage(img_itk, test_save_path + '/'+ case + "_img.nii.gz")
         sitk.WriteImage(lab_itk, test_save_path + '/'+ case + "_gt.nii.gz")
     return metric_list

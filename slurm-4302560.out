@@ -1,12 +1,0 @@
-/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
-  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
-Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
-TU_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
-30 test iterations per epoch
-0it [00:00, ?it/s]1it [01:48, 108.45s/it]2it [02:16, 61.08s/it] 3it [02:44, 45.84s/it]4it [03:12, 38.93s/it]5it [03:40, 34.98s/it]6it [04:07, 32.47s/it]7it [04:35, 30.81s/it]8it [05:01, 29.30s/it]9it [05:27, 28.30s/it]10it [05:55, 28.11s/it]11it [06:22, 27.98s/it]12it [06:48, 27.31s/it]13it [07:14, 26.87s/it]14it [07:39, 26.26s/it]15it [08:02, 25.44s/it]16it [08:31, 26.37s/it]17it [08:59, 26.93s/it]18it [09:27, 27.25s/it]19it [09:55, 27.55s/it]20it [10:24, 27.77s/it]21it [10:52, 27.98s/it]22it [11:21, 28.09s/it]23it [11:48, 27.97s/it]24it [12:15, 27.69s/it]25it [12:44, 27.85s/it]26it [13:11, 27.88s/it]27it [13:38, 27.39s/it]28it [14:04, 27.00s/it]29it [14:29, 26.34s/it]30it [14:53, 25.71s/it]30it [14:53, 29.78s/it]
-Traceback (most recent call last):
-  File "/home/mhashemi/TransUNet/test_deg.py", line 205, in <module>
-    inference(args, model, test_save_path)
-  File "/home/mhashemi/TransUNet/test_deg.py", line 77, in inference
-    logging.info('Mean class %d mean_dice %f mean_hd95 %f' % (i, metric_list[i][0], metric_list[i][1]))
-IndexError: index 0 is out of bounds for axis 0 with size 0

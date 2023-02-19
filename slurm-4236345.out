@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/mhashemi/TransUNet/test_deg.py", line 113, in <module>
-    args.volume_path = dataset_config[dataset_name]['volume_path']
-KeyError: 'volume_path'

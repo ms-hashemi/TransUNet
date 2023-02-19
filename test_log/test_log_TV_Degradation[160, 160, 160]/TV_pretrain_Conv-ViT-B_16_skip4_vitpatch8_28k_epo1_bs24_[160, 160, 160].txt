@@ -1,0 +1,70 @@
+[10:54:05.030] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[10:54:05.030] TV_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[10:54:05.032] 30 test iterations per epoch
+[10:55:55.397] i_batch 0 mean_dice 0.000000 mean_hd95 0.000000
+[10:56:23.206] i_batch 1 mean_dice 0.000000 mean_hd95 0.000000
+[10:56:50.773] i_batch 2 mean_dice 0.000000 mean_hd95 0.000000
+[10:57:18.950] i_batch 3 mean_dice 0.000000 mean_hd95 0.000000
+[10:57:46.785] i_batch 4 mean_dice 0.000000 mean_hd95 0.000000
+[10:58:14.398] i_batch 5 mean_dice 0.000000 mean_hd95 0.000000
+[10:58:41.712] i_batch 6 mean_dice 0.000000 mean_hd95 0.000000
+[10:59:07.534] i_batch 7 mean_dice 0.000000 mean_hd95 0.000000
+[10:59:33.494] i_batch 8 mean_dice 0.000000 mean_hd95 0.000000
+[11:00:01.058] i_batch 9 mean_dice 0.000000 mean_hd95 0.000000
+[11:00:28.457] i_batch 10 mean_dice 0.000000 mean_hd95 0.000000
+[11:00:53.770] i_batch 11 mean_dice 0.000000 mean_hd95 0.000000
+[11:01:19.210] i_batch 12 mean_dice 0.000000 mean_hd95 0.000000
+[11:01:43.749] i_batch 13 mean_dice 0.000000 mean_hd95 0.000000
+[11:02:07.042] i_batch 14 mean_dice 0.000000 mean_hd95 0.000000
+[11:02:35.373] i_batch 15 mean_dice 0.000000 mean_hd95 0.000000
+[11:03:03.396] i_batch 16 mean_dice 0.000000 mean_hd95 0.000000
+[11:03:31.169] i_batch 17 mean_dice 0.000000 mean_hd95 0.000000
+[11:03:59.051] i_batch 18 mean_dice 0.000000 mean_hd95 0.000000
+[11:04:27.013] i_batch 19 mean_dice 0.000000 mean_hd95 0.000000
+[11:04:55.555] i_batch 20 mean_dice 0.000000 mean_hd95 0.000000
+[11:05:23.659] i_batch 21 mean_dice 0.000000 mean_hd95 0.000000
+[11:05:50.996] i_batch 22 mean_dice 0.000000 mean_hd95 0.000000
+[11:06:17.653] i_batch 23 mean_dice 0.000000 mean_hd95 0.000000
+[11:06:45.619] i_batch 24 mean_dice 0.000000 mean_hd95 0.000000
+[11:07:13.233] i_batch 25 mean_dice 0.000000 mean_hd95 0.000000
+[11:07:39.192] i_batch 26 mean_dice 0.000000 mean_hd95 0.000000
+[11:08:04.883] i_batch 27 mean_dice 0.000000 mean_hd95 0.000000
+[11:08:29.252] i_batch 28 mean_dice 0.000000 mean_hd95 0.000000
+[11:08:52.961] i_batch 29 mean_dice 0.000000 mean_hd95 0.000000
+[11:08:53.035] Mean class 1 mean_dice 0.000000 mean_hd95 0.000000
+[11:08:53.035] Testing performance in best val model: mean_dice : 0.420367 mean_hd95 : 0.591514
+[16:39:10.272] Namespace(volume_path='/work/sheidaei/mhashemi/data/deg', dataset='Degradation', num_classes=2, list_dir='./lists/lists_Degradation', max_iterations=288, max_epochs=1, batch_size=24, img_size=[160, 160, 160], is_savenii=False, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, n_skip=4, vit_name='Conv-ViT-B_16', test_save_dir='../predictions', deterministic=1, base_lr=0.01, seed=1234, vit_patches_size=8, Dataset=<class 'datasets.dataset_deg.Degradation_dataset'>, z_spacing=1, is_pretrain=True, exp='TV_Degradation[160, 160, 160]', distributed=False)
+[16:39:10.272] TV_pretrain_Conv-ViT-B_16_skip4_vitpatch8_28k_epo1_bs24_[160, 160, 160]
+[16:39:10.274] 30 test iterations per epoch
+[16:41:00.109] i_batch 0 mean_dice 23.192929 mean_hd95 24.000000
+[16:41:27.905] i_batch 1 mean_dice 23.121115 mean_hd95 24.000000
+[16:41:55.592] i_batch 2 mean_dice 23.062417 mean_hd95 24.000000
+[16:42:23.860] i_batch 3 mean_dice 22.392249 mean_hd95 24.000000
+[16:42:51.758] i_batch 4 mean_dice 22.422785 mean_hd95 24.000000
+[16:43:19.405] i_batch 5 mean_dice 21.681434 mean_hd95 24.000000
+[16:43:46.742] i_batch 6 mean_dice 18.641973 mean_hd95 24.000000
+[16:44:12.624] i_batch 7 mean_dice 20.677137 mean_hd95 25.242641
+[16:44:38.692] i_batch 8 mean_dice 22.905503 mean_hd95 24.000000
+[16:45:06.425] i_batch 9 mean_dice 20.879942 mean_hd95 24.000000
+[16:45:33.878] i_batch 10 mean_dice 19.700061 mean_hd95 24.000000
+[16:45:59.322] i_batch 11 mean_dice 19.657028 mean_hd95 24.000000
+[16:46:24.876] i_batch 12 mean_dice 12.165100 mean_hd95 54.092475
+[16:46:49.517] i_batch 13 mean_dice 14.637811 mean_hd95 73.877533
+[16:47:12.905] i_batch 14 mean_dice 16.966375 mean_hd95 33.941125
+[16:47:41.536] i_batch 15 mean_dice 22.583258 mean_hd95 24.000000
+[16:48:09.923] i_batch 16 mean_dice 22.605358 mean_hd95 24.000000
+[16:48:37.836] i_batch 17 mean_dice 22.424290 mean_hd95 24.000000
+[16:49:05.832] i_batch 18 mean_dice 22.448380 mean_hd95 24.000000
+[16:49:33.917] i_batch 19 mean_dice 21.909115 mean_hd95 24.000000
+[16:50:02.290] i_batch 20 mean_dice 20.009923 mean_hd95 24.000000
+[16:50:30.566] i_batch 21 mean_dice 21.855254 mean_hd95 24.000000
+[16:50:58.063] i_batch 22 mean_dice 22.234398 mean_hd95 24.000000
+[16:51:24.900] i_batch 23 mean_dice 22.872613 mean_hd95 24.000000
+[16:51:52.956] i_batch 24 mean_dice 20.492266 mean_hd95 24.000000
+[16:52:20.715] i_batch 25 mean_dice 19.167781 mean_hd95 24.414214
+[16:52:46.838] i_batch 26 mean_dice 20.459739 mean_hd95 24.000000
+[16:53:12.669] i_batch 27 mean_dice 12.958018 mean_hd95 43.694801
+[16:53:37.176] i_batch 28 mean_dice 14.901865 mean_hd95 34.576800
+[16:54:01.002] i_batch 29 mean_dice 16.302286 mean_hd95 33.941125
+[16:54:01.051] Mean class 1 mean_dice 0.840734 mean_hd95 1.183029
+[16:54:01.051] Testing performance in best val model: mean_dice : 0.840734 mean_hd95 : 1.183029
