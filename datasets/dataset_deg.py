@@ -154,8 +154,10 @@ class Design_dataset(Dataset):
         return len(self.sample_list)
 
     def __getitem__(self, idx):
-        volume_name = self.sample_list[idx].strip('\n').split()
-        property_path = os.path.join(self.data_dir, volume_name+'_64x64x64.mat')
+        volume_name = self.sample_list[idx].strip('\n').split()[0]
+        # property_path = os.path.join(self.data_dir, volume_name+'_64x64x64.mat')
+        property_path = f'{self.data_dir}/{volume_name+"_64x64x64.mat"}'
+        # property_data = h5py.File(property_path, 'r')
         property_data = h5py.File(property_path, 'r').get('C_macro')
         C11 = property_data[0, 0]
         C12 = (property_data[0, 1] + property_data[1, 0])/2
