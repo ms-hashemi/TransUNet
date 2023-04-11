@@ -29,6 +29,23 @@ def random_rotate(image, label):
     return image, label
 
 
+def random_rot_flip2(image, label):
+    k = np.random.randint(0, 4)
+    axes = (0,1)
+    image = np.rot90(image, k, axes)
+    axis = np.random.randint(0, 3)
+    image = np.flip(image, axis=axis).copy()
+    return image, label
+
+
+def random_rotate2(image, label):
+    angle = np.random.randint(-20, 20)
+    axes = {0:(0,1), 1:(1,2), 2:(0,2)}[np.random.randint(0, 3)]
+    image = ndimage.rotate(image, angle, axes, order=0, reshape=False)
+    label = ndimage.rotate(label, angle, axes, order=0, reshape=False)
+    return image, label
+
+
 class RandomGenerator(object):
     def __init__(self, output_size):
         self.output_size = output_size
@@ -50,6 +67,28 @@ class RandomGenerator(object):
         label = torch.from_numpy(label.astype(np.uint8))
         sample['image'] = image.byte()
         sample['label'] = label.byte()
+        return sample
+    
+
+# Almost the same as RandomGenerator, but with the physical limitations of the material design dataset
+# I.e., there is only one image (label is actually numerical properties vector); rotation of the image/
+# microstructure can only be around the axis which defines the orthotropic properties of the 
+# microstructure
+class RandomGenerator2(object):
+    def __init__(self, output_size):
+        self.output_size = output_size
+
+    def __call__(self, sample):
+        image, label = sample['image'], sample['label']
+
+        image, label = random_rot_flip2(image, label)
+        x, y, z = image.shape
+        if x != self.output_size[0] or y != self.output_size[1] or z != self.output_size[2]:
+            image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
+            image[image>1] = 1
+        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+        sample['image'] = image.byte()
+        sample['label'] = label.to()
         return sample
 
 
@@ -129,7 +168,7 @@ class Design_dataset(Dataset):
         e31 = abs(property_data[0, 8]) + abs(property_data[8, 0])
         e33 = abs(property_data[0, 8]) + abs(property_data[8, 0])
         e15 = abs(property_data[0, 8]) + abs(property_data[8, 0])
-        label = [C11, C12, C13, C33, C44, C66, gamma11, gamma33, e31, e33, e15]
+        label = torch.FloatTensor([C11, C12, C13, C33, C44, C66, gamma11, gamma33, e31, e33, e15])
         image_path = os.path.join(self.data_dir, volume_name+'.zip')
         image_zip = zipfile.ZipFile(image_path)
         image = np.zeros((3, 150, 150, 150))
@@ -141,7 +180,7 @@ class Design_dataset(Dataset):
                 if index <= 15 or index >= 166:
                     continue
             image_i = image_zip.open(info)
-            image[:, index] = np.array(Image.open(image_i))[16:166, 16:166]
+            image[:, index-16] = np.array(Image.open(image_i))[16:166, 16:166]
 
         sample = {'image': image, 'label': label}
         if self.transform:
