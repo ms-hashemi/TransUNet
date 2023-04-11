@@ -27,7 +27,7 @@ def get_b16_config():
 
 def get_b16_3D_config():
     """Returns the ViT-B/16 configuration."""
-    # The simplest Tran-V-Net for the 3D image segmentation 
+    # The simplest TransVNet for the 3D image segmentation 
     # No feature extraction via additional CNN encoder and no skip connections to the decoder cup
     config = ml_collections.ConfigDict()
     config.patches = ml_collections.ConfigDict({'size': (16, 16, 16)})
@@ -51,7 +51,7 @@ def get_b16_3D_config():
 
 def get_conv_b16_3D_config():
     """Returns the Conv + ViT-B/16 configuration."""
-    # The suggested Tran-V-Net for the 3D image segmentation 
+    # The suggested TransVNet for the 3D image segmentation 
     # Feature extraction via additional CNN encoder and skip connections from the CNN encoder to the decoder cup
     config = ml_collections.ConfigDict()
     config.patches = ml_collections.ConfigDict({'size': (8, 8, 8)})

@@ -8,13 +8,12 @@ import random
 import numpy as np
 import torch
 import torch.backends.cudnn as cudnn
+# Following are our own codes/libraries
 from networks.vit_seg_modeling import VisionTransformer as ViT_seg
 from networks.vit_seg_modeling import CONFIGS as CONFIGS_ViT_seg, CONFIGS3D as CONFIGS_ViT_seg_3D
 from trainer import trainer_synapse, trainer_deg, trainer_mat
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('--root_path', type=str,
-#                     default='../data/deg/train_npz', help='root dir for data')
 parser.add_argument('--root_path', type=str,
                     default='/work/sheidaei/mhashemi/data/mat', help='root dir for data')
 parser.add_argument('--dataset', type=str,
@@ -58,35 +57,44 @@ args = parser.parse_args()
 
 
 if __name__ == "__main__":
+    # Random or deterministic training
     if not args.deterministic:
         cudnn.benchmark = True
         cudnn.deterministic = False
     else:
         cudnn.benchmark = False
         cudnn.deterministic = True
-
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed(args.seed)
+
+    # Preprocessing the input and the hyperparameters for training
     dataset_name = args.dataset
     dataset_config = {
         'Synapse': {
             'root_path': '../data/Synapse/train_npz',
             'list_dir': './lists/lists_Synapse',
             'num_classes': 9,
+            'dimension': 2
         },
         'Degradation': {
             'root_path': '/work/sheidaei/mhashemi/data/deg',
             'list_dir': './lists/lists_Degradation',
             'num_classes': 2,
+            'dimension': 3
         },
         'Design': {
             'root_path': '/work/sheidaei/mhashemi/data/mat',
             'list_dir': './lists/lists_Design',
             'num_classes': 2,
+            'dimension': 3
         }
     }
+    if len(args.vit_patches_size) == 1:
+        args.vit_patches_size = [args.vit_patches_size] * dataset_config[dataset_name]['dimension']
+    if len(args.img_size) == 1:
+        args.img_size = [args.img_size] * dataset_config[dataset_name]['dimension']
     args.num_classes = dataset_config[dataset_name]['num_classes']
     args.root_path = dataset_config[dataset_name]['root_path']
     args.list_dir = dataset_config[dataset_name]['list_dir']
@@ -96,22 +104,29 @@ if __name__ == "__main__":
     snapshot_path = snapshot_path + '_pretrain' if args.is_pretrain else snapshot_path
     snapshot_path += '_' + args.vit_name
     snapshot_path = snapshot_path + '_skip' + str(args.n_skip)
-    snapshot_path = snapshot_path + '_vitpatch' + str(args.vit_patches_size) if args.vit_patches_size!=16 else snapshot_path
-    snapshot_path = snapshot_path + '_' + str(args.max_iterations)[0:2]+'k' if args.max_iterations != 30000 else snapshot_path
-    snapshot_path = snapshot_path + '_epo' + str(args.max_epochs) if args.max_epochs != 30 else snapshot_path
+    snapshot_path = snapshot_path + '_vitpatch' + str(args.vit_patches_size)# if args.vit_patches_size!=16 else snapshot_path
+    snapshot_path = snapshot_path + '_' + str(args.max_iterations)[0:2]+'k'# if args.max_iterations != 30000 else snapshot_path
+    snapshot_path = snapshot_path + '_epo' + str(args.max_epochs)# if args.max_epochs != 30 else snapshot_path
     snapshot_path = snapshot_path + '_bs' + str(args.batch_size)
-    snapshot_path = snapshot_path + '_lr' + str(args.base_lr) if args.base_lr != 0.01 else snapshot_path
+    snapshot_path = snapshot_path + '_lr' + str(args.base_lr)# if args.base_lr != 0.01 else snapshot_path
     snapshot_path = snapshot_path + '_' + str(args.img_size)
-    snapshot_path = snapshot_path + '_s' + str(args.seed) if args.seed!=1234 else snapshot_path
-
+    snapshot_path = snapshot_path + '_s' + str(args.seed)# if args.seed!=1234 else snapshot_path
+    # Create a folder to save the training results and log if it does not exist
     if not os.path.exists(snapshot_path):
         os.makedirs(snapshot_path)
-    config_vit = CONFIGS_ViT_seg_3D[args.vit_name]
+    if dataset_config[dataset_name]['dimension'] == 3:
+        config_vit = CONFIGS_ViT_seg_3D[args.vit_name]
+    else:
+        config_vit = CONFIGS_ViT_seg[args.vit_name]
     config_vit.n_classes = args.num_classes
     config_vit.n_skip = args.n_skip
-    if args.vit_name.find('R50') != -1:
-        config_vit.patches.grid = (int(args.img_size / args.vit_patches_size), int(args.img_size / args.vit_patches_size), int(args.img_size / args.vit_patches_size))
+    config_vit.patches.grid = []
+    if args.vit_name.find('R50') != -1: # If ResNet50 is not used for the CNN feature extractor of the encoder
+        for i in range(dataset_config[dataset_name]['dimension']):
+            config_vit.patches.grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
+    config_vit.patches.grid = tuple(config_vit.patches.grid)
 
+    # Settings if distributed training is required (different GPUs on different Nodes)
     # DDP setting
     if "WORLD_SIZE" in os.environ:
         args.world_size = int(os.environ["WORLD_SIZE"])
@@ -127,13 +142,11 @@ if __name__ == "__main__":
             args.gpu = args.rank % torch.cuda.device_count()
         torch.distributed.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
                                 world_size=args.world_size, rank=args.rank)
-
     # suppress printing if not on master gpu
     if args.rank!=0:
         def print_pass(*args):
             pass
         builtins.print = print_pass
-
     # model    
     model = ViT_seg(config_vit, img_size=args.img_size, num_classes=config_vit.n_classes)
     model.load_from(weights=np.load(config_vit.pretrained_path))

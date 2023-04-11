@@ -194,7 +194,7 @@ def trainer_deg(args, model, snapshot_path):
     return "Training Finished!"
 
 def trainer_mat(args, model, snapshot_path):
-    from datasets.dataset_deg import Design_dataset, RandomGenerator
+    from datasets.dataset_deg import Design_dataset, RandomGenerator2
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -205,7 +205,7 @@ def trainer_mat(args, model, snapshot_path):
     # max_iterations = args.max_iterations
     db_train = Design_dataset(base_dir=args.root_path, list_dir=args.list_dir, split="train",
                                 transform=transforms.Compose(
-                                   [RandomGenerator(output_size=args.img_size)]))
+                                   [RandomGenerator2(output_size=args.img_size)]))
     print("The length of train set is: {}".format(len(db_train)))
 
     # g = torch.Generator()
