@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "Python: File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "justMyCode": true,
+            "args": ["--dataset", "Design", "--batch_size", "2", "--gpu", "1"]
+        }
+    ]
+}

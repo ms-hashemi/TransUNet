@@ -91,9 +91,9 @@ if __name__ == "__main__":
             'dimension': 3
         }
     }
-    if len(args.vit_patches_size) == 1:
+    if isinstance(args.vit_patches_size, int): #len(args.vit_patches_size) == 1:
         args.vit_patches_size = [args.vit_patches_size] * dataset_config[dataset_name]['dimension']
-    if len(args.img_size) == 1:
+    if isinstance(args.img_size, int): #len(args.img_size) == 1:
         args.img_size = [args.img_size] * dataset_config[dataset_name]['dimension']
     args.num_classes = dataset_config[dataset_name]['num_classes']
     args.root_path = dataset_config[dataset_name]['root_path']
