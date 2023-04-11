@@ -85,7 +85,8 @@ if __name__ == "__main__":
             'dimension': 3
         },
         'Design': {
-            'root_path': '/work/sheidaei/mhashemi/data/mat',
+            # 'root_path': '/work/sheidaei/mhashemi/data/mat',
+            'root_path': '../data/mat/Results',
             'list_dir': './lists/lists_Design',
             'num_classes': 2,
             'dimension': 3
@@ -120,11 +121,11 @@ if __name__ == "__main__":
         config_vit = CONFIGS_ViT_seg[args.vit_name]
     config_vit.n_classes = args.num_classes
     config_vit.n_skip = args.n_skip
-    config_vit.patches.grid = []
     if args.vit_name.find('R50') != -1: # If ResNet50 is not used for the CNN feature extractor of the encoder
+        config_vit.patches.grid = []
         for i in range(dataset_config[dataset_name]['dimension']):
             config_vit.patches.grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
-    config_vit.patches.grid = tuple(config_vit.patches.grid)
+        config_vit.patches.grid = tuple(config_vit.patches.grid)
 
     # Settings if distributed training is required (different GPUs on different Nodes)
     # DDP setting
