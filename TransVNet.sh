@@ -37,5 +37,5 @@ source activate mytorch
 # srun python train_deg.py --dataset Degradation
 # python train_deg.py --dataset Degradation
 # python test_deg.py --dataset Degradation
-python train_deg.py --dataset Design
+python train_deg.py --dataset Design --max_iterations 50
 # python test_deg.py --dataset Design
