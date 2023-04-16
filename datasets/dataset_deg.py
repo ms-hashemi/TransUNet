@@ -31,7 +31,7 @@ def random_rotate(image, label):
 
 def random_rot_flip2(image, label):
     k = np.random.randint(0, 4)
-    axes = (0,1)
+    axes = (1,2)
     image = np.rot90(image, k, axes)
     axis = np.random.randint(0, 3)
     image = np.flip(image, axis=axis).copy()
@@ -80,9 +80,8 @@ class RandomGenerator2(object):
 
     def __call__(self, sample):
         image, label = sample['image'], sample['label']
-
         image, label = random_rot_flip2(image, label)
-        x, y, z = image.shape
+        _, x, y, z = image.shape
         if x != self.output_size[0] or y != self.output_size[1] or z != self.output_size[2]:
             image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
             image[image>1] = 1
