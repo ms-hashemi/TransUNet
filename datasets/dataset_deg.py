@@ -83,9 +83,9 @@ class RandomGenerator2(object):
         image, label = random_rot_flip2(image, label)
         _, x, y, z = image.shape
         if x != self.output_size[0] or y != self.output_size[1] or z != self.output_size[2]:
-            image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
-            image[image>1] = 1
-        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+            image = zoom(image, (1, self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
+            # image[image>1] = 1
+        image = torch.from_numpy(image.astype(np.uint8)) # check later if unsqueeze is needed for our 3D images
         sample['image'] = image.byte()
         sample['label'] = label.to()
         return sample
@@ -169,7 +169,11 @@ class Design_dataset(Dataset):
         e31 = abs(property_data[0, 8]) + abs(property_data[8, 0])
         e33 = abs(property_data[0, 8]) + abs(property_data[8, 0])
         e15 = abs(property_data[0, 8]) + abs(property_data[8, 0])
-        label = torch.FloatTensor([C11, C12, C13, C33, C44, C66, gamma11, gamma33, e31, e33, e15])
+        label = torch.FloatTensor([C11, C12, C13, C33, C44, C66, e31, e33, e15, gamma11, gamma33])
+        # Normalize the labels such that they represent N(0, 1)
+        mean = torch.FloatTensor([38.323, 15.7224, 11.898, 21.1556, 18.2747, 24.4512, -0.3501, 1.6984, 1.8966, 3.2065, 2.0996])
+        std = torch.FloatTensor([35.6838, 13.6047, 10.1844, 21.6407, 19.2492, 22.9862, 0.5574, 2.259, 2.2365, 2.4594, 1.9398])
+        label = (label - mean) / std
         image_path = os.path.join(self.data_dir, volume_name+'.zip')
         image_zip = zipfile.ZipFile(image_path)
         image = np.zeros((3, 150, 150, 150))
@@ -183,7 +187,7 @@ class Design_dataset(Dataset):
             image_i = image_zip.open(info)
             image[:, index-16] = np.array(Image.open(image_i))[16:166, 16:166]
 
-        sample = {'image': image, 'label': label}
+        sample = {'image': image, 'time': torch.FloatTensor([-1]), 'label': label} # Time = -1 will let the network know that the data is not (time-)sequential!
         if self.transform:
             sample = self.transform(sample)
         sample['case_name'] = self.sample_list[idx].strip('\n')[8:-4]

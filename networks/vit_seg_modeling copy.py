@@ -215,10 +215,9 @@ class Embeddings3D(nn.Module):
 
     def forward(self, x, time):
         x = x.float()
-        if -1 not in time:
-            time = time.float()
-            time = torch.unsqueeze(time,1)
-            time = torch.unsqueeze(time,2)
+        time = time.float()
+        time = torch.unsqueeze(time,1)
+        time = torch.unsqueeze(time,2)
         if self.hybrid:
             x, features = self.hybrid_model(x)
         else:
@@ -227,14 +226,12 @@ class Embeddings3D(nn.Module):
         x = x.flatten(2)
         x = x.transpose(-1, -2)  # (B, n_patches, hidden)
         # Embed the time variable
-        if -1 not in time:
-            time = self.time_embeddings(time)
-            time = time.flatten(2)
-            time = time.transpose(-1, -2)  # (B, n_patches, hidden)
-            # x = torch.cat([x, time], dim=1) # Concatanate the embedded time to the image embeddings
-            embeddings = x + time + self.position_embeddings
-        else:
-            embeddings = x + self.position_embeddings
+        time = self.time_embeddings(time)
+        time = time.flatten(2)
+        time = time.transpose(-1, -2)  # (B, n_patches, hidden)
+        # x = torch.cat([x, time], dim=1) # Concatanate the embedded time to the image embeddings
+
+        embeddings = x + time + self.position_embeddings
         embeddings = self.dropout(embeddings)
         return embeddings, features
 
@@ -549,13 +546,9 @@ class DecoderCup(nn.Module):
         super().__init__()
         self.config = config
         head_channels = config.decoder_channels[0]
-        if config.classifier == 'gen':
-            first_in_channels = config.label_size
-        else:
-            first_in_channels = config.hidden_size
         if len(config.patches.size) == 3:
             self.conv_more = Conv3dReLU(
-                first_in_channels,
+                config.hidden_size,
                 head_channels,
                 kernel_size=3,
                 padding=1,
@@ -563,14 +556,14 @@ class DecoderCup(nn.Module):
             )
         else:
             self.conv_more = Conv2dReLU(
-                first_in_channels,
+                config.hidden_size,
                 head_channels,
                 kernel_size=3,
                 padding=1,
                 use_batchnorm=True,
             )
         # in_channels = config.decoder_channels[:-1]
-        in_channels = [first_in_channels] + list(config.decoder_channels[:-1])
+        in_channels = [config.hidden_size] + list(config.decoder_channels[:-1])
         # out_channels = config.decoder_channels[1:]
         out_channels = list(config.decoder_channels)
         # skip_channels = config.skip_channels[1:]
@@ -648,43 +641,13 @@ class SpatialTransformer(nn.Module):
         return nn.functional.grid_sample(src, new_locs, align_corners=True, mode=self.mode)
 
 
-class EncoderForGenerativeModels(nn.Module):
-    """
-    A class encapsulating the whole encoder of TransVNet for generative purposes (not segmentation)
-    """
-    def __init__(self, config, img_size, vis):
-        super().__init__()
-        self.config = config
+class VisionTransformer(nn.Module):
+    def __init__(self, config, img_size=224, num_classes=21843, zero_head=False, vis=False):
+        super(VisionTransformer, self).__init__()
+        self.num_classes = num_classes
+        self.zero_head = zero_head
+        self.classifier = config.classifier
         self.transformer = Transformer(config, img_size, vis)
-        # Distribution parameters
-        n_patch = 1
-        for i in range(len(config.patches.grid)):
-            n_patch = n_patch * config.patches.grid[i]
-        self.fc_mean = nn.Linear(config.hidden_size*n_patch, n_patch)
-        self.fc_log_variance = nn.Linear(config.hidden_size*n_patch, n_patch)
-        self.fc_label = nn.Sequential(
-            nn.Linear(config.hidden_size*n_patch, n_patch),
-            nn.Linear(n_patch, config.label_size)
-        )
-
-    def forward(self, x, time):
-        # Encode (x, time) to get the mu and variance parameters as well as lebels 
-        x_encoded, attn_weights, features = self.transformer(x, time)
-        B, n_patch, hidden = x_encoded.size()  # reshape from (B, n_patch, hidden) to (B, h, w, hidden)
-        x_encoded = x_encoded.contiguous().view(B, hidden*n_patch)
-        mu = self.fc_mean(x_encoded)
-        log_variance = self.fc_log_variance(x_encoded)
-        predicted_labels = self.fc_label(x_encoded)
-        return (mu, log_variance, predicted_labels)
-
-
-class DecoderForGenerativeModels(nn.Module):
-    """
-    A class encapsulating the whole decoder of TransVNet for generative purposes (not segmentation)
-    """
-    def __init__(self, config, img_size):
-        super().__init__()
-        self.config = config
         self.decoder = DecoderCup(config)
         if len(config.patches.size) == 3:
             self.morph_head = Morph3D(
@@ -699,45 +662,6 @@ class DecoderForGenerativeModels(nn.Module):
                 out_channels=config['n_classes'],
                 kernel_size=3,
             )
-
-    def forward(self, x):
-        # Decode the encoded input x to get a reconstructed image
-        x = self.decoder(x)
-        if len(self.config.patches.size) == 3:
-            x = self.morph_head(x)
-            # x = self.spatial_transformer(src, x)
-        else:
-            x = self.segmentation_head(x)
-        return x
-
-class VisionTransformer(nn.Module):
-    def __init__(self, config, img_size=224, num_classes=21843, zero_head=False, vis=False):
-        super(VisionTransformer, self).__init__()
-        self.num_classes = num_classes
-        self.zero_head = zero_head
-        self.classifier = config.classifier
-        if self.classifier == 'gen':
-            self.encoder = EncoderForGenerativeModels(config, img_size, vis)
-            self.transformer = self.encoder.transformer
-            # For the Gaussian likelihood used in reconstruction loss calculation
-            self.log_scale = nn.Parameter(torch.zeros(img_size))
-            self.decoder = DecoderForGenerativeModels(config, img_size)
-        else:
-            self.transformer = Transformer(config, img_size, vis)
-            self.decoder = DecoderCup(config)
-            if len(config.patches.size) == 3:
-                self.morph_head = Morph3D(
-                    in_channels=config['decoder_channels'][-1],
-                    out_channels=config['n_classes'],
-                    kernel_size=3,
-                )
-                self.spatial_transformer = SpatialTransformer(_triple(img_size) if len(img_size) == 1 else img_size)
-            else:
-                self.segmentation_head = SegmentationHead(
-                    in_channels=config['decoder_channels'][-1],
-                    out_channels=config['n_classes'],
-                    kernel_size=3,
-                )
         self.config = config
 
     def forward(self, x, time):
@@ -746,51 +670,14 @@ class VisionTransformer(nn.Module):
             x = x.repeat(1,3,1,1,1)
         elif x.size()[1] == 1 and len(self.config.patches.size) != 3:
             x = x.repeat(1,3,1,1)
-        if self.classifier == 'gen':
-            # KL divergence estimation in the current batch using the VAE's encoder part (model.encoder)
-            mu, log_variance, predicted_labels = self.encoder(x, time)
-            # Sample z from q(z|x)
-            std = torch.exp(log_variance / 2)
-            q = torch.distributions.Normal(mu, std)
-            z = q.rsample()
-            # Concatenating the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
-            l = []
-            for i in range(predicted_labels.shape[1]):
-                l.append(torch.mul(z, torch.exp(torch.unsqueeze(predicted_labels[:, i], -1))))
-            x = torch.stack(l, 2)
-            # features = x.shape[-1]
-            # Monte carlo KL divergence
-            # 1. define the first two probabilities (in this case Normal for both)
-            p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std)) # Target latent distribution
-            q = torch.distributions.Normal(mu, std) # Network-calculated latent distribution
-            # 2. get the probabilities from the equation
-            log_qzx = q.log_prob(z)
-            log_pz = p.log_prob(z)
-            # kl
-            kl = (log_qzx - log_pz)
-            kl = kl.sum(-1)
-            # Decoder output given a random sample of the encoder distribution and its predicted labels
-            x = self.decoder(x)
-            # Gaussian likelihood for the reconstruction loss
-            scale = torch.exp(self.log_scale)
-            mean = x
-            dist = torch.distributions.Normal(mean, scale)
-            # Measure prob of seeing image under p(x|y,z)
-            log_pxz = dist.log_prob(x) # Reconstruction loss in VAEs
-            if len(self.config.patches.size) == 3:
-                log_pxz.sum(dim=(1, 2, 3, 4))
-            else:
-                log_pxz.sum(dim=(1, 2, 3))
-            return (predicted_labels, x, kl, log_pxz)
+        x, attn_weights, features = self.transformer(x, time)
+        x = self.decoder(x, features)
+        if len(self.config.patches.size) == 3:
+            x = self.morph_head(x)
+            # x = self.spatial_transformer(src, x)
         else:
-            x, _, features = self.transformer(x, time)
-            x = self.decoder(x, features)
-            if len(self.config.patches.size) == 3:
-                x = self.morph_head(x)
-                # x = self.spatial_transformer(src, x)
-            else:
-                x = self.segmentation_head(x)
-            return x
+            x = self.segmentation_head(x)
+        return x
 
     def load_from(self, weights):
         with torch.no_grad():
@@ -857,6 +744,5 @@ CONFIGS = {
 CONFIGS3D = {
     'ViT-B_16': configs.get_b16_3D_config(),
     'Conv-ViT-B_16': configs.get_conv_b16_3D_config(),
-    'Conv-ViT-Gen-B_16': configs.get_conv_b16_3D_gen_config()
 }
 

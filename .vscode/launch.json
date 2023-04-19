@@ -6,7 +6,7 @@
             "request": "launch",
             "program": "${file}",
             "justMyCode": true,
-            "args": ["--dataset", "Design", "--batch_size", "2", "--gpu", "1", "--max_iterations", "595"]
+            "args": ["--dataset", "Design", "--batch_size", "2", "--gpu", "1", "--max_iterations", "595", "--vit_name", "Conv-ViT-Gen-B_16"]
         }
     ]
 }

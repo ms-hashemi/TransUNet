@@ -221,8 +221,7 @@ def trainer_mat(args, model, snapshot_path):
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # model.to(device)
     model.train()
-    ce_loss = CrossEntropyLoss()
-    dice_loss = DiceLoss(num_classes)
+    loss_mse = nn.MSELoss()
     optimizer = optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
@@ -240,10 +239,12 @@ def trainer_mat(args, model, snapshot_path):
         for i_batch, sampled_batch in enumerate(trainloader):
             image_batch, time_batch, label_batch = sampled_batch['image'], sampled_batch['time'], sampled_batch['label']
             image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
-            outputs = model(image_batch, time_batch)
-            loss_ce = ce_loss(outputs, label_batch[:].long())
-            loss_dice = dice_loss(outputs, label_batch, softmax=True)
-            loss = 0.5 * loss_ce + 0.5 * loss_dice
+            predicted_labels, outputs, kl, log_pxz = model(image_batch, time_batch)
+            kl = kl.mean()
+            log_pxz = log_pxz.mean()
+            # Loss = ELBO loss function + MSE loss function for label prediction in VAEs
+            loss_pred = loss_mse(predicted_labels, label_batch)
+            loss = kl - log_pxz + loss_pred
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -253,10 +254,12 @@ def trainer_mat(args, model, snapshot_path):
 
             iter_num = iter_num + 1
             writer.add_scalar('info/lr', lr_, iter_num)
-            writer.add_scalar('info/total_loss', loss, iter_num)
-            writer.add_scalar('info/loss_ce', loss_ce, iter_num)
+            writer.add_scalar('info/loss', loss, iter_num)
+            writer.add_scalar('info/loss_kl', kl, iter_num)
+            writer.add_scalar('info/loss_recon', log_pxz, iter_num)
+            writer.add_scalar('info/loss_pred', loss_pred, iter_num)
 
-            logging.info('iteration %d : loss : %f, loss_ce: %f' % (iter_num, loss.item(), loss_ce.item()))
+            logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, log_pxz, loss_pred))
 
             if iter_num % 20 == 0:
                 image = image_batch[1, 0:1, :, :, :]

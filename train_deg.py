@@ -85,8 +85,8 @@ if __name__ == "__main__":
             'dimension': 3
         },
         'Design': {
-            'root_path': '/work/sheidaei/mhashemi/data/mat',
-            # 'root_path': '../data/mat/Results',
+            # 'root_path': '/work/sheidaei/mhashemi/data/mat',
+            'root_path': '../data/mat/Results',
             'list_dir': './lists/lists_Design',
             'num_classes': 2,
             'dimension': 3
