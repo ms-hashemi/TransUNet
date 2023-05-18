@@ -239,6 +239,7 @@ def trainer_mat(args, model, snapshot_path):
         for i_batch, sampled_batch in enumerate(trainloader):
             image_batch, time_batch, label_batch = sampled_batch['image'], sampled_batch['time'], sampled_batch['label']
             image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
+            # logging.info('iteration %d: anomaly detection in image_batch: %f, time_batch: %f, label_batch: %f' % (iter_num, torch.isnan(image_batch).any() or torch.isinf(image_batch).any(), torch.isnan(time_batch).any() or torch.isinf(time_batch).any(), torch.isnan(label_batch).any() or torch.isinf(label_batch).any())) 
             predicted_labels, outputs, kl, log_pxz = model(image_batch, time_batch)
             kl = kl.mean()
             log_pxz = log_pxz.mean()
@@ -261,17 +262,17 @@ def trainer_mat(args, model, snapshot_path):
 
             logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, log_pxz, loss_pred))
 
-            if iter_num % 20 == 0:
-                image = image_batch[1, 0:1, :, :, :]
-                image = (image - image.min()) / (image.max() - image.min())
-                # writer.add_image('train/Image', image, iter_num)
-                writer.add_images('train/Image', image, iter_num, None, 'CHWN')
-                outputs = torch.argmax(torch.softmax(outputs, dim=1), dim=1, keepdim=True)
-                # writer.add_image('train/Prediction', outputs[1, ...] * 50, iter_num)
-                writer.add_images('train/Prediction', outputs[1, ...], iter_num, None, 'CHWN')
-                labs = label_batch[1, ...].unsqueeze(0)
-                # writer.add_image('train/GroundTruth', labs, iter_num)
-                writer.add_images('train/GroundTruth', labs, iter_num, None, 'CHWN')
+            # if iter_num % 20 == 0:
+            #     image = image_batch[1, 0:1, :, :, :]
+            #     image = (image - image.min()) / (image.max() - image.min())
+            #     # writer.add_image('train/Image', image, iter_num)
+            #     writer.add_images('train/Image', image, iter_num, None, 'CHWN')
+            #     outputs = torch.argmax(torch.softmax(outputs, dim=1), dim=1, keepdim=True)
+            #     # writer.add_image('train/Prediction', outputs[1, ...] * 50, iter_num)
+            #     writer.add_images('train/Prediction', outputs[1, ...], iter_num, None, 'CHWN')
+            #     labs = label_batch[1, ...].unsqueeze(0)
+            #     # writer.add_image('train/GroundTruth', labs, iter_num)
+            #     writer.add_images('train/GroundTruth', labs, iter_num, None, 'CHWN')
 
         save_interval = 50  # int(max_epoch/6)
         if epoch_num > int(max_epoch / 2) and (epoch_num + 1) % save_interval == 0:
