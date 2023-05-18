@@ -1,0 +1,45 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1666643016022/work/aten/src/ATen/native/TensorShape.cpp:3190.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(root_path='/work/sheidaei/mhashemi/data/mat', dataset='Design', list_dir='./lists/lists_Design', num_classes=2, max_iterations=50, max_epochs=1, batch_size=24, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-Gen-B_16', vit_patches_size=[8, 8, 8], is_pretrain=True, exp='TV_Design[160, 160, 160]', distributed=False)
+13 iterations per epoch. 13 max iterations 
+  0%|                                           | 0/1 [00:00<?, ?it/s]iteration 1: loss: 3.939634, loss_kl: 1.610729, loss_recon: -0.918938, loss_pred: 1.409967
+iteration 2: loss: 456.407623, loss_kl: 453.723724, loss_recon: -0.918938, loss_pred: 1.764947
+iteration 3: loss: 316715543202428854252601344.000000, loss_kl: 316715543202428854252601344.000000, loss_recon: -0.918938, loss_pred: 9.292455
+  0%|                                           | 0/1 [37:11<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/mhashemi/TransVNet/train_deg.py", line 174, in <module>
+    trainer[dataset_name](args, model, snapshot_path)
+  File "/home/mhashemi/TransVNet/trainer.py", line 242, in trainer_mat
+    predicted_labels, outputs, kl, log_pxz = model(image_batch, time_batch)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1190, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/parallel/data_parallel.py", line 171, in forward
+    outputs = self.parallel_apply(replicas, inputs, kwargs)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/parallel/data_parallel.py", line 181, in parallel_apply
+    return parallel_apply(replicas, inputs, kwargs, self.device_ids[:len(replicas)])
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/parallel/parallel_apply.py", line 89, in parallel_apply
+    output.reraise()
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/_utils.py", line 543, in reraise
+    raise exception
+ValueError: Caught ValueError in replica 0 on device 0.
+Original Traceback (most recent call last):
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/parallel/parallel_apply.py", line 64, in _worker
+    output = module(*input, **kwargs)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1190, in _call_impl
+    return forward_call(*input, **kwargs)
+  File "/home/mhashemi/TransVNet/networks/vit_seg_modeling.py", line 754, in forward
+    q = torch.distributions.Normal(mu, std)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/distributions/normal.py", line 56, in __init__
+    super(Normal, self).__init__(batch_shape, validate_args=validate_args)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/distributions/distribution.py", line 56, in __init__
+    raise ValueError(
+ValueError: Expected parameter loc (Tensor of shape (24, 125)) of distribution Normal(loc: torch.Size([24, 125]), scale: torch.Size([24, 125])) to satisfy the constraint Real(), but found invalid values:
+tensor([[nan, nan, nan,  ..., nan, nan, nan],
+        [nan, nan, nan,  ..., nan, nan, nan],
+        [nan, nan, nan,  ..., nan, nan, nan],
+        ...,
+        [nan, nan, nan,  ..., nan, nan, nan],
+        [nan, nan, nan,  ..., nan, nan, nan],
+        [nan, nan, nan,  ..., nan, nan, nan]], device='cuda:0',
+       grad_fn=<AddmmBackward0>)
+
