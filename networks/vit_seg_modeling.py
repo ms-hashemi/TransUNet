@@ -762,7 +762,7 @@ class VisionTransformer(nn.Module):
             # Concatenating the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
             l = []
             for i in range(predicted_labels.shape[1]):
-                l.append(torch.mul(z, torch.exp(torch.unsqueeze(predicted_labels[:, i], -1))))
+                l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
             x = torch.stack(l, 2)
             # features = x.shape[-1]
             # Monte carlo KL divergence
