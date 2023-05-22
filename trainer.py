@@ -240,6 +240,7 @@ def trainer_mat(args, model, snapshot_path):
             image_batch, time_batch, label_batch = sampled_batch['image'], sampled_batch['time'], sampled_batch['label']
             image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
             # logging.info('iteration %d: anomaly detection in image_batch: %f, time_batch: %f, label_batch: %f' % (iter_num, torch.isnan(image_batch).any() or torch.isinf(image_batch).any(), torch.isnan(time_batch).any() or torch.isinf(time_batch).any(), torch.isnan(label_batch).any() or torch.isinf(label_batch).any())) 
+            image_batch
             predicted_labels, outputs, kl, log_pxz = model(image_batch, time_batch)
             kl = kl.mean()
             log_pxz = log_pxz.mean()
