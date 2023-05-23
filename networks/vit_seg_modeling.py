@@ -747,7 +747,7 @@ class VisionTransformer(nn.Module):
         self.config = config
 
     def forward(self, x, time):
-        src = x[:,0:1,:,:,:].float()
+        # src = x[:,0:1,:,:,:].float()
         if x.size()[1] == 1 and len(self.config.patches.size) == 3:
             x = x.repeat(1,3,1,1,1)
         elif x.size()[1] == 1 and len(self.config.patches.size) != 3:
@@ -763,7 +763,7 @@ class VisionTransformer(nn.Module):
             l = []
             for i in range(predicted_labels.shape[1]):
                 l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
-            x = torch.stack(l, 2)
+            decoder_input = torch.stack(l, 2)
             # features = x.shape[-1]
             # Monte carlo KL divergence
             # 1. define the first two probabilities (in this case Normal for both)
@@ -776,17 +776,16 @@ class VisionTransformer(nn.Module):
             kl = (log_qzx - log_pz)
             kl = kl.sum(-1)
             # Decoder output given a random sample of the encoder distribution and its predicted labels
-            x = self.decoder(x)
+            decoder_output = self.decoder(decoder_input)
             # Gaussian likelihood for the reconstruction loss
             scale = torch.exp(self.log_scale)
-            mean = x
-            dist = torch.distributions.Normal(mean, scale)
+            dist = torch.distributions.Normal(decoder_output, scale)
             # Measure prob of seeing image under p(x|y,z)
-            log_pxz = dist.log_prob(x) # Reconstruction loss in VAEs
+            log_pxz = dist.log_prob(x[:,:self.config['n_classes'],:]) # Reconstruction loss in VAEs
             if len(self.config.patches.size) == 3:
-                log_pxz.sum(dim=(1, 2, 3, 4))
+                log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
             else:
-                log_pxz.sum(dim=(1, 2, 3))
+                log_pxz = log_pxz.mean(dim=(1, 2, 3))
             return (predicted_labels, x, kl, log_pxz)
         else:
             x, _, features = self.transformer(x, time)
