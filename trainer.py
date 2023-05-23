@@ -222,7 +222,8 @@ def trainer_mat(args, model, snapshot_path):
     # model.to(device)
     model.train()
     loss_mse = nn.MSELoss()
-    optimizer = optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
+    # optimizer = optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
+    optimizer = optim.Adam(model.parameters())
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
     max_epoch = args.max_epochs
@@ -230,6 +231,22 @@ def trainer_mat(args, model, snapshot_path):
     logging.info("{} iterations per epoch. {} max iterations ".format(len(trainloader), max_iterations))
     best_performance = 0.0
     iterator = tqdm(range(max_epoch), ncols=70)
+    def frange_cycle_sigmoid(start, stop, n_epoch, n_cycle=4, ratio=0.5):
+        L = np.ones(n_epoch)
+        period = n_epoch/n_cycle
+        step = (stop-start)/(period*ratio) # step is in [0,1]
+        
+        # transform into [-6, 6] for plots: v*12.-6.
+
+        for c in range(n_cycle):
+
+            v , i = start , 0
+            while v <= stop:
+                L[int(i+c*period)] = 1.0/(1.0+ np.exp(- (v*12.-6.)))
+                v += step
+                i += 1
+        return L
+    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4)
     for epoch_num in iterator:
         # np.random.seed(epoch_num)
         # random.seed(epoch_num)
@@ -245,7 +262,7 @@ def trainer_mat(args, model, snapshot_path):
             log_pxz = log_pxz.mean()
             # Loss = ELBO loss function + MSE loss function for label prediction in VAEs
             loss_pred = loss_mse(predicted_labels, label_batch)
-            loss = kl - log_pxz + loss_pred
+            loss = L[epoch_num]*kl - log_pxz + loss_pred
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()

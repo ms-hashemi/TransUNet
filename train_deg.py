@@ -25,7 +25,7 @@ parser.add_argument('--num_classes', type=int,
 parser.add_argument('--max_iterations', type=int,
                     default=288, help='maximum iteration number to train')
 parser.add_argument('--max_epochs', type=int,
-                    default=1, help='maximum epoch number to train')
+                    default=100, help='maximum epoch number to train')
 parser.add_argument('--batch_size', type=int,
                     default=24, help='batch_size per gpu')
 parser.add_argument('--gpu', type=int, default=4, help='total gpu')
@@ -85,8 +85,8 @@ if __name__ == "__main__":
             'dimension': 3
         },
         'Design': {
-            'root_path': '/work/sheidaei/mhashemi/data/mat',
-            # 'root_path': '../data/mat/Results',
+            # 'root_path': '/work/sheidaei/mhashemi/data/mat',
+            'root_path': '../data/mat/Results',
             'list_dir': './lists/lists_Design',
             'num_classes': 2,
             'dimension': 3
