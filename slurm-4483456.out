@@ -2,4 +2,18 @@
   return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
 Namespace(root_path='/work/sheidaei/mhashemi/data/mat', dataset='Design', list_dir='./lists/lists_Design', num_classes=2, max_iterations=50, max_epochs=1, batch_size=24, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, deterministic=1, base_lr=0.01, img_size=[160, 160, 160], seed=1234, n_skip=4, vit_name='Conv-ViT-Gen-B_16', vit_patches_size=[8, 8, 8], is_pretrain=True, exp='TV_Design[160, 160, 160]', distributed=False)
 13 iterations per epoch. 13 max iterations 
-  0%|                                           | 0/1 [00:00<?, ?it/s]
+  0%|                                           | 0/1 [00:00<?, ?it/s]iteration 1: loss: 3.907601, loss_kl: 1.578696, loss_recon: -0.918938, loss_pred: 1.409967
+iteration 2: loss: 60.919502, loss_kl: 58.235497, loss_recon: -0.918938, loss_pred: 1.765069
+iteration 3: loss: 33.522503, loss_kl: 30.902737, loss_recon: -0.918938, loss_pred: 1.700827
+iteration 4: loss: 46.016640, loss_kl: 43.559875, loss_recon: -0.918938, loss_pred: 1.537826
+iteration 5: loss: 84.537560, loss_kl: 79.558838, loss_recon: -0.918938, loss_pred: 4.059787
+iteration 6: loss: 103.832970, loss_kl: 86.193954, loss_recon: -0.918938, loss_pred: 16.720078
+iteration 7: loss: 94.075974, loss_kl: 89.660477, loss_recon: -0.918938, loss_pred: 3.496559
+iteration 8: loss: 105.615410, loss_kl: 91.127075, loss_recon: -0.918938, loss_pred: 13.569395
+iteration 9: loss: 97.918602, loss_kl: 87.514954, loss_recon: -0.918938, loss_pred: 9.484708
+iteration 10: loss: 122.012894, loss_kl: 94.583618, loss_recon: -0.918938, loss_pred: 26.510340
+iteration 11: loss: 101.384476, loss_kl: 90.484459, loss_recon: -0.918938, loss_pred: 9.981076
+iteration 12: loss: 146.750290, loss_kl: 95.845299, loss_recon: -0.918938, loss_pred: 49.986057
+iteration 13: loss: 125.112801, loss_kl: 97.683357, loss_recon: -0.918938, loss_pred: 26.510504
+save model to ../model/TV_Design[160, 160, 160]/TV_pretrain_Conv-ViT-Gen-B_16_skip4_vitpatch[8, 8, 8]_50k_epo1_bs24_lr0.01_[160, 160, 160]_s1234/epoch_0.pth
+  0%|                                         | 0/1 [1:11:18<?, ?it/s]
