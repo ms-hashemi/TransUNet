@@ -83,6 +83,33 @@ def inference(args, model, test_save_path=None):
     return "Testing Finished!"
 
 
+
+def inference(args, model, test_save_path=None):
+    db_test = args.Dataset(base_dir=args.volume_path, split="test_vol", list_dir=args.list_dir, transform=transforms.Compose([Resize(output_size=args.img_size)]))
+    testloader = DataLoader(db_test, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
+    logging.info("{} test iterations per epoch".format(len(testloader)))
+    model.eval()
+    metric_list = np.zeros(shape=(args.num_classes-1, 2))
+    for i_batch, sampled_batch in tqdm(enumerate(testloader)):
+        # h, w = sampled_batch["image"].size()[2:]
+        image_batch, label_batch, time_batch, case_name_batch = sampled_batch["image"], sampled_batch["label"], sampled_batch["time"], sampled_batch['case_name']
+        image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
+        metric_batch = test_multiple_volumes(image_batch, label_batch, time_batch, model, classes=args.num_classes, patch_size=args.img_size,
+                                         test_save_path=test_save_path, case=case_name_batch, z_spacing=args.z_spacing)
+        for i in range(1, args.num_classes):
+            logging.info('i_batch %d mean_dice %f mean_hd95 %f' % (i_batch, metric_batch[i-1][0], metric_batch[i-1][1]))
+        metric_list += np.array(metric_batch)
+        # logging.info('idx %d case %s mean_dice %f mean_hd95 %f' % (i_batch, case_name, np.mean(metric_i, axis=0)[0], np.mean(metric_i, axis=0)[1]))
+    metric_list = metric_list / len(db_test)
+    for i in range(1, args.num_classes):
+        logging.info('Mean class %d mean_dice %f mean_hd95 %f' % (i, metric_list[i-1][0], metric_list[i-1][1]))
+    performance = np.mean(metric_list, axis=0)[0]
+    mean_hd95 = np.mean(metric_list, axis=0)[1]
+    logging.info('Testing performance in best val model: mean_dice : %f mean_hd95 : %f' % (performance, mean_hd95))
+    return "Testing Finished!"
+
+
+
 if __name__ == "__main__":
 
     if not args.deterministic:
