@@ -101,7 +101,7 @@ def seed_worker(worker_id):
     random.seed(worker_seed)
 
 def trainer_deg(args, model, snapshot_path):
-    from datasets.dataset_deg import Degradation_dataset, RandomGenerator
+    from datasets.dataset_3D import Degradation_dataset, RandomGenerator
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
@@ -194,7 +194,7 @@ def trainer_deg(args, model, snapshot_path):
     return "Training Finished!"
 
 def trainer_mat(args, model, snapshot_path):
-    from datasets.dataset_deg import Design_dataset, RandomGenerator2
+    from datasets.dataset_3D import Design_dataset, RandomGenerator2
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
