@@ -12,7 +12,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from datasets.dataset_synapse import Synapse_dataset
-from utils import test_single_volume, test_multiple_volumes
+from utils import test_single_volume, test_multiple_volumes, test_single_volume_generative, test_multiple_volumes_generative
 from networks.TransVNet_modeling import VisionTransformer as Net
 from networks.TransVNet_modeling import CONFIGS, CONFIGS3D
 from torchvision import transforms
@@ -105,24 +105,26 @@ def inferrer_mat(args, model, test_save_path=None):
     testloader = DataLoader(db_test, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
     logging.info("{} test iterations per epoch".format(len(testloader)))
     model.eval()
-    metric_list = np.zeros(shape=(args.num_classes-1, 2))
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
-        # h, w = sampled_batch["image"].size()[2:]
-        image_batch, label_batch, time_batch, case_name_batch = sampled_batch["image"], sampled_batch["label"], sampled_batch["time"], sampled_batch['case_name']
-        image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
-        metric_batch = test_multiple_volumes(image_batch, label_batch, time_batch, model, classes=args.num_classes, patch_size=args.img_size,
-                                         test_save_path=test_save_path, case=case_name_batch, z_spacing=args.z_spacing)
-        for i in range(1, args.num_classes):
-            logging.info('i_batch %d mean_dice %f mean_hd95 %f' % (i_batch, metric_batch[i-1][0], metric_batch[i-1][1]))
-        metric_list += np.array(metric_batch)
-        # logging.info('idx %d case %s mean_dice %f mean_hd95 %f' % (i_batch, case_name, np.mean(metric_i, axis=0)[0], np.mean(metric_i, axis=0)[1]))
-    metric_list = metric_list / len(db_test)
-    for i in range(1, args.num_classes):
-        logging.info('Mean class %d mean_dice %f mean_hd95 %f' % (i, metric_list[i-1][0], metric_list[i-1][1]))
-    performance = np.mean(metric_list, axis=0)[0]
-    mean_hd95 = np.mean(metric_list, axis=0)[1]
-    logging.info('Testing performance in best val model: mean_dice : %f mean_hd95 : %f' % (performance, mean_hd95))
+        image_batch, label_batch, time_batch, name_batch = sampled_batch["image"], sampled_batch["label"], sampled_batch["time"], sampled_batch['case_name']
+        image_batch, time_batch, label_batch, name_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda(), name_batch.cuda()
+        metric_batch = test_multiple_volumes_generative(image_batch, label_batch, time_batch, model, name_batch)
+        for i in range(metric_batch.shape[0]):
+            logging.info('name %s surrogate_model_error %f generative_error %f log_pxz %f' % (metric_batch[i][0], metric_batch[i][1], metric_batch[i][2], metric_batch[i][3]))
     return "Testing Finished!"
+
+
+
+def inferrer_mat_single(args, model, test_save_path=None):
+    db_test = args.Dataset(base_dir=args.volume_path, split="test_vol", list_dir=args.list_dir, transform=transforms.Compose([Resize(output_size=args.img_size)]))
+    sample = db_test[args.index]
+    logging.info("{} case is being tested...".format(sample['case_name']))
+    model.eval()
+    image, label, time, name = sample["image"], sample["label"], sample["time"], sample['case_name']
+    image, time, label, name = image.cuda(), time.cuda(), label.cuda(), name.cuda()
+    metric = test_single_volume_generative(image, label, time, model, name)
+    logging.info('name %s surrogate_model_error %f generative_error %f log_pxz %f' % (metric[0], metric[1], metric[2], metric[3]))
+    return "Single Test Finished!"
 
 
 
@@ -159,7 +161,7 @@ if __name__ == "__main__":
             'dimension': 3,
             'prefix': 'TVD', # TransVNetDegradation
         },
-        'Degradation': {
+        'Design': {
             'Dataset': Design_dataset,
             'volume_path': '/work/sheidaei/mhashemi/data/mat',
             'list_dir': './lists/lists_Design',
@@ -167,8 +169,20 @@ if __name__ == "__main__":
             'z_spacing': 1,
             'dimension': 3,
             'prefix': 'TVG', # TransVNetGenerative
+        },
+        'Design_single': {
+            'Dataset': Design_dataset,
+            'volume_path': '/work/sheidaei/mhashemi/data/mat',
+            'list_dir': './lists/lists_Design',
+            'case': 0,
+            'num_classes': 2,
+            'z_spacing': 1,
+            'dimension': 3,
+            'prefix': 'TVG', # TransVNetGenerative
         }
     }
+    if dataset_name == 'Design_single':
+        args.index = dataset_config[dataset_name]['case']
     if isinstance(args.vit_patches_size, int): #len(args.vit_patches_size) == 1:
         args.vit_patches_size = [args.vit_patches_size] * dataset_config[dataset_name]['dimension']
     if isinstance(args.img_size, int): #len(args.img_size) == 1:
@@ -267,6 +281,6 @@ if __name__ == "__main__":
     else:
         test_save_path = None
 
-    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Design': inferrer_mat}
+    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Design': inferrer_mat, 'Design_single': inferrer_mat_single}
     inferrer[dataset_name](args, net, test_save_path)
     # sys.exit(0)

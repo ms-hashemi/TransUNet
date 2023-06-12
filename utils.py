@@ -153,3 +153,73 @@ def test_multiple_volumes(image, label, time, net, classes, patch_size=[160, 160
         sitk.WriteImage(img_itk, test_save_path + '/'+ case + "_img.nii.gz")
         sitk.WriteImage(lab_itk, test_save_path + '/'+ case + "_gt.nii.gz")
     return metric_list
+
+
+def test_multiple_volumes_generative(image_batch, label_batch, time_batch, net, name_batch):
+    with torch.no_grad():
+        mu, log_variance, predicted_labels = net.encoder(image_batch, time_batch)
+        p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
+        z = p.sample()
+        # Mixing the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
+        l = []
+        for i in range(predicted_labels.shape[1]):
+            l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
+        decoder_input = torch.stack(l, 2)
+        decoder_output = net.decoder(decoder_input)
+        # Gaussian likelihood for the reconstruction loss
+        scale = torch.exp(net.log_scale)
+        dist = torch.distributions.Normal(decoder_output, scale)
+        # Measure prob of seeing image under p(x|y,z)
+        log_pxz = dist.log_prob(image_batch[:,:net.config['n_classes'],:]) # Reconstruction loss in VAEs
+        if len(net.config.patches.size) == 3:
+            log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
+        else:
+            log_pxz = log_pxz.mean(dim=(1, 2, 3))
+        generative_output = dist.sample()
+
+    loss_mse = nn.MSELoss(reduction='none')
+    surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
+    mu, log_variance, predicted_labels_generative = net.encoder(generative_output, time_batch)
+    generative_error = torch.sum(loss_mse(predicted_labels_generative, label_batch), dim=1)
+    metric_list = torch.stack((name_batch, surrogate_model_error, generative_error, log_pxz), 1)
+
+    return metric_list
+
+
+def test_single_volume_generative(image_batch, label_batch, time_batch, net, name_batch, test_save_path=None):
+    with torch.no_grad():
+        mu, log_variance, predicted_labels = net.encoder(image_batch, time_batch)
+        p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
+        z = p.sample()
+        # Mixing the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
+        l = []
+        for i in range(predicted_labels.shape[1]):
+            l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
+        decoder_input = torch.stack(l, 2)
+        decoder_output = net.decoder(decoder_input)
+        # Gaussian likelihood for the reconstruction loss
+        scale = torch.exp(net.log_scale)
+        dist = torch.distributions.Normal(decoder_output, scale)
+        # Measure prob of seeing image under p(x|y,z)
+        log_pxz = dist.log_prob(image_batch[:,:net.config['n_classes'],:]) # Reconstruction loss in VAEs
+        if len(net.config.patches.size) == 3:
+            log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
+        else:
+            log_pxz = log_pxz.mean(dim=(1, 2, 3))
+        generative_output = dist.sample()
+
+    loss_mse = nn.MSELoss(reduction='none')
+    surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
+    mu, log_variance, predicted_labels_generative = net.encoder(generative_output, time_batch)
+    generative_error = torch.sum(loss_mse(predicted_labels_generative, label_batch), dim=1)
+    metric_list = torch.stack((name_batch, surrogate_model_error, generative_error, log_pxz), 1)
+
+    if test_save_path is not None:
+        img_itk = sitk.GetImageFromArray(image_batch.astype(np.float32))
+        prd_itk = sitk.GetImageFromArray(generative_output.astype(np.float32))
+        img_itk.SetSpacing((1, 1, 1))
+        prd_itk.SetSpacing((1, 1, 1))
+        sitk.WriteImage(prd_itk, test_save_path + '/'+ name_batch + "_pred.nii.gz")
+        sitk.WriteImage(img_itk, test_save_path + '/'+ name_batch + "_img.nii.gz")
+    
+    return metric_list
