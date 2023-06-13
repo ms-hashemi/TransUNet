@@ -35,5 +35,5 @@ module load miniconda3
 source activate mytorch
 # CUDA_VISIBLE_DEVICES=0,1,2,3 # Not needed given the current version of the script
 # srun python train_deg.py --dataset Degradation # Not needed given the current version of the script
-# python train.py --dataset Design --vit_name Conv-ViT-Gen-B_16 # Main training code
-python test.py --dataset Design --vit_name Conv-ViT-Gen-B_16 # Main testing/inference code
+python train.py --dataset Design --vit_name Conv-ViT-Gen-B_16 # Main training code
+# python test.py --dataset Design --vit_name Conv-ViT-Gen-B_16 # Main testing/inference code
