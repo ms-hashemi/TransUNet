@@ -154,7 +154,7 @@ def trainer_deg(args, model, snapshot_path):
             outputs = model(image_batch, time_batch)
             loss_ce = ce_loss(outputs, label_batch[:].long())
             loss_dice = dice_loss(outputs, label_batch, softmax=True)
-            # Total loss value is the following composite function
+            # Total loss value is the following composite function (each term is averaged among the input batch samples)
             loss = 0.5 * loss_ce + 0.5 * loss_dice
             optimizer.zero_grad()
             loss.backward()
@@ -276,13 +276,13 @@ def trainer_mat(args, model, snapshot_path):
             # Reconstruction loss in terms of log liklihood of seeing the output/decoder image given the input image (it is usually negative, so it will be negated in the total loss for minimization)
             # log_pxz = log_pxz.mean()
             # loss_reconstruction = -log_pxz
-            loss_ce = ce_loss(decoder_output, image_batch)
+            loss_ce = ce_loss(decoder_output, image_batch.squeeze(1).long())
             loss_reconstruction = loss_ce
             # MSE loss for label prediction in VAEs
             loss_pred = loss_mse(predicted_labels, label_batch)
-            # Total loss value is the following composite function
+            # Total loss value is the following composite function (each term is averaged among the input batch samples)
             # loss = L[epoch_num]*kl - log_pxz + loss_pred
-            loss = L[epoch_num]*kl + loss_reconstruction + loss_pred
+            loss = L[epoch_num]*kl + loss_reconstruction + L[epoch_num]*loss_pred
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()

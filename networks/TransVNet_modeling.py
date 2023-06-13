@@ -793,7 +793,7 @@ class VisionTransformer(nn.Module):
             #     log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
             # else:
             #     log_pxz = log_pxz.mean(dim=(1, 2, 3))
-            log_pxz = None
+            log_pxz = 0
             return (predicted_labels, decoder_output, kl, log_pxz)
         else:
             x, _, features = self.transformer(x, time)

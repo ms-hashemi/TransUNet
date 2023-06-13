@@ -107,6 +107,7 @@ def inferrer_mat(args, model, test_save_path=None):
     """Main inferrence function for the material design dataset used in our TransVNet as a 3D predictive and generative model"""
     db_test = args.Dataset(base_dir=args.volume_path, split="test_vol", list_dir=args.list_dir, transform=transforms.Compose([Resize2(output_size=args.img_size)]))
     if args.index is None: # If the whole test cases in the testing list need to be tested.
+        args.batch_size = 2 # For a local machine test (with lower GPU/batch_size capability)
         testloader = DataLoader(db_test, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
     else: # If only one case or sample needs to be tested.
         testloader = db_test[args.index]
@@ -120,13 +121,13 @@ def inferrer_mat(args, model, test_save_path=None):
         # Method in "utils.py" to run the model/network in the evaluation model on multiple inputs in parallel using GPU (at the end of it, the results are transferred to CPU for further calculations).
         name_batch, metric_batch = test_multiple_volumes_generative(image_batch, label_batch, time_batch, model, name_batch, test_save_path)
         for i in range(len(name_batch)):
-            logging.info('name %s surrogate_model_error %f generative_error %f reconstruction_loss(-log(liklihood)) %f' % (name_batch[i], metric_batch[i][0], metric_batch[i][1], metric_batch[i][2]))
+            logging.info('name %7s surrogate_model_error %f generative_error %f reconstruction_loss %f' % (name_batch[i], metric_batch[i][0], metric_batch[i][1], metric_batch[i][2]))
             metric[0] = metric[0] + metric_batch[i][0]
             metric[1] = metric[1] + metric_batch[i][1]
             metric[2] = metric[2] + metric_batch[i][2]
             counter = counter + 1
     # Average metrics
-    logging.info('name %s surrogate_model_error %f generative_error %f log_pxz %f' % ('average', metric[0]/counter, metric[1]/counter, metric[2]/counter))
+    logging.info('name %s surrogate_model_error %f generative_error %f reconstruction_loss %f' % ('average', metric[0]/counter, metric[1]/counter, metric[2]/counter))
     return "Testing Finished!"
 
 

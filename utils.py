@@ -157,12 +157,13 @@ def test_multiple_volumes_generative(image_batch, label_batch, time_batch, net, 
         generative_output = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
 
     loss_mse = torch.nn.MSELoss(reduction='none')
-    surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
-    mu, log_variance, predicted_labels_generative = net.module.encoder(generative_output[:,0:1,:], time_batch)
-    generative_error = torch.sum(loss_mse(predicted_labels_generative, label_batch), dim=1)
+    surrogate_model_error = torch.mean(loss_mse(predicted_labels, label_batch), dim=1)
+    mu, log_variance, predicted_labels_generative = net.module.encoder(generative_output.unsqueeze(1), time_batch)
+    generative_error = torch.mean(loss_mse(predicted_labels_generative, label_batch), dim=1)
     # reconstruction_loss = -log_pxz
-    ce_loss = torch.nn.CrossEntropyLoss()
-    reconstruction_loss = ce_loss(decoder_output, image_batch)
+    ce_loss = torch.nn.CrossEntropyLoss(reduction='none')
+    dim = [i for i in range(1, len(image_batch.size()) - 1)]
+    reconstruction_loss = torch.mean(ce_loss(decoder_output, image_batch.squeeze(1).long()), dim=dim)
     metric_list = torch.stack((surrogate_model_error, generative_error, reconstruction_loss), 1)
 
     for i in range(len(name_batch)):
