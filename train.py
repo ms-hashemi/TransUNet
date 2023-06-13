@@ -24,11 +24,11 @@ parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Wh
 parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
 parser.add_argument('--max_epochs', type=int, default=100, help='Maximum number of training epochs')
-parser.add_argument('--batch_size', type=int, default=24, help='Training batch size per gpu')
+parser.add_argument('--batch_size', type=int, default=2, help='Training batch size per gpu')
 parser.add_argument('--base_lr', type=float,  default=0.01, help='The initial learning rate of the optimizer (for SGD, not ADAM)')
 parser.add_argument('--seed', type=int, default=1234, help='The random seed value')
 
-parser.add_argument('--gpu', type=int, default=4, help='Total number of gpus')
+parser.add_argument('--gpu', type=int, default=1, help='Total number of gpus')
 parser.add_argument('--world-size', default=-1, type=int, help='Number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int, help='Node rank for distributed training')
 parser.add_argument('--dist-url', default='env://', type=str, help='Url used to set up distributed training')
@@ -69,8 +69,8 @@ if __name__ == "__main__":
             'prefix': 'TVD', # TransVNetDegradation
         },
         'Design': {
-            'root_path': '/work/sheidaei/mhashemi/data/mat',
-            # 'root_path': '../data/mat/Results', # On my local machine or CyBox
+            # 'root_path': '/work/sheidaei/mhashemi/data/mat',
+            'root_path': '../data/mat/Results', # On my local machine or CyBox
             'list_dir': './lists/lists_Design',
             'num_classes': 2,
             'dimension': 3,
@@ -159,7 +159,7 @@ if __name__ == "__main__":
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
     if args.pretrained_net_path:
         model.load_state_dict(torch.load(args.pretrained_net_path))
-    model.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
+    model.module.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
 
     trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_mat}
     trainer[dataset_name](args, model, snapshot_path)
