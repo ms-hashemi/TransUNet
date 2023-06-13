@@ -527,6 +527,7 @@ class DecoderBlock3D(nn.Module):
         x = self.conv2(x)
         return x
 
+
 class SegmentationHead(nn.Sequential):
 
     def __init__(self, in_channels, out_channels, kernel_size=3, upsampling=1):
@@ -543,6 +544,7 @@ class Morph3D(nn.Sequential):
         conv3d.weight = nn.Parameter(Normal(0, 1e-5).sample(conv3d.weight.shape))
         conv3d.bias = nn.Parameter(torch.zeros(conv3d.bias.shape))
         super().__init__(conv3d, upsampling)
+
 
 class DecoderCup(nn.Module):
     def __init__(self, config):
@@ -674,7 +676,11 @@ class EncoderForGenerativeModels(nn.Module):
         )
 
     def forward(self, x, time):
-        # Encode (x, time) to get the mu and variance parameters as well as lebels 
+        # Encode (x, time) to get the mu and variance parameters as well as lebels
+        if x.size()[1] == 1 and len(self.config.patches.size) == 3:
+            x = x.repeat(1,3,1,1,1)
+        elif x.size()[1] == 1 and len(self.config.patches.size) != 3:
+            x = x.repeat(1,3,1,1)
         x_encoded, attn_weights, features = self.transformer(x, time)
         B, n_patch, hidden = x_encoded.size()  # reshape from (B, n_patch, hidden) to (B, h, w, hidden)
         x_encoded = x_encoded.contiguous().view(B, hidden*n_patch)
@@ -715,6 +721,7 @@ class DecoderForGenerativeModels(nn.Module):
         else:
             x = self.segmentation_head(x)
         return x
+
 
 class VisionTransformer(nn.Module):
     def __init__(self, config, img_size=224, num_classes=21843, zero_head=False, vis=False):
@@ -759,7 +766,7 @@ class VisionTransformer(nn.Module):
             std = torch.exp(log_variance / 2)
             q = torch.distributions.Normal(mu, std)
             z = q.rsample()
-            # Concatenating the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
+            # Mixing the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
             l = []
             for i in range(predicted_labels.shape[1]):
                 l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
@@ -777,16 +784,17 @@ class VisionTransformer(nn.Module):
             kl = kl.sum(-1)
             # Decoder output given a random sample of the encoder distribution and its predicted labels
             decoder_output = self.decoder(decoder_input)
-            # Gaussian likelihood for the reconstruction loss
-            scale = torch.exp(self.log_scale)
-            dist = torch.distributions.Normal(decoder_output, scale)
-            # Measure prob of seeing image under p(x|y,z)
-            log_pxz = dist.log_prob(x[:,:self.config['n_classes'],:]) # Reconstruction loss in VAEs
-            if len(self.config.patches.size) == 3:
-                log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
-            else:
-                log_pxz = log_pxz.mean(dim=(1, 2, 3))
-            return (predicted_labels, x, kl, log_pxz)
+            # # Gaussian likelihood for the reconstruction loss
+            # scale = torch.exp(self.log_scale)
+            # dist = torch.distributions.Normal(decoder_output, scale)
+            # # Measure prob of seeing image under p(x|y,z)
+            # log_pxz = dist.log_prob(x[:,:self.config['n_classes'],:]) # Reconstruction loss in VAEs
+            # if len(self.config.patches.size) == 3:
+            #     log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
+            # else:
+            #     log_pxz = log_pxz.mean(dim=(1, 2, 3))
+            log_pxz = None
+            return (predicted_labels, decoder_output, kl, log_pxz)
         else:
             x, _, features = self.transformer(x, time)
             x = self.decoder(x, features)

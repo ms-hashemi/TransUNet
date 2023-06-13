@@ -2,11 +2,11 @@ import numpy as np
 import torch
 from medpy import metric
 from scipy.ndimage import zoom
-import torch.nn as nn
 import SimpleITK as sitk
 
 
-class DiceLoss(nn.Module):
+class DiceLoss(torch.nn.Module):
+    """A class for calculating the Dice metric loss given an image, the decoder output logits, and the target labeled image"""
     def __init__(self, n_classes):
         super(DiceLoss, self).__init__()
         self.n_classes = n_classes
@@ -46,6 +46,7 @@ class DiceLoss(nn.Module):
 
 
 def calculate_metric_percase(pred, gt):
+    """A function to gather different performance metrics for the segmentation tasks"""
     pred[pred > 0] = 1
     gt[gt > 0] = 1
     if pred.sum() > 0 and gt.sum() > 0:
@@ -59,6 +60,7 @@ def calculate_metric_percase(pred, gt):
 
 
 def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_save_path=None, case=None, z_spacing=1):
+    """The original TransUNet test function to determine the network performance on the synapse dataset (each volume consisting of 2D image slices)"""
     image, label = image.squeeze(0).cpu().detach().numpy(), label.squeeze(0).cpu().detach().numpy()
     if len(image.shape) == 3:
         prediction = np.zeros_like(label)
@@ -103,32 +105,7 @@ def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_s
 
 
 def test_multiple_volumes(image, label, time, net, classes, patch_size=[160, 160, 160], test_save_path=None, case=None, z_spacing=1):
-    # image, label = image.squeeze(0).cpu().detach().numpy(), label.squeeze(0).cpu().detach().numpy()
-    # if len(image.shape) == 3:
-    #     prediction = np.zeros_like(label)
-    #     for ind in range(image.shape[0]):
-    #         slice = image[ind, :, :]
-    #         x, y = slice.shape[0], slice.shape[1]
-    #         if x != patch_size[0] or y != patch_size[1]:
-    #             slice = zoom(slice, (patch_size[0] / x, patch_size[1] / y), order=3)  # previous using 0
-    #         input = torch.from_numpy(slice).unsqueeze(0).unsqueeze(0).float().cuda()
-    #         net.eval()
-    #         with torch.no_grad():
-    #             outputs = net(input)
-    #             out = torch.argmax(torch.softmax(outputs, dim=1), dim=1).squeeze(0)
-    #             out = out.cpu().detach().numpy()
-    #             if x != patch_size[0] or y != patch_size[1]:
-    #                 pred = zoom(out, (x / patch_size[0], y / patch_size[1]), order=0)
-    #             else:
-    #                 pred = out
-    #             prediction[ind] = pred
-    # else:
-    #     input = torch.from_numpy(image).unsqueeze(
-    #         0).unsqueeze(0).float().cuda()
-    #     net.eval()
-    #     with torch.no_grad():
-    #         out = torch.argmax(torch.softmax(net(input), dim=1), dim=1).squeeze(0)
-    #         prediction = out.cpu().detach().numpy()
+    """The TransVNet test function for segmented sequencing tasks"""
     with torch.no_grad():
         out = torch.argmax(torch.softmax(net(image, time), dim=1), dim=1)
         prediction = out.cpu().detach().numpy()
@@ -155,9 +132,10 @@ def test_multiple_volumes(image, label, time, net, classes, patch_size=[160, 160
     return metric_list
 
 
-def test_multiple_volumes_generative(image_batch, label_batch, time_batch, net, name_batch):
+def test_multiple_volumes_generative(image_batch, label_batch, time_batch, net, name_batch, test_save_path=None):
+    """The TransVNet test function for generative tasks"""
     with torch.no_grad():
-        mu, log_variance, predicted_labels = net.encoder(image_batch, time_batch)
+        mu, log_variance, predicted_labels = net.module.encoder(image_batch, time_batch)
         p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
         z = p.sample()
         # Mixing the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
@@ -165,61 +143,35 @@ def test_multiple_volumes_generative(image_batch, label_batch, time_batch, net, 
         for i in range(predicted_labels.shape[1]):
             l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
         decoder_input = torch.stack(l, 2)
-        decoder_output = net.decoder(decoder_input)
-        # Gaussian likelihood for the reconstruction loss
-        scale = torch.exp(net.log_scale)
-        dist = torch.distributions.Normal(decoder_output, scale)
-        # Measure prob of seeing image under p(x|y,z)
-        log_pxz = dist.log_prob(image_batch[:,:net.config['n_classes'],:]) # Reconstruction loss in VAEs
-        if len(net.config.patches.size) == 3:
-            log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
-        else:
-            log_pxz = log_pxz.mean(dim=(1, 2, 3))
-        generative_output = dist.sample()
+        decoder_output = net.module.decoder(decoder_input)
+        # # Gaussian likelihood for the reconstruction loss
+        # scale = torch.exp(net.module.log_scale)
+        # dist = torch.distributions.Normal(decoder_output, scale)
+        # # Measure prob of seeing image under p(x|y,z)
+        # log_pxz = dist.log_prob(image_batch[:,:net.module.config['n_classes'],:]) # Reconstruction loss in VAEs
+        # if len(net.module.config.patches.size) == 3:
+        #     log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
+        # else:
+        #     log_pxz = log_pxz.mean(dim=(1, 2, 3))
+        # generative_output = dist.sample()
+        generative_output = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
 
-    loss_mse = nn.MSELoss(reduction='none')
+    loss_mse = torch.nn.MSELoss(reduction='none')
     surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
-    mu, log_variance, predicted_labels_generative = net.encoder(generative_output, time_batch)
+    mu, log_variance, predicted_labels_generative = net.module.encoder(generative_output[:,0:1,:], time_batch)
     generative_error = torch.sum(loss_mse(predicted_labels_generative, label_batch), dim=1)
-    metric_list = torch.stack((name_batch, surrogate_model_error, generative_error, log_pxz), 1)
+    # reconstruction_loss = -log_pxz
+    ce_loss = torch.nn.CrossEntropyLoss()
+    reconstruction_loss = ce_loss(decoder_output, image_batch)
+    metric_list = torch.stack((surrogate_model_error, generative_error, reconstruction_loss), 1)
 
-    return metric_list
-
-
-def test_single_volume_generative(image_batch, label_batch, time_batch, net, name_batch, test_save_path=None):
-    with torch.no_grad():
-        mu, log_variance, predicted_labels = net.encoder(image_batch, time_batch)
-        p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
-        z = p.sample()
-        # Mixing the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
-        l = []
-        for i in range(predicted_labels.shape[1]):
-            l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
-        decoder_input = torch.stack(l, 2)
-        decoder_output = net.decoder(decoder_input)
-        # Gaussian likelihood for the reconstruction loss
-        scale = torch.exp(net.log_scale)
-        dist = torch.distributions.Normal(decoder_output, scale)
-        # Measure prob of seeing image under p(x|y,z)
-        log_pxz = dist.log_prob(image_batch[:,:net.config['n_classes'],:]) # Reconstruction loss in VAEs
-        if len(net.config.patches.size) == 3:
-            log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
-        else:
-            log_pxz = log_pxz.mean(dim=(1, 2, 3))
-        generative_output = dist.sample()
-
-    loss_mse = nn.MSELoss(reduction='none')
-    surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
-    mu, log_variance, predicted_labels_generative = net.encoder(generative_output, time_batch)
-    generative_error = torch.sum(loss_mse(predicted_labels_generative, label_batch), dim=1)
-    metric_list = torch.stack((name_batch, surrogate_model_error, generative_error, log_pxz), 1)
-
-    if test_save_path is not None:
-        img_itk = sitk.GetImageFromArray(image_batch.astype(np.float32))
-        prd_itk = sitk.GetImageFromArray(generative_output.astype(np.float32))
-        img_itk.SetSpacing((1, 1, 1))
-        prd_itk.SetSpacing((1, 1, 1))
-        sitk.WriteImage(prd_itk, test_save_path + '/'+ name_batch + "_pred.nii.gz")
-        sitk.WriteImage(img_itk, test_save_path + '/'+ name_batch + "_img.nii.gz")
+    for i in range(len(name_batch)):
+        if test_save_path is not None:
+            img_itk = sitk.GetImageFromArray(image_batch[i, :].cpu().detach().numpy().astype(np.float32))
+            prd_itk = sitk.GetImageFromArray(generative_output[i, :].cpu().detach().numpy().astype(np.float32))
+            img_itk.SetSpacing((1, 1, 1))
+            prd_itk.SetSpacing((1, 1, 1))
+            sitk.WriteImage(prd_itk, test_save_path + '/'+ name_batch[i] + "_pred.nii.gz")
+            sitk.WriteImage(img_itk, test_save_path + '/'+ name_batch[i] + "_img.nii.gz")
     
-    return metric_list
+    return (name_batch, metric_list.cpu().detach().numpy())

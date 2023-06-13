@@ -121,6 +121,33 @@ class Resize(object):
         return sample
 
 
+class Resize2(object):
+    def __init__(self, output_size):
+        self.output_size = output_size
+
+    def __call__(self, sample):
+        image = sample['image']
+
+        if len(image.shape) == 4:
+            _, x, y, z = image.shape
+        elif len(image.shape) == 3:
+            x, y, z = image.shape
+        else:
+            raise ValueError('Dimension of image is not 3 or 4.')
+        if x != self.output_size[0] or y != self.output_size[1] or z != self.output_size[2]:
+            if len(image.shape) == 4:
+                image = zoom(image, (1, self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
+            elif len(image.shape) == 3:
+                image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
+            else:
+                raise ValueError('Dimension of image is not 3 or 4.')
+            # image[image>1] = 1
+        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+        sample['image'] = image.byte()
+
+        return sample
+
+
 class Degradation_dataset(Dataset):
     def __init__(self, base_dir, list_dir, split, transform=None):
         self.transform = transform  # using transform in torch!
@@ -209,5 +236,5 @@ class Design_dataset(Dataset):
         sample = {'image': image, 'time': torch.FloatTensor([-1]), 'label': label} # Time = -1 will let the network know that the data is not (time-)sequential!
         if self.transform:
             sample = self.transform(sample)
-        sample['case_name'] = self.sample_list[idx].strip('\n')[8:-4]
+        sample['case_name'] = self.sample_list[idx].strip('\n')
         return sample

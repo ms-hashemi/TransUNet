@@ -15,24 +15,25 @@ from trainer import trainer_synapse, trainer_deg, trainer_mat
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--dataset', type=str, default='Design', help='experiment_name')
-parser.add_argument('--img_size', type=int, default=[160, 160, 160], help='input patch size of network input')
+parser.add_argument('--dataset', type=str, default='Degradation', help='Experiment/dateset name')
+parser.add_argument('--img_size', type=int, default=[160, 160, 160], help='Input image size')
 
-parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='select one vit model')
-parser.add_argument('--pretrained_net_path', type=str, default=False, help='if the training should start from a pretrained state/weights, default is False') # '../model/TV_Design[160, 160, 160]/TV_pretrain_Conv-ViT-Gen-B_16_skip4_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
-parser.add_argument('--vit_patches_size', type=int, default=8, help='vit_patches_size, default is 8')
-parser.add_argument('--deterministic', type=int, default=1, help='whether use deterministic training')
-parser.add_argument('--max_epochs', type=int, default=100, help='maximum epoch number to train')
-parser.add_argument('--batch_size', type=int, default=24, help='batch_size per gpu')
-parser.add_argument('--base_lr', type=float, default=0.01, help='segmentation network learning rate')
-parser.add_argument('--seed', type=int, default=1234, help='random seed')
+parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='The name of the model/network architecture to be built/considered; detailed in "configs.py"')
+parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.') # '../model/TV_Design[160, 160, 160]/TV_pretrain_Conv-ViT-Gen-B_16_skip4_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
+parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Whether the encoder or part(s) of it are pretrained; the default value is True')
+parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
+parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
+parser.add_argument('--max_epochs', type=int, default=100, help='Maximum number of training epochs')
+parser.add_argument('--batch_size', type=int, default=24, help='Training batch size per gpu')
+parser.add_argument('--base_lr', type=float,  default=0.01, help='The initial learning rate of the optimizer (for SGD, not ADAM)')
+parser.add_argument('--seed', type=int, default=1234, help='The random seed value')
 
-parser.add_argument('--gpu', type=int, default=4, help='total gpu')
-parser.add_argument('--world-size', default=-1, type=int, help='number of nodes for distributed training')
-parser.add_argument('--rank', default=-1, type=int, help='node rank for distributed training')
-parser.add_argument('--dist-url', default='env://', type=str, help='url used to set up distributed training')
-parser.add_argument('--dist-backend', default='nccl', type=str, help='distributed backend')
-parser.add_argument('--local_rank', default=-1, type=int, help='local rank for distributed training')
+parser.add_argument('--gpu', type=int, default=4, help='Total number of gpus')
+parser.add_argument('--world-size', default=-1, type=int, help='Number of nodes for distributed training')
+parser.add_argument('--rank', default=-1, type=int, help='Node rank for distributed training')
+parser.add_argument('--dist-url', default='env://', type=str, help='Url used to set up distributed training')
+parser.add_argument('--dist-backend', default='nccl', type=str, help='Distributed backend')
+parser.add_argument('--local_rank', default=-1, type=int, help='Local rank for distributed training')
 
 args = parser.parse_args()
 
@@ -83,14 +84,14 @@ if __name__ == "__main__":
     args.num_classes = dataset_config[dataset_name]['num_classes']
     args.root_path = dataset_config[dataset_name]['root_path']
     args.list_dir = dataset_config[dataset_name]['list_dir']
-    args.exp = dataset_config[dataset_name]['prefix'] + dataset_name + str(args.img_size)
+    args.exp = dataset_config[dataset_name]['prefix'] + '_' + dataset_name + str(args.img_size)
 
     # Set the training snapshot name
     snapshot_path = "../model/{}/{}".format(args.exp, dataset_config[dataset_name]['prefix'])
     if args.pretrained_net_path: # If the whole TransVNet has been trained, and the new training should start based on that trained model
         snapshot_path = snapshot_path + '_pretrained'
     else: # If only the encoder (or part of it) has been trained, and the new training should start based on that trained model
-        snapshot_path = snapshot_path + '_encoderpretrained' if args.is_pretrain_encoder else snapshot_path
+        snapshot_path = snapshot_path + '_encoderpretrained' if args.is_encoder_pretrained else snapshot_path
     snapshot_path += '_' + args.vit_name
     snapshot_path = snapshot_path + '_vitpatch' + str(args.vit_patches_size)
     snapshot_path = snapshot_path + '_epo' + str(args.max_epochs)

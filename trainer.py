@@ -1,4 +1,3 @@
-import argparse
 import logging
 import os
 import random
@@ -6,16 +5,15 @@ import sys
 import time
 import numpy as np
 import torch
-import torch.nn as nn
-import torch.optim as optim
 from tensorboardX import SummaryWriter
-from torch.nn.modules.loss import CrossEntropyLoss
 from torch.utils.data import DataLoader, distributed
 from tqdm import tqdm
 from utils import DiceLoss
 from torchvision import transforms
 
+
 def trainer_synapse(args, model, snapshot_path):
+    """Trainer function for the synapse dataset, an example for the 2D-segmentation-tasked TransUNet"""
     from datasets.dataset_synapse import Synapse_dataset, RandomGenerator
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
@@ -36,11 +34,11 @@ def trainer_synapse(args, model, snapshot_path):
     trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=True, num_workers=8, pin_memory=True,
                              worker_init_fn=worker_init_fn)
     if args.n_gpu > 1:
-        model = nn.DataParallel(model)
+        model = torch.nn.DataParallel(model)
     model.train()
-    ce_loss = CrossEntropyLoss()
+    ce_loss = torch.nn.CrossEntropyLoss()
     dice_loss = DiceLoss(num_classes)
-    optimizer = optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
+    optimizer = torch.optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
     max_epoch = args.max_epochs
@@ -70,14 +68,14 @@ def trainer_synapse(args, model, snapshot_path):
 
             logging.info('iteration %d : loss : %f, loss_ce: %f' % (iter_num, loss.item(), loss_ce.item()))
 
-            # if iter_num % 20 == 0:
-            #     image = image_batch[1, 0:1, :, :]
-            #     image = (image - image.min()) / (image.max() - image.min())
-            #     writer.add_image('train/Image', image, iter_num)
-            #     outputs = torch.argmax(torch.softmax(outputs, dim=1), dim=1, keepdim=True)
-            #     writer.add_image('train/Prediction', outputs[1, ...] * 50, iter_num)
-            #     labs = label_batch[1, ...].unsqueeze(0) * 50
-            #     writer.add_image('train/GroundTruth', labs, iter_num)
+            if iter_num % 20 == 0:
+                image = image_batch[1, 0:1, :, :]
+                image = (image - image.min()) / (image.max() - image.min())
+                writer.add_image('train/Image', image, iter_num)
+                outputs = torch.argmax(torch.softmax(outputs, dim=1), dim=1, keepdim=True)
+                writer.add_image('train/Prediction', outputs[1, ...] * 50, iter_num)
+                labs = label_batch[1, ...].unsqueeze(0) * 50
+                writer.add_image('train/GroundTruth', labs, iter_num)
 
         save_interval = 10 # 50 # int(max_epoch/6)
         if epoch_num > int(max_epoch / 2) and (epoch_num + 1) % save_interval == 0:
@@ -95,12 +93,16 @@ def trainer_synapse(args, model, snapshot_path):
     writer.close()
     return "Training Finished!"
 
+
 def seed_worker(worker_id):
+    """A function to seed the workers/threads in the dataset loader methods"""
     worker_seed = torch.initial_seed() % 2**32
     np.random.seed(worker_seed)
     random.seed(worker_seed)
 
+
 def trainer_deg(args, model, snapshot_path):
+    """Trainer function for the microstructure degradation dataset, an example for the 3D-segmented sequencing TransVNet"""
     from datasets.dataset_3D import Degradation_dataset, RandomGenerator
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
@@ -124,13 +126,13 @@ def trainer_deg(args, model, snapshot_path):
     trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=True, num_workers=8, 
                             pin_memory=True, worker_init_fn=seed_worker)
     # if args.n_gpu > 1:
-    #     model = nn.DataParallel(model)
+    #     model = torch.nn.DataParallel(model)
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # model.to(device)
     model.train()
-    ce_loss = CrossEntropyLoss()
+    ce_loss = torch.nn.CrossEntropyLoss()
     dice_loss = DiceLoss(num_classes)
-    optimizer = optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
+    optimizer = torch.optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
     max_epoch = args.max_epochs
@@ -138,6 +140,8 @@ def trainer_deg(args, model, snapshot_path):
     logging.info("{} iterations per epoch. {} max iterations ".format(len(trainloader), max_iterations))
     best_performance = 0.0
     iterator = tqdm(range(max_epoch), ncols=70)
+
+    # Training epochs iterations
     for epoch_num in iterator:
         # np.random.seed(epoch_num)
         # random.seed(epoch_num)
@@ -150,6 +154,7 @@ def trainer_deg(args, model, snapshot_path):
             outputs = model(image_batch, time_batch)
             loss_ce = ce_loss(outputs, label_batch[:].long())
             loss_dice = dice_loss(outputs, label_batch, softmax=True)
+            # Total loss value is the following composite function
             loss = 0.5 * loss_ce + 0.5 * loss_dice
             optimizer.zero_grad()
             loss.backward()
@@ -165,6 +170,7 @@ def trainer_deg(args, model, snapshot_path):
 
             logging.info('iteration %d : loss : %f, loss_ce: %f' % (iter_num, loss.item(), loss_ce.item()))
 
+            # Saving the intermediate training results
             if iter_num % 20 == 0:
                 image = image_batch[1, 0:1, :, :, :]
                 image = (image - image.min()) / (image.max() - image.min())
@@ -177,12 +183,14 @@ def trainer_deg(args, model, snapshot_path):
                 # writer.add_image('train/GroundTruth', labs, iter_num)
                 writer.add_images('train/GroundTruth', labs, iter_num, None, 'CHWN')
 
-        save_interval = 50  # int(max_epoch/6)
+        # Periodic saving of the trained model according to the current training epoch number
+        save_interval = int(max_epoch / 6)
         if epoch_num > int(max_epoch / 2) and (epoch_num + 1) % save_interval == 0:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)
             logging.info("save model to {}".format(save_mode_path))
 
+        # Saving the final training results
         if epoch_num >= max_epoch - 1:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)
@@ -193,21 +201,19 @@ def trainer_deg(args, model, snapshot_path):
     writer.close()
     return "Training Finished!"
 
+
 def trainer_mat(args, model, snapshot_path):
+    """Trainer function for the material design dataset, an example for the generative TransVNet"""
     from datasets.dataset_3D import Design_dataset, RandomGenerator2
     logging.basicConfig(filename=snapshot_path + "/log.txt", level=logging.INFO,
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     logging.info(str(args))
-    base_lr = args.base_lr
-    num_classes = args.num_classes
     batch_size = args.batch_size * args.gpu
-    # max_iterations = args.max_iterations
     db_train = Design_dataset(base_dir=args.root_path, list_dir=args.list_dir, split="train",
                                 transform=transforms.Compose(
                                    [RandomGenerator2(output_size=args.img_size)]))
     print("The length of train set is: {}".format(len(db_train)))
-
     # g = torch.Generator()
     # g.manual_seed(args.seed)
 
@@ -217,13 +223,14 @@ def trainer_mat(args, model, snapshot_path):
     trainloader = DataLoader(db_train, batch_size=batch_size, shuffle=True, num_workers=8, 
                             pin_memory=True, worker_init_fn=seed_worker)
     # if args.n_gpu > 1:
-    #     model = nn.DataParallel(model)
+    #     model = torch.nn.DataParallel(model)
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # model.to(device)
     model.train()
-    loss_mse = nn.MSELoss()
-    # optimizer = optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
-    optimizer = optim.Adam(model.parameters())
+    loss_mse = torch.nn.MSELoss()
+    ce_loss = torch.nn.CrossEntropyLoss()
+    # optimizer = torch.optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
+    optimizer = torch.optim.Adam(model.parameters())
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
     max_epoch = args.max_epochs
@@ -231,6 +238,9 @@ def trainer_mat(args, model, snapshot_path):
     logging.info("{} iterations per epoch. {} max iterations ".format(len(trainloader), max_iterations))
     best_performance = 0.0
     iterator = tqdm(range(max_epoch), ncols=70)
+
+    # Annealing scheduler function for better training stability and final performance of the VAE
+    # It oscillates between 0 and 1 and is a loss term multiplier; e.g., the KL contribution to the total network loss value changes accordingly. 
     def frange_cycle_sigmoid(start, stop, n_epoch, n_cycle=4, ratio=0.5):
         L = np.ones(n_epoch)
         period = n_epoch/n_cycle
@@ -247,6 +257,8 @@ def trainer_mat(args, model, snapshot_path):
                 i += 1
         return L
     L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4)
+
+    # Training epochs iterations
     for epoch_num in iterator:
         # np.random.seed(epoch_num)
         # random.seed(epoch_num)
@@ -257,12 +269,20 @@ def trainer_mat(args, model, snapshot_path):
             image_batch, time_batch, label_batch = sampled_batch['image'], sampled_batch['time'], sampled_batch['label']
             image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
             # logging.info('iteration %d: anomaly detection in image_batch: %f, time_batch: %f, label_batch: %f' % (iter_num, torch.isnan(image_batch).any() or torch.isinf(image_batch).any(), torch.isnan(time_batch).any() or torch.isinf(time_batch).any(), torch.isnan(label_batch).any() or torch.isinf(label_batch).any())) 
-            predicted_labels, outputs, kl, log_pxz = model(image_batch, time_batch)
+            predicted_labels, decoder_output, kl, log_pxz = model(image_batch, time_batch) # decoder_output is in fact the logits of the output image whose channels represent the categories/classes (each class = a material phase in this function)
+            # output_image = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
+            # Monte-Carlo estimation of the KL divergence loss
             kl = kl.mean()
-            log_pxz = log_pxz.mean()
-            # Loss = ELBO loss function + MSE loss function for label prediction in VAEs
+            # Reconstruction loss in terms of log liklihood of seeing the output/decoder image given the input image (it is usually negative, so it will be negated in the total loss for minimization)
+            # log_pxz = log_pxz.mean()
+            # loss_reconstruction = -log_pxz
+            loss_ce = ce_loss(decoder_output, image_batch)
+            loss_reconstruction = loss_ce
+            # MSE loss for label prediction in VAEs
             loss_pred = loss_mse(predicted_labels, label_batch)
-            loss = L[epoch_num]*kl - log_pxz + loss_pred
+            # Total loss value is the following composite function
+            # loss = L[epoch_num]*kl - log_pxz + loss_pred
+            loss = L[epoch_num]*kl + loss_reconstruction + loss_pred
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -273,12 +293,14 @@ def trainer_mat(args, model, snapshot_path):
             iter_num = iter_num + 1
             # writer.add_scalar('info/lr', lr_, iter_num)
             writer.add_scalar('info/loss', loss, iter_num)
+            writer.add_scalar('info/annealing_multiplier', L[epoch_num], epoch_num)
             writer.add_scalar('info/loss_kl', kl, iter_num)
-            writer.add_scalar('info/loss_recon', log_pxz, iter_num)
+            writer.add_scalar('info/loss_recon', loss_reconstruction, iter_num)
             writer.add_scalar('info/loss_pred', loss_pred, iter_num)
 
-            logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, log_pxz, loss_pred))
+            logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, loss_reconstruction, loss_pred))
 
+            # Saving the intermediate training results
             # if iter_num % 20 == 0:
             #     image = image_batch[1, 0:1, :, :, :]
             #     image = (image - image.min()) / (image.max() - image.min())
@@ -291,12 +313,14 @@ def trainer_mat(args, model, snapshot_path):
             #     # writer.add_image('train/GroundTruth', labs, iter_num)
             #     writer.add_images('train/GroundTruth', labs, iter_num, None, 'CHWN')
 
-        save_interval = 50  # int(max_epoch/6)
+        # Periodic saving of the trained model according to the current training epoch number
+        save_interval = int(max_epoch / 6)
         if epoch_num > int(max_epoch / 2) and (epoch_num + 1) % save_interval == 0:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)
             logging.info("save model to {}".format(save_mode_path))
 
+        # Saving the final training results
         if epoch_num >= max_epoch - 1:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)
