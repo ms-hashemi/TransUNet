@@ -266,7 +266,7 @@ if __name__ == "__main__":
             net = torch.nn.parallel.DistributedDataParallel(net)
             net_without_ddp = net.module
     else:
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         net = torch.nn.DataParallel(net)
         net.to(device)
         # raise NotImplementedError("Only DistributedDataParallel is supported.")

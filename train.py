@@ -68,14 +68,22 @@ if __name__ == "__main__":
             'dimension': 3,
             'prefix': 'TVD', # TransVNetDegradation
         },
-        'Design': {
+        'Design_local': {
             # 'root_path': '/work/sheidaei/mhashemi/data/mat',
             'root_path': '../data/mat/Results', # On my local machine or CyBox
             'list_dir': './lists/lists_Design',
             'num_classes': 2,
             'dimension': 3,
             'prefix': 'TVG', # TransVNetGenerative
-        }
+        },
+        'Design': {
+            'root_path': '/work/sheidaei/mhashemi/data/mat',
+            # 'root_path': '../data/mat/Results', # On my local machine or CyBox
+            'list_dir': './lists/lists_Design',
+            'num_classes': 2,
+            'dimension': 3,
+            'prefix': 'TVG', # TransVNetGenerative
+        },
     }
     if isinstance(args.vit_patches_size, int): #len(args.vit_patches_size) == 1:
         args.vit_patches_size = [args.vit_patches_size] * dataset_config[dataset_name]['dimension']
@@ -153,7 +161,7 @@ if __name__ == "__main__":
             model = torch.nn.parallel.DistributedDataParallel(model)
             model_without_ddp = model.module
     else:
-        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model = torch.nn.DataParallel(model)
         model.to(device)
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
@@ -161,6 +169,6 @@ if __name__ == "__main__":
         model.load_state_dict(torch.load(args.pretrained_net_path))
     model.module.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
 
-    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_mat}
+    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_mat, 'Design_local': trainer_mat}
     trainer[dataset_name](args, model, snapshot_path)
     # sys.exit(0)

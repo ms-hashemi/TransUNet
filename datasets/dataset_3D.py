@@ -63,10 +63,10 @@ class RandomGenerator(object):
             image[image>1] = 1
             label = zoom(label, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)
             label[label>1] = 1
-        image = torch.from_numpy(image.astype(np.float32)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
-        label = torch.from_numpy(label.astype(np.float32))
-        sample['image'] = image.to(torch.float32)
-        sample['label'] = label.to(torch.int64)
+        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+        label = torch.from_numpy(label.astype(np.uint8))
+        sample['image'] = image.to(torch.uint8)
+        sample['label'] = label.to(torch.uint8)
         return sample
     
 
@@ -94,9 +94,9 @@ class RandomGenerator2(object):
                 image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
             else:
                 raise ValueError('Dimension of image is not 3 or 4.')
-            # image[image>1] = 1
-        image = torch.from_numpy(image.astype(np.float32)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
-        sample['image'] = image.to(torch.float32)
+            image[image>1] = 1
+        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+        sample['image'] = image.to(torch.uint8)
         return sample
 
 
@@ -112,10 +112,10 @@ class Resize(object):
             image[image>1] = 1
             label = zoom(label, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)
             label[label>1] = 1
-        image = torch.from_numpy(image.astype(np.float32)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
-        label = torch.from_numpy(label.astype(np.int32))
-        sample['image'] = image.to(torch.float32)
-        sample['label'] = label.to(torch.int64)
+        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+        label = torch.from_numpy(label.astype(np.uint8))
+        sample['image'] = image.to(torch.uint8)
+        sample['label'] = label.to(torch.uint8)
         return sample
 
 
@@ -138,9 +138,9 @@ class Resize2(object):
                 image = zoom(image, (self.output_size[0] / x, self.output_size[1] / y, self.output_size[2] / z), order=3)  # why not 3?
             else:
                 raise ValueError('Dimension of image is not 3 or 4.')
-            # image[image>1] = 1
-        image = torch.from_numpy(image.astype(np.float32)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
-        sample['image'] = image.to(torch.float32)
+            image[image>1] = 1
+        image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
+        sample['image'] = image.to(torch.uint8)
         return sample
 
 
