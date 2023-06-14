@@ -19,7 +19,8 @@ parser.add_argument('--dataset', type=str, default='Degradation', help='Experime
 parser.add_argument('--img_size', type=int, default=[160, 160, 160], help='Input image size')
 
 parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='The name of the model/network architecture to be built/considered; detailed in "configs.py"')
-parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.') # '../model/TV_Design[160, 160, 160]/TV_pretrain_Conv-ViT-Gen-B_16_skip4_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
+parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.')
+# '../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
 parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Whether the encoder or part(s) of it are pretrained; the default value is True')
 parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
@@ -167,7 +168,10 @@ if __name__ == "__main__":
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
     if args.pretrained_net_path:
         model.load_state_dict(torch.load(args.pretrained_net_path))
-    model.module.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
+    if hasattr(model, "module"):
+        model.module.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
+    else:
+        model.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
 
     trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_mat, 'Design_local': trainer_mat}
     trainer[dataset_name](args, model, snapshot_path)

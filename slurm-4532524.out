@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/home/mhashemi/TransVNet/test.py", line 199, in <module>
-    if args.pretrained_net_path: # If the whole TransVNet has been trained, and the new training should start based on that trained model
-AttributeError: 'Namespace' object has no attribute 'pretrained_net_path'
