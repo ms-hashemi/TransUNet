@@ -261,7 +261,7 @@ def trainer_mat(args, model, snapshot_path):
 
     # Training epochs iterations
     if args.pretrained_net_path:
-        iterator2 = range(int(args.pretrained_net_path[:-2]) + 1, max_epoch)
+        iterator2 = range(int(os.path.basename(args.pretrained_net_path)[6:-4]) + 1, max_epoch)
     for epoch_num in iterator2:
         # np.random.seed(epoch_num)
         # random.seed(epoch_num)
