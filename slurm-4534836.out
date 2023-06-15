@@ -1,0 +1,74 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(dataset='Design', img_size=[160, 160, 160], vit_name='Conv-ViT-Gen-B_16', pretrained_net_path='../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs32_lr0.01_seed1234/epoch_99.pth', is_encoder_pretrained=True, vit_patches_size=[8, 8, 8], deterministic=1, max_epochs=100, batch_size=32, base_lr=0.01, seed=1234, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, num_classes=2, root_path='/work/sheidaei/mhashemi/data/mat', list_dir='./lists/lists_Design', exp='TVG_Design[160, 160, 160]', distributed=False)
+10 iterations per epoch. 1000 max iterations 
+  0%|                                         | 0/100 [00:00<?, ?it/s]iteration 1: loss: 0.612930, loss_kl: 0.756578, loss_recon: 0.611004, loss_pred: 0.022598
+iteration 2: loss: 0.680185, loss_kl: 2.053891, loss_recon: 0.660426, loss_pred: 5.937315
+iteration 3: loss: 0.659056, loss_kl: 2.057352, loss_recon: 0.647389, loss_pred: 2.661113
+iteration 4: loss: 0.643783, loss_kl: 2.235435, loss_recon: 0.636473, loss_pred: 0.720927
+iteration 5: loss: 0.664359, loss_kl: 1.291747, loss_recon: 0.657315, loss_pred: 1.557183
+iteration 6: loss: 0.624953, loss_kl: 0.492390, loss_recon: 0.620869, loss_pred: 1.159250
+iteration 7: loss: 0.620235, loss_kl: 0.085566, loss_recon: 0.617919, loss_pred: 0.851234
+iteration 8: loss: 0.622163, loss_kl: 0.630937, loss_recon: 0.618340, loss_pred: 0.915209
+iteration 9: loss: 0.620060, loss_kl: 0.437728, loss_recon: 0.616416, loss_pred: 1.036110
+iteration 10: loss: 0.615805, loss_kl: 0.732305, loss_recon: 0.611033, loss_pred: 1.197711
+iteration 11: loss: 0.630303, loss_kl: 0.705542, loss_recon: 0.616823, loss_pred: 1.390118
+iteration 12: loss: 0.626391, loss_kl: 0.635935, loss_recon: 0.613738, loss_pred: 1.331267
+iteration 13: loss: 0.626339, loss_kl: 1.234737, loss_recon: 0.613388, loss_pred: 0.778664
+iteration 14: loss: 0.625675, loss_kl: 1.498137, loss_recon: 0.613190, loss_pred: 0.442948
+iteration 15: loss: 0.618835, loss_kl: 0.712245, loss_recon: 0.611951, loss_pred: 0.357883
+iteration 16: loss: 0.619270, loss_kl: 0.594128, loss_recon: 0.613735, loss_pred: 0.266443
+iteration 17: loss: 0.615693, loss_kl: 0.231997, loss_recon: 0.612503, loss_pred: 0.263982
+iteration 18: loss: 0.617914, loss_kl: 0.579741, loss_recon: 0.612571, loss_pred: 0.250877
+iteration 19: loss: 0.618420, loss_kl: 0.873785, loss_recon: 0.611021, loss_pred: 0.276551
+iteration 20: loss: 0.613823, loss_kl: 0.820304, loss_recon: 0.606717, loss_pred: 0.284565
+iteration 21: loss: 0.632329, loss_kl: 0.958570, loss_recon: 0.612829, loss_pred: 0.214274
+iteration 22: loss: 0.627405, loss_kl: 0.886542, loss_recon: 0.610164, loss_pred: 0.150445
+iteration 23: loss: 0.620458, loss_kl: 0.369032, loss_recon: 0.611098, loss_pred: 0.193957
+iteration 24: loss: 0.631489, loss_kl: 1.134338, loss_recon: 0.610522, loss_pred: 0.126690
+iteration 25: loss: 0.612770, loss_kl: 0.042296, loss_recon: 0.609207, loss_pred: 0.171978
+iteration 26: loss: 0.634407, loss_kl: 1.317062, loss_recon: 0.610416, loss_pred: 0.125902
+iteration 27: loss: 0.626531, loss_kl: 0.944338, loss_recon: 0.608956, loss_pred: 0.112728
+iteration 28: loss: 0.623241, loss_kl: 0.772759, loss_recon: 0.609039, loss_pred: 0.081445
+iteration 29: loss: 0.628874, loss_kl: 1.189059, loss_recon: 0.608088, loss_pred: 0.061117
+iteration 30: loss: 0.626677, loss_kl: 1.216730, loss_recon: 0.604771, loss_pred: 0.100808
+iteration 31: loss: 0.656904, loss_kl: 0.972511, loss_recon: 0.611699, loss_pred: 0.096438
+iteration 32: loss: 0.655814, loss_kl: 0.969746, loss_recon: 0.608415, loss_pred: 0.151051
+iteration 33: loss: 0.647818, loss_kl: 0.785861, loss_recon: 0.610421, loss_pred: 0.098439
+iteration 34: loss: 0.654116, loss_kl: 0.961387, loss_recon: 0.609770, loss_pred: 0.087245
+iteration 35: loss: 0.646831, loss_kl: 0.745891, loss_recon: 0.609887, loss_pred: 0.127694
+iteration 36: loss: 0.666709, loss_kl: 1.286266, loss_recon: 0.609692, loss_pred: 0.061985
+iteration 37: loss: 0.693614, loss_kl: 1.892434, loss_recon: 0.608933, loss_pred: 0.109957
+iteration 38: loss: 0.670258, loss_kl: 1.389221, loss_recon: 0.608816, loss_pred: 0.063672
+iteration 39: loss: 0.651980, loss_kl: 0.958157, loss_recon: 0.607515, loss_pred: 0.093270
+iteration 40: loss: 0.642661, loss_kl: 0.786849, loss_recon: 0.604220, loss_pred: 0.122154
+iteration 41: loss: 0.755181, loss_kl: 1.362754, loss_recon: 0.610366, loss_pred: 0.037773
+iteration 42: loss: 0.681980, loss_kl: 0.676639, loss_recon: 0.607922, loss_pred: 0.039590
+iteration 43: loss: 0.765405, loss_kl: 1.421703, loss_recon: 0.609648, loss_pred: 0.084643
+iteration 44: loss: 0.757262, loss_kl: 1.355961, loss_recon: 0.609631, loss_pred: 0.071793
+iteration 45: loss: 0.734679, loss_kl: 1.160264, loss_recon: 0.608184, loss_pred: 0.063085
+iteration 46: loss: 0.764378, loss_kl: 1.446717, loss_recon: 0.609425, loss_pred: 0.051856
+iteration 47: loss: 0.742266, loss_kl: 1.235625, loss_recon: 0.608590, loss_pred: 0.057175
+iteration 48: loss: 0.745801, loss_kl: 1.282715, loss_recon: 0.608380, loss_pred: 0.046306
+iteration 49: loss: 0.801920, loss_kl: 1.828184, loss_recon: 0.607795, loss_pred: 0.049228
+iteration 50: loss: 0.842051, loss_kl: 2.167740, loss_recon: 0.604196, loss_pred: 0.132592
+iteration 51: loss: 0.928231, loss_kl: 1.315743, loss_recon: 0.610346, loss_pred: 0.057559
+iteration 52: loss: 0.930749, loss_kl: 1.216716, loss_recon: 0.608518, loss_pred: 0.175361
+iteration 53: loss: 1.052676, loss_kl: 1.665403, loss_recon: 0.611454, loss_pred: 0.240727
+iteration 54: loss: 0.988302, loss_kl: 1.504414, loss_recon: 0.609513, loss_pred: 0.131997
+iteration 55: loss: 0.915494, loss_kl: 1.116473, loss_recon: 0.609536, loss_pred: 0.205301
+iteration 56: loss: 1.040761, loss_kl: 1.679808, loss_recon: 0.610218, loss_pred: 0.180185
+iteration 57: loss: 1.028229, loss_kl: 1.734757, loss_recon: 0.609238, loss_pred: 0.075335
+iteration 58: loss: 0.922599, loss_kl: 1.243741, loss_recon: 0.609630, loss_pred: 0.108324
+iteration 59: loss: 0.901860, loss_kl: 1.164754, loss_recon: 0.608927, loss_pred: 0.100751
+iteration 60: loss: 1.034284, loss_kl: 1.727316, loss_recon: 0.605183, loss_pred: 0.126452
+iteration 61: loss: 1.341610, loss_kl: 1.602946, loss_recon: 0.610837, loss_pred: 0.056822
+iteration 62: loss: 1.209995, loss_kl: 1.250943, loss_recon: 0.609389, loss_pred: 0.113182
+iteration 63: loss: 1.413192, loss_kl: 1.656212, loss_recon: 0.611681, loss_pred: 0.164221
+iteration 64: loss: 1.229782, loss_kl: 1.285665, loss_recon: 0.612158, loss_pred: 0.117114
+iteration 65: loss: 1.429084, loss_kl: 1.739392, loss_recon: 0.611126, loss_pred: 0.118394
+iteration 66: loss: 1.131453, loss_kl: 1.074306, loss_recon: 0.614486, loss_pred: 0.099855
+iteration 67: loss: 1.352362, loss_kl: 1.618047, loss_recon: 0.613804, loss_pred: 0.059401
+iteration 68: loss: 1.379158, loss_kl: 1.606410, loss_recon: 0.614758, loss_pred: 0.129733
+iteration 69: loss: 1.330882, loss_kl: 1.424147, loss_recon: 0.611265, loss_pred: 0.210282
+iteration 70: loss: 1.616495, loss_kl: 1.860214, loss_recon: 0.610010, loss_pred: 0.425764

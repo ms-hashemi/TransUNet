@@ -169,10 +169,10 @@ if __name__ == "__main__":
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
     if args.pretrained_net_path:
         model.load_state_dict(torch.load(args.pretrained_net_path))
-    if hasattr(model, "module"):
-        model.module.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
-    else:
-        model.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
+    # if hasattr(model, "module"):
+    #     model.module.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
+    # else:
+    #     model.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
 
     trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_mat, 'Design_local': trainer_mat}
     trainer[dataset_name](args, model, snapshot_path)
