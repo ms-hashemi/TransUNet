@@ -35,5 +35,6 @@ module load miniconda3
 source activate mytorch
 # CUDA_VISIBLE_DEVICES=0,1,2,3 # Not needed given the current version of the script
 # srun python train_deg.py --dataset Degradation # Not needed given the current version of the script
-python train.py --dataset Design --vit_name Conv-ViT-Gen-B_16 --gpu 4 --batch_size 28 # Main training code
-# python test.py --dataset Design --vit_name Conv-ViT-Gen-B_16 --gpu 4 --batch_size 24 # Main testing/inference code
+python train.py --dataset Design --vit_name Conv-ViT-Gen-B_16 --gpu 4 --batch_size 32 # Main training code
+python train.py --dataset Design --vit_name Conv-ViT-Gen-B_16 --gpu 4 --batch_size 32 --pretrained_net_path '../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs32_lr0.01_seed1234/epoch_99.pth' # Main training code
+python test.py --dataset Design --vit_name Conv-ViT-Gen-B_16 --gpu 4 --batch_size 32 --batch_size_test 32 # Main testing/inference code

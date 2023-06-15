@@ -29,13 +29,14 @@ parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Wh
 parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
 parser.add_argument('--max_epochs', type=int, default=100, help='Maximum number of training epochs')
-parser.add_argument('--batch_size', type=int, default=24, help='Training batch size per gpu')
+parser.add_argument('--batch_size', type=int, default=32, help='Training batch size per gpu')
 parser.add_argument('--base_lr', type=float,  default=0.01, help='The initial learning rate of the optimizer (for SGD, not ADAM)')
 parser.add_argument('--seed', type=int, default=1234, help='The random seed value')
 parser.add_argument('--is_savenii', action="store_true", help='Whether to save the results during inference')
 parser.add_argument('--test_save_dir', type=str, default='../predictions', help='Saving directory to be created for the inference results')
 
-parser.add_argument('--gpu', type=int, default=4, help='Total number of gpus')
+parser.add_argument('--gpu', type=int, default=4, help='Total number of gpus for testing')
+parser.add_argument('--batch_size_test', type=int, default=32, help='Test batch size per gpu')
 parser.add_argument('--world-size', default=-1, type=int, help='Number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int, help='Node rank for distributed training')
 parser.add_argument('--dist-url', default='env://', type=str, help='Url used to set up distributed training')
@@ -78,7 +79,7 @@ def inferrer_synapse(args, model, test_save_path=None):
 def inferrer_deg(args, model, test_save_path=None):
     """Main inferrence function for the degradation dataset used in our TransVNet for 3D-segmented sequence prediction"""
     db_test = args.Dataset(base_dir=args.volume_path, split="test_vol", list_dir=args.list_dir, transform=transforms.Compose([Resize(output_size=args.img_size)]))
-    testloader = DataLoader(db_test, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
+    testloader = DataLoader(db_test, batch_size=args.batch_size_test, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
     logging.info("{} test iterations per epoch".format(len(testloader)))
     model.eval()
     # Matrix of the network performance: row: class; column: metric of performance (dice, hd95)
@@ -107,8 +108,7 @@ def inferrer_mat(args, model, test_save_path=None):
     """Main inferrence function for the material design dataset used in our TransVNet as a 3D predictive and generative model"""
     db_test = args.Dataset(base_dir=args.volume_path, split="test_vol", list_dir=args.list_dir, transform=transforms.Compose([Resize2(output_size=args.img_size)]))
     if args.index is None: # If the whole test cases in the testing list need to be tested.
-        args.batch_size = 2 # For a local machine test (with lower GPU/batch_size capability)
-        testloader = DataLoader(db_test, batch_size=args.batch_size, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
+        testloader = DataLoader(db_test, batch_size=args.batch_size_test, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
     else: # If only one case or sample needs to be tested.
         testloader = db_test[args.index]
     logging.info("{} test iterations per epoch".format(len(testloader)))
@@ -164,10 +164,20 @@ if __name__ == "__main__":
             'dimension': 3,
             'prefix': 'TVD', # TransVNetDegradation
         },
-        'Design': {
+        'Design_local': {
             'Dataset': Design_dataset,
             # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
             'volume_path': '../data/mat/Results', # On my local machine or CyBox
+            'list_dir': './lists/lists_Design',
+            'num_classes': 2,
+            'z_spacing': 1,
+            'dimension': 3,
+            'prefix': 'TVG', # TransVNetGenerative
+        },
+        'Design': {
+            'Dataset': Design_dataset,
+            'volume_path': '/work/sheidaei/mhashemi/data/mat',
+            # 'volume_path': '../data/mat/Results', # On my local machine or CyBox
             'list_dir': './lists/lists_Design',
             'num_classes': 2,
             'z_spacing': 1,

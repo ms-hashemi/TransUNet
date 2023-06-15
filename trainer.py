@@ -233,11 +233,12 @@ def trainer_mat(args, model, snapshot_path):
     optimizer = torch.optim.Adam(model.parameters())
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
-    max_epoch = args.max_epochs
+    max_epoch = args.max_epochs + 1 + int(os.path.basename(args.pretrained_net_path)[6:-4])
     max_iterations = args.max_epochs * len(trainloader)  # max_epoch = max_iterations // len(trainloader) + 1
     logging.info("{} iterations per epoch. {} max iterations ".format(len(trainloader), max_iterations))
     best_performance = 0.0
-    iterator = tqdm(range(max_epoch), ncols=70)
+    iterator = tqdm(range(args.max_epochs), ncols=70)
+    iterator2 = iterator
 
     # Annealing scheduler function for better training stability and final performance of the VAE
     # It oscillates between 0 and 1 and is a loss term multiplier; e.g., the KL contribution to the total network loss value changes accordingly. 
@@ -256,10 +257,12 @@ def trainer_mat(args, model, snapshot_path):
                 v += step
                 i += 1
         return L
-    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4)
+    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 8)
 
     # Training epochs iterations
-    for epoch_num in iterator:
+    if args.pretrained_net_path:
+        iterator2 = range(args.pretrained_net_path[:-2] + 1, max_epoch)
+    for epoch_num in iterator2:
         # np.random.seed(epoch_num)
         # random.seed(epoch_num)
         # # fix sampling seed such that each gpu gets different part of dataset
