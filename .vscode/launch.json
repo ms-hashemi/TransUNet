@@ -6,7 +6,7 @@
             "request": "launch",
             "program": "${file}",
             "justMyCode": true,
-            "args": ["--dataset", "Design_local", "--vit_name", "Conv-ViT-Gen-B_16", "--gpu", "1", "--batch_size", "2"]
+            "args": ["--dataset", "Design_local", "--vit_name", "Conv-ViT-Gen-B_16", "--gpu", "1", "--batch_size", "2", "--pretrained_net_path", "../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth"]
         }
     ]
 }
