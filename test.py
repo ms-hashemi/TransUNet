@@ -35,8 +35,8 @@ parser.add_argument('--seed', type=int, default=1234, help='The random seed valu
 parser.add_argument('--is_savenii', action="store_true", help='Whether to save the results during inference')
 parser.add_argument('--test_save_dir', type=str, default='../predictions', help='Saving directory to be created for the inference results')
 
-parser.add_argument('--gpu', type=int, default=4, help='Total number of gpus for testing')
-parser.add_argument('--batch_size_test', type=int, default=32, help='Test batch size per gpu')
+parser.add_argument('--gpu', type=int, default=1, help='Total number of gpus for testing')
+parser.add_argument('--batch_size_test', type=int, default=2, help='Test batch size per gpu')
 parser.add_argument('--world-size', default=-1, type=int, help='Number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int, help='Node rank for distributed training')
 parser.add_argument('--dist-url', default='env://', type=str, help='Url used to set up distributed training')

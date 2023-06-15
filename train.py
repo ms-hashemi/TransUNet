@@ -26,11 +26,11 @@ parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Wh
 parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
 parser.add_argument('--max_epochs', type=int, default=100, help='Maximum number of training epochs')
-parser.add_argument('--batch_size', type=int, default=24, help='Training batch size per gpu')
+parser.add_argument('--batch_size', type=int, default=2, help='Training batch size per gpu')
 parser.add_argument('--base_lr', type=float,  default=0.01, help='The initial learning rate of the optimizer (for SGD, not ADAM)')
 parser.add_argument('--seed', type=int, default=1234, help='The random seed value')
 
-parser.add_argument('--gpu', type=int, default=4, help='Total number of gpus')
+parser.add_argument('--gpu', type=int, default=1, help='Total number of gpus')
 parser.add_argument('--world-size', default=-1, type=int, help='Number of nodes for distributed training')
 parser.add_argument('--rank', default=-1, type=int, help='Node rank for distributed training')
 parser.add_argument('--dist-url', default='env://', type=str, help='Url used to set up distributed training')
