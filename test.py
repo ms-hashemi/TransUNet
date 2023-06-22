@@ -11,7 +11,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from datasets.dataset_synapse import Synapse_dataset
-from utils import test_single_volume, test_multiple_volumes, test_multiple_volumes_generative
+from utils import test_single_volume, test_multiple_volumes, test_multiple_volumes_generative, test_multiple_volumes_generative2
 from networks.TransVNet_modeling import VisionTransformer as Net
 from networks.TransVNet_modeling import CONFIGS, CONFIGS3D
 from torchvision import transforms
@@ -131,6 +131,37 @@ def inferrer_mat(args, model, test_save_path=None):
     return "Testing Finished!"
 
 
+def inferrer_mat2(args, model, test_save_path=None):
+    """The inferrence function for the material design dataset used in our TransVNet as a 3D predictive and generative model - case by case testing"""
+    db_test = args.Dataset(base_dir=args.volume_path, split="test_vol", list_dir=args.list_dir, transform=transforms.Compose([Resize2(output_size=args.img_size)]))
+    if args.index is None: # If the whole test cases in the testing list need to be tested.
+        testloader = DataLoader(db_test, batch_size=args.batch_size_test, shuffle=False, num_workers=8, pin_memory=True, worker_init_fn=seed_worker)
+    else: # If only one case or sample needs to be tested.
+        testloader = db_test[args.index]
+    if args.number_of_samplings is not None: # If the whole test cases in the testing list need to be tested.
+        number_of_samplings = args.number_of_samplings
+    else:
+        number_of_samplings = 6
+    logging.info("{} test iterations per epoch".format(len(testloader)))
+    metric = torch.tensor([0.0, 0.0, 0.0]) # The metrics are (surrogate_model_error, generative_error, log_pxz).
+    counter = 0 # Number of cases tested (for the average calculation)
+    model.eval()
+    for i_batch, sampled_batch in tqdm(enumerate(testloader)):
+        image_batch, label_batch, time_batch, name_batch = sampled_batch["image"], sampled_batch["label"], sampled_batch["time"], sampled_batch['case_name']
+        image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
+        # Method in "utils.py" to run the model/network in the evaluation model on multiple inputs in parallel using GPU (at the end of it, the results are transferred to CPU for further calculations).
+        name_batch, metric_batch = test_multiple_volumes_generative2(image_batch, label_batch, time_batch, model, name_batch, test_save_path, number_of_samplings)
+        for i in range(len(name_batch)):
+            logging.info('name %7s surrogate_model_error %f generative_error %f reconstruction_loss %f' % (name_batch[i], metric_batch[i][0], metric_batch[i][1], metric_batch[i][2]))
+            metric[0] = metric[0] + metric_batch[i][0]
+            metric[1] = metric[1] + metric_batch[i][1]
+            metric[2] = metric[2] + metric_batch[i][2]
+            counter = counter + 1
+    # Average metrics
+    logging.info('name %s surrogate_model_error %f generative_error %f reconstruction_loss %f' % ('average', metric[0]/counter, metric[1]/counter, metric[2]/counter))
+    return "Testing Finished!"
+
+
 if __name__ == "__main__":
     # Random or deterministic inference
     if not args.deterministic:
@@ -184,6 +215,17 @@ if __name__ == "__main__":
             'dimension': 3,
             'prefix': 'TVG', # TransVNetGenerative
         },
+        'Design2': {
+            'Dataset': Design_dataset,
+            'volume_path': '/work/sheidaei/mhashemi/data/mat',
+            # 'volume_path': '../data/mat/Results', # On my local machine or CyBox
+            'list_dir': './lists/lists_Design',
+            'num_classes': 2,
+            'z_spacing': 1,
+            'dimension': 3,
+            'prefix': 'TVG', # TransVNetGenerative
+            'number_of_samplings': 6,
+        },
         'Design_single': { # To test a single specific case in the test list
             'Dataset': Design_dataset,
             # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
@@ -199,6 +241,10 @@ if __name__ == "__main__":
     # Assigning index attribute to args if a single case is needed to be tested in the material design dataset
     if dataset_name == 'Design_single':
         args.index = dataset_config[dataset_name]['case_index_in_list']
+    else:
+        args.index = None
+    if dataset_name == 'Design2':
+        args.number_of_samplings = dataset_config[dataset_name]['number_of_samplings']
     else:
         args.index = None
     # Repeating the arg to get the 2D/3D arg
@@ -300,6 +346,6 @@ if __name__ == "__main__":
     else:
         test_save_path = None
 
-    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Design': inferrer_mat}
+    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Design': inferrer_mat2}
     inferrer[dataset_name](args, net, test_save_path)
     # sys.exit(0)
