@@ -209,6 +209,7 @@ def trainer_mat(args, model, snapshot_path):
                         format='[%(asctime)s.%(msecs)03d] %(message)s', datefmt='%H:%M:%S')
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     logging.info(str(args))
+    base_lr = args.base_lr
     batch_size = args.batch_size * args.gpu
     db_train = Design_dataset(base_dir=args.root_path, list_dir=args.list_dir, split="train",
                                 transform=transforms.Compose(
@@ -230,7 +231,7 @@ def trainer_mat(args, model, snapshot_path):
     loss_mse = torch.nn.MSELoss()
     ce_loss = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=base_lr)
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
     if args.pretrained_net_path:
