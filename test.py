@@ -308,10 +308,10 @@ if __name__ == "__main__":
         config = CONFIGS[args.vit_name]
     config.n_classes = args.num_classes
     if args.vit_name.upper().find('R50') != -1 or args.vit_name.upper().find('CONV') != -1: # If ResNet50/CNN is going to be used in a hybrid encoder
-        config.patches.grid = []
+        grid = []
         for i in range(test_config[dataset_name]['dimension']):
-            config.patches.grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
-        config.patches.grid = tuple(config.patches.grid)
+            grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
+        config.patches.grid = tuple(grid)
 
     # DDP setting
     if "WORLD_SIZE" in os.environ:
