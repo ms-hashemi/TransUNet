@@ -245,30 +245,31 @@ def trainer_mat(args, model, snapshot_path):
 
     # Annealing scheduler function for better training stability and final performance of the VAE
     # It oscillates between 0 and 1 and is a loss term multiplier; e.g., the KL contribution to the total network loss value changes accordingly. 
-    def frange_cycle_sigmoid(start, stop, n_epoch, n_cycle=4, ratio=0.5, suppress_from_epoch=float("inf")):
+    def frange_cycle_sigmoid(start, stop, n_epoch, n_cycle=4, ratio=0.5, suppress_from_cycle=4):
+        if int(suppress_from_cycle) > n_cycle:
+            suppress_from_cycle = n_cycle
         L = np.ones(n_epoch)
         period = n_epoch/n_cycle
         step = (stop-start)/(period*ratio) # step is in [0,1]
         
         # transform into [-6, 6] for plots: v*12.-6.
 
-        for c in range(n_cycle):
-            if c < suppress_from_epoch:
-                v , i = start , 0
-                while v <= stop:
-                    L[int(i+c*period)] = 1.0/(1.0+ np.exp(- (v*12.-6.)))
-                    v += step
-                    i += 1
-            else:
-                L[c] = 1.0
+        for c in range(int(suppress_from_cycle)):
+            v , i = start , 0
+            while v <= stop:
+                L[int(i+c*period)] = 1.0/(1.0+ np.exp(- (v*12.-6.)))
+                v += step
+                i += 1
         return L
-    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4, 0.5, 50)
+    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4, 0.5, 2)
 
     # Training epochs iterations
     if args.pretrained_net_path:
         iterator2 = range(int(os.path.basename(args.pretrained_net_path)[6:-4]) + 1, max_epoch)
+    
     # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
     wd = 0.3
+    
     for epoch_num in iterator2:
         # np.random.seed(epoch_num)
         # random.seed(epoch_num)
