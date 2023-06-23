@@ -233,7 +233,10 @@ def trainer_mat(args, model, snapshot_path):
     optimizer = torch.optim.Adam(model.parameters())
     writer = SummaryWriter(snapshot_path + '/log')
     iter_num = 0
-    max_epoch = args.max_epochs + 1 + int(os.path.basename(args.pretrained_net_path)[6:-4])
+    if args.pretrained_net_path:
+        max_epoch = args.max_epochs + 1 + int(os.path.basename(args.pretrained_net_path)[6:-4])
+    else:
+        max_epoch = args.max_epochs
     max_iterations = args.max_epochs * len(trainloader)  # max_epoch = max_iterations // len(trainloader) + 1
     logging.info("{} iterations per epoch. {} max iterations ".format(len(trainloader), max_iterations))
     best_performance = 0.0
@@ -257,7 +260,7 @@ def trainer_mat(args, model, snapshot_path):
                 v += step
                 i += 1
         return L
-    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 8)
+    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4)
 
     # Training epochs iterations
     if args.pretrained_net_path:

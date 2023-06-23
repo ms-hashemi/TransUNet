@@ -871,6 +871,7 @@ CONFIGS = {
 CONFIGS3D = {
     'ViT-B_16': configs.get_b16_3D_config(), # No initial CNN in the encoder
     'Conv-ViT-B_16': configs.get_conv_b16_3D_config(), # Degradation config - basic
-    'Conv-ViT-Gen-B_16': configs.get_conv_b16_3D_gen_config() # Design/VAE config - basic
+    'Conv-ViT-Gen-B_16': configs.get_conv_b16_3D_gen_config(), # Design/VAE config - basic
+    'Conv-ViT-Gen2-B_16': configs.get_conv_b16_3D_gen2_config() # Design/VAE config - basic
 }
 
