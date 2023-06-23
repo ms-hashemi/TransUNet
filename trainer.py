@@ -300,7 +300,7 @@ def trainer_mat(args, model, snapshot_path):
             # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
             for group in optimizer.param_groups:
                 for param in group['params']:
-                    param.data = param.data.add(-wd * group['lr'], param.data)
+                    param.data = param.data.add(param.data, alpha=-wd * group['lr'])
             optimizer.step()
             # lr_ = base_lr * (1.0 - iter_num / max_iterations) ** 0.9
             # for param_group in optimizer.param_groups:
