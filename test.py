@@ -179,8 +179,9 @@ if __name__ == "__main__":
     torch.cuda.manual_seed(args.seed)
 
     dataset_name = args.dataset
-    dataset_config = {
+    test_config = {
         'Synapse': {
+            'dataset_name': 'Synapse',
             'Dataset': Synapse_dataset,
             'volume_path': '../data/Synapse/test_vol_h5',
             'list_dir': './lists/lists_Synapse',
@@ -190,6 +191,7 @@ if __name__ == "__main__":
             'prefix': 'TU', # TransUNet
         },
         'Degradation': {
+            'dataset_name': 'Degradation',
             'Dataset': Degradation_dataset,
             'volume_path': '/work/sheidaei/mhashemi/data/deg',
             'list_dir': './lists/lists_Degradation',
@@ -199,6 +201,7 @@ if __name__ == "__main__":
             'prefix': 'TVD', # TransVNetDegradation
         },
         'Design_local': {
+            'dataset_name': 'Design',
             'Dataset': Design_dataset,
             # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
             'volume_path': '../data/mat/Results', # On my local machine or CyBox
@@ -209,6 +212,7 @@ if __name__ == "__main__":
             'prefix': 'TVG', # TransVNetGenerative
         },
         'Design': {
+            'dataset_name': 'Design',
             'Dataset': Design_dataset,
             'volume_path': '/work/sheidaei/mhashemi/data/mat',
             # 'volume_path': '../data/mat/Results', # On my local machine or CyBox
@@ -219,6 +223,7 @@ if __name__ == "__main__":
             'prefix': 'TVG', # TransVNetGenerative
         },
         'Design2_local': {
+            'dataset_name': 'Design',
             'Dataset': Design_dataset,
             # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
             'volume_path': '../data/mat/Results', # On my local machine or CyBox
@@ -230,6 +235,7 @@ if __name__ == "__main__":
             'number_of_samplings': 6,
         },
         'Design2': {
+            'dataset_name': 'Design',
             'Dataset': Design_dataset,
             'volume_path': '/work/sheidaei/mhashemi/data/mat',
             # 'volume_path': '../data/mat/Results', # On my local machine or CyBox
@@ -241,6 +247,7 @@ if __name__ == "__main__":
             'number_of_samplings': 6,
         },
         'Design_single': { # To test a single specific case in the test list
+            'dataset_name': 'Design',
             'Dataset': Design_dataset,
             # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
             'volume_path': '../data/mat/Results', # On my local machine or CyBox
@@ -254,31 +261,31 @@ if __name__ == "__main__":
     }
     # Assigning index attribute to args if a single case is needed to be tested in the material design dataset
     if dataset_name == 'Design_single':
-        args.index = dataset_config[dataset_name]['case_index_in_list']
+        args.index = test_config[dataset_name]['case_index_in_list']
     else:
         args.index = None
     if dataset_name == 'Design2' or dataset_name == 'Design2_local':
-        args.number_of_samplings = dataset_config[dataset_name]['number_of_samplings']
+        args.number_of_samplings = test_config[dataset_name]['number_of_samplings']
     else:
         args.index = None
     # Repeating the arg to get the 2D/3D arg
     if isinstance(args.vit_patches_size, int): #len(args.vit_patches_size) == 1:
-        args.vit_patches_size = [args.vit_patches_size] * dataset_config[dataset_name]['dimension']
+        args.vit_patches_size = [args.vit_patches_size] * test_config[dataset_name]['dimension']
     if isinstance(args.img_size, int): #len(args.img_size) == 1:
-        args.img_size = [args.img_size] * dataset_config[dataset_name]['dimension']
-    args.num_classes = dataset_config[dataset_name]['num_classes']
-    args.volume_path = dataset_config[dataset_name]['volume_path']
-    args.Dataset = dataset_config[dataset_name]['Dataset']
-    args.list_dir = dataset_config[dataset_name]['list_dir']
-    args.z_spacing = dataset_config[dataset_name]['z_spacing']
-    args.exp = dataset_config[dataset_name]['prefix'] + '_' + dataset_name + str(args.img_size)
+        args.img_size = [args.img_size] * test_config[dataset_name]['dimension']
+    args.num_classes = test_config[dataset_name]['num_classes']
+    args.volume_path = test_config[dataset_name]['volume_path']
+    args.Dataset = test_config[dataset_name]['Dataset']
+    args.list_dir = test_config[dataset_name]['list_dir']
+    args.z_spacing = test_config[dataset_name]['z_spacing']
+    args.exp = test_config[dataset_name]['prefix'] + '_' + test_config[dataset_name]['dataset_name'] + str(args.img_size)
 
     if args.net_path:
         snapshot = args.net_path
         snapshot_name = snapshot.split('/')[-2]
     else:
         # name the same snapshot defined in train script!
-        snapshot_path = "../model/{}/{}".format(args.exp, dataset_config[dataset_name]['prefix'])
+        snapshot_path = "../model/{}/{}".format(args.exp, test_config[dataset_name]['prefix'])
         if args.pretrained_net_path: # If the whole TransVNet has been trained, and the new training should start based on that trained model
             snapshot_path = snapshot_path + '_pretrained'
         else: # If only the encoder (or part of it) has been trained, and the new training should start based on that trained model
@@ -295,14 +302,14 @@ if __name__ == "__main__":
         snapshot_name = snapshot_path.split('/')[-1]
     
     # Get the config of the network to be built/considered in training
-    if dataset_config[dataset_name]['dimension'] == 3:
+    if test_config[dataset_name]['dimension'] == 3:
         config = CONFIGS3D[args.vit_name]
     else:
         config = CONFIGS[args.vit_name]
     config.n_classes = args.num_classes
     if args.vit_name.find('R50') != -1: # If ResNet50 is not used for the CNN feature extractor of the encoder
         config.patches.grid = []
-        for i in range(dataset_config[dataset_name]['dimension']):
+        for i in range(test_config[dataset_name]['dimension']):
             config.patches.grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
         config.patches.grid = tuple(config.patches.grid)
 
