@@ -16,7 +16,8 @@ from trainer import trainer_synapse, trainer_deg, trainer_mat
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--dataset', type=str, default='Degradation', help='Experiment/dateset name')
-parser.add_argument('--img_size', type=int, default=[160, 160, 160], help='Input image size')
+parser.add_argument('--img_size', type=int, default=160, help='Input image size')
+parser.add_argument('--vit_grid', type=int, default=False, help='ViT\'s number of grid sections per dimension; the default (False) will make it use the configs file to find the parameter')
 
 parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='The name of the model/network architecture to be built/considered; detailed in "configs.py"')
 parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.')
@@ -119,6 +120,10 @@ if __name__ == "__main__":
     else:
         config = CONFIGS[args.vit_name]
     config.n_classes = args.num_classes
+    if args.vit_grid:
+        if isinstance(args.vit_grid, int): #len(args.img_size) == 1:
+            args.vit_grid = [args.vit_grid] * dataset_config[dataset_name]['dimension']
+        config.patches.grid = tuple(args.vit_grid)
     if args.vit_name.find('R50') != -1: # If ResNet50 is not used for the CNN feature extractor of the encoder
         config.patches.grid = []
         for i in range(dataset_config[dataset_name]['dimension']):
