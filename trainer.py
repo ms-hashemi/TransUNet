@@ -245,7 +245,7 @@ def trainer_mat(args, model, snapshot_path):
 
     # Annealing scheduler function for better training stability and final performance of the VAE
     # It oscillates between 0 and 1 and is a loss term multiplier; e.g., the KL contribution to the total network loss value changes accordingly. 
-    def frange_cycle_sigmoid(start, stop, n_epoch, n_cycle=4, ratio=0.5):
+    def frange_cycle_sigmoid(start, stop, n_epoch, n_cycle=4, ratio=0.5, suppress_from_epoch=float("inf")):
         L = np.ones(n_epoch)
         period = n_epoch/n_cycle
         step = (stop-start)/(period*ratio) # step is in [0,1]
@@ -253,18 +253,22 @@ def trainer_mat(args, model, snapshot_path):
         # transform into [-6, 6] for plots: v*12.-6.
 
         for c in range(n_cycle):
-
-            v , i = start , 0
-            while v <= stop:
-                L[int(i+c*period)] = 1.0/(1.0+ np.exp(- (v*12.-6.)))
-                v += step
-                i += 1
+            if c < suppress_from_epoch:
+                v , i = start , 0
+                while v <= stop:
+                    L[int(i+c*period)] = 1.0/(1.0+ np.exp(- (v*12.-6.)))
+                    v += step
+                    i += 1
+            else:
+                L[c] = 1.0
         return L
-    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4)
+    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4, 0.5, 50)
 
     # Training epochs iterations
     if args.pretrained_net_path:
         iterator2 = range(int(os.path.basename(args.pretrained_net_path)[6:-4]) + 1, max_epoch)
+    # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+    wd = 0.3
     for epoch_num in iterator2:
         # np.random.seed(epoch_num)
         # random.seed(epoch_num)
@@ -288,9 +292,14 @@ def trainer_mat(args, model, snapshot_path):
             loss_pred = loss_mse(predicted_labels, label_batch)
             # Total loss value is the following composite function (each term is averaged among the input batch samples)
             # loss = L[epoch_num]*kl - log_pxz + loss_pred
-            loss = L[epoch_num]*kl + loss_reconstruction + L[epoch_num]*loss_pred
+            loss = L[epoch_num]*kl + loss_reconstruction + loss_pred
             optimizer.zero_grad()
+
             loss.backward()
+            # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+            for group in optimizer.param_groups:
+                for param in group['params']:
+                    param.data = param.data.add(-wd * group['lr'], param.data)
             optimizer.step()
             # lr_ = base_lr * (1.0 - iter_num / max_iterations) ** 0.9
             # for param_group in optimizer.param_groups:

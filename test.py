@@ -310,7 +310,7 @@ if __name__ == "__main__":
     if args.vit_name.upper().find('R50') != -1 or args.vit_name.upper().find('CONV') != -1: # If ResNet50/CNN is going to be used in a hybrid encoder
         grid = []
         for i in range(test_config[dataset_name]['dimension']):
-            grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
+            grid.append(int((args.img_size[i] // (2**config.number_down_scaled)) / args.vit_patches_size[i]))
         config.patches.grid = tuple(grid)
 
     # DDP setting
