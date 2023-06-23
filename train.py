@@ -17,14 +17,13 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--dataset', type=str, default='Degradation', help='Experiment/dateset name')
 parser.add_argument('--img_size', type=int, default=160, help='Input image size')
-parser.add_argument('--vit_grid', type=int, default=False, help='ViT\'s number of grid sections per dimension; the default (False) will make it use the configs file to find the parameter')
+parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 
 parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='The name of the model/network architecture to be built/considered; detailed in "configs.py"')
 parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.')
 # '../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
 # '../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs32_lr0.01_seed1234/epoch_99.pth'
 parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Whether the encoder or part(s) of it are pretrained; the default value is True')
-parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
 parser.add_argument('--max_epochs', type=int, default=100, help='Maximum number of training epochs')
 parser.add_argument('--batch_size', type=int, default=2, help='Training batch size per gpu')
@@ -56,7 +55,7 @@ if __name__ == "__main__":
 
     # Preprocessing the input and the hyperparameters for training
     dataset_name = args.dataset
-    dataset_config = {
+    train_config = {
         'Synapse': {
             'root_path': '../data/Synapse/train_npz',
             'list_dir': './lists/lists_Synapse',
@@ -89,16 +88,16 @@ if __name__ == "__main__":
         },
     }
     if isinstance(args.vit_patches_size, int): #len(args.vit_patches_size) == 1:
-        args.vit_patches_size = [args.vit_patches_size] * dataset_config[dataset_name]['dimension']
+        args.vit_patches_size = [args.vit_patches_size] * train_config[dataset_name]['dimension']
     if isinstance(args.img_size, int): #len(args.img_size) == 1:
-        args.img_size = [args.img_size] * dataset_config[dataset_name]['dimension']
-    args.num_classes = dataset_config[dataset_name]['num_classes']
-    args.root_path = dataset_config[dataset_name]['root_path']
-    args.list_dir = dataset_config[dataset_name]['list_dir']
-    args.exp = dataset_config[dataset_name]['prefix'] + '_' + dataset_name + str(args.img_size)
+        args.img_size = [args.img_size] * train_config[dataset_name]['dimension']
+    args.num_classes = train_config[dataset_name]['num_classes']
+    args.root_path = train_config[dataset_name]['root_path']
+    args.list_dir = train_config[dataset_name]['list_dir']
+    args.exp = train_config[dataset_name]['prefix'] + '_' + dataset_name + str(args.img_size)
 
     # Set the training snapshot name
-    snapshot_path = "../model/{}/{}".format(args.exp, dataset_config[dataset_name]['prefix'])
+    snapshot_path = "../model/{}/{}".format(args.exp, train_config[dataset_name]['prefix'])
     if args.pretrained_net_path: # If the whole TransVNet has been trained, and the new training should start based on that trained model
         snapshot_path = snapshot_path + '_pretrained'
     else: # If only the encoder (or part of it) has been trained, and the new training should start based on that trained model
@@ -115,18 +114,14 @@ if __name__ == "__main__":
         os.makedirs(snapshot_path)
     
     # Get the config of the network to be built/considered in training
-    if dataset_config[dataset_name]['dimension'] == 3:
+    if train_config[dataset_name]['dimension'] == 3:
         config = CONFIGS3D[args.vit_name]
     else:
         config = CONFIGS[args.vit_name]
     config.n_classes = args.num_classes
-    if args.vit_grid:
-        if isinstance(args.vit_grid, int): #len(args.img_size) == 1:
-            args.vit_grid = [args.vit_grid] * dataset_config[dataset_name]['dimension']
-        config.patches.grid = tuple(args.vit_grid)
-    if args.vit_name.find('R50') != -1: # If ResNet50 is not used for the CNN feature extractor of the encoder
+    if args.vit_name.upper().find('R50') != -1 or args.vit_name.upper().find('CONV') != -1: # If ResNet50/CNN is going to be used in a hybrid encoder
         config.patches.grid = []
-        for i in range(dataset_config[dataset_name]['dimension']):
+        for i in range(train_config[dataset_name]['dimension']):
             config.patches.grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
         config.patches.grid = tuple(config.patches.grid)
 

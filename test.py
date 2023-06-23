@@ -22,12 +22,12 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--dataset', type=str, default='Degradation', help='Experiment/dateset name')
 parser.add_argument('--img_size', type=int, default=[160, 160, 160], help='Input image size')
+parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 
 parser.add_argument('--net_path', type=str, default=False, help='The path to the trained network file to be used for testing: the default value (False) means that it is not specified, so the path should be found by the following arguments. However, if the full path (including the file name) is specified by an input string, the program will find the network directly without using the following arguments.')
 parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='The name of the model/network architecture to be built/considered; detailed in "configs.py"')
 parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.') # '../model/TV_Design[160, 160, 160]/TV_pretrain_Conv-ViT-Gen-B_16_skip4_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
 parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Whether the encoder or part(s) of it are pretrained; the default value is True')
-parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch size which will be considered in the image sequentialization of the ViT input')
 parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
 parser.add_argument('--max_epochs', type=int, default=100, help='Maximum number of training epochs')
 parser.add_argument('--batch_size', type=int, default=32, help='Training batch size per gpu')
@@ -155,12 +155,12 @@ def inferrer_mat2(args, model, test_save_path=None):
         # Method in "utils.py" to run the model/network in the evaluation model on multiple inputs in parallel using GPU (at the end of it, the results are transferred to CPU for further calculations).
         name_batch, metric_batch = test_multiple_volumes_generative2(image_batch, label_batch, time_batch, model, name_batch, test_save_path, number_of_samplings)
         for i in range(len(name_batch)):
-            formatting_tuple = tuple([name_batch[i]] + [metric_batch[i][j] for j in range(metric_avg.shape[1])])
+            formatting_tuple = tuple([name_batch[i]] + [metric_batch[i, j] for j in range(metric_avg.shape[1])])
             logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C11 %12.6f C11_predicted %12.6f C11_error %12.6f C12 %12.6f C12_predicted %12.6f C12_error %12.6f C13 %12.6f C13_predicted %12.6f C13_error %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f C44 %12.6f C44_predicted %12.6f C44_error %12.6f C66 %12.6f C66_predicted %12.6f C66_error %12.6f e31 %12.6f e31_predicted %12.6f e31_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f e15 %12.6f e15_predicted %12.6f e15_error %12.6f gamma11 %12.6f gamma11_predicted %12.6f gamma11_error %12.6f gamma33 %12.6f gamma33_predicted %12.6f gamma33_error %12.6f' % formatting_tuple)
             metric_avg = metric_avg + metric_batch[i, :]
             counter = counter + 1
     # Average metrics
-    formatting_tuple = tuple(['average'] + [metric_avg[i]/counter for i in range(metric_avg.shape[1])])
+    formatting_tuple = tuple(['average'] + [metric_avg[0, i]/counter for i in range(metric_avg.shape[1])])
     logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C11 %12.6f C11_predicted %12.6f C11_error %12.6f C12 %12.6f C12_predicted %12.6f C12_error %12.6f C13 %12.6f C13_predicted %12.6f C13_error %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f C44 %12.6f C44_predicted %12.6f C44_error %12.6f C66 %12.6f C66_predicted %12.6f C66_error %12.6f e31 %12.6f e31_predicted %12.6f e31_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f e15 %12.6f e15_predicted %12.6f e15_error %12.6f gamma11 %12.6f gamma11_predicted %12.6f gamma11_error %12.6f gamma33 %12.6f gamma33_predicted %12.6f gamma33_error %12.6f' % formatting_tuple)
     return "Testing Finished!"
 
@@ -307,7 +307,7 @@ if __name__ == "__main__":
     else:
         config = CONFIGS[args.vit_name]
     config.n_classes = args.num_classes
-    if args.vit_name.find('R50') != -1: # If ResNet50 is not used for the CNN feature extractor of the encoder
+    if args.vit_name.upper().find('R50') != -1 or args.vit_name.upper().find('CONV') != -1: # If ResNet50/CNN is going to be used in a hybrid encoder
         config.patches.grid = []
         for i in range(test_config[dataset_name]['dimension']):
             config.patches.grid.append(int(args.img_size[i] / args.vit_patches_size[i]))
