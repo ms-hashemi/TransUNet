@@ -23,6 +23,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', type=str, default='Degradation', help='Experiment/dateset name')
 parser.add_argument('--img_size', type=int, default=[160, 160, 160], help='Input image size')
 
+parser.add_argument('--net_path', type=str, default=False, help='The path to the trained network file to be used for testing: the default value (False) means that it is not specified, so the path should be found by the following arguments. However, if the full path (including the file name) is specified by an input string, the program will find the network directly without using the following arguments.')
 parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='The name of the model/network architecture to be built/considered; detailed in "configs.py"')
 parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.') # '../model/TV_Design[160, 160, 160]/TV_pretrain_Conv-ViT-Gen-B_16_skip4_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
 parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Whether the encoder or part(s) of it are pretrained; the default value is True')
@@ -143,7 +144,9 @@ def inferrer_mat2(args, model, test_save_path=None):
     else:
         number_of_samplings = 6
     logging.info("{} test iterations per epoch".format(len(testloader)))
-    metric = torch.tensor([0.0, 0.0, 0.0]) # The metrics are (surrogate_model_error, generative_error, log_pxz).
+    # handler = logging.StreamHandler()
+    # handler.terminator = ""
+    metric_avg = torch.zeros(1, 3 + 11*3).cuda() # The main metrics are (surrogate_model_error, generative_error, log_pxz). The rest are related to the labels.
     counter = 0 # Number of cases tested (for the average calculation)
     model.eval()
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
@@ -152,13 +155,13 @@ def inferrer_mat2(args, model, test_save_path=None):
         # Method in "utils.py" to run the model/network in the evaluation model on multiple inputs in parallel using GPU (at the end of it, the results are transferred to CPU for further calculations).
         name_batch, metric_batch = test_multiple_volumes_generative2(image_batch, label_batch, time_batch, model, name_batch, test_save_path, number_of_samplings)
         for i in range(len(name_batch)):
-            logging.info('name %7s surrogate_model_error %f generative_error %f reconstruction_loss %f' % (name_batch[i], metric_batch[i][0], metric_batch[i][1], metric_batch[i][2]))
-            metric[0] = metric[0] + metric_batch[i][0]
-            metric[1] = metric[1] + metric_batch[i][1]
-            metric[2] = metric[2] + metric_batch[i][2]
+            formatting_tuple = tuple([name_batch[i]] + [metric_batch[i][j] for j in range(metric_avg.shape[1])])
+            logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C11 %12.6f C11_predicted %12.6f C11_error %12.6f C12 %12.6f C12_predicted %12.6f C12_error %12.6f C13 %12.6f C13_predicted %12.6f C13_error %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f C44 %12.6f C44_predicted %12.6f C44_error %12.6f C66 %12.6f C66_predicted %12.6f C66_error %12.6f e31 %12.6f e31_predicted %12.6f e31_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f e15 %12.6f e15_predicted %12.6f e15_error %12.6f gamma11 %12.6f gamma11_predicted %12.6f gamma11_error %12.6f gamma33 %12.6f gamma33_predicted %12.6f gamma33_error %12.6f' % formatting_tuple)
+            metric_avg = metric_avg + metric_batch[i, :]
             counter = counter + 1
     # Average metrics
-    logging.info('name %s surrogate_model_error %f generative_error %f reconstruction_loss %f' % ('average', metric[0]/counter, metric[1]/counter, metric[2]/counter))
+    formatting_tuple = tuple(['average'] + [metric_avg[i]/counter for i in range(metric_avg.shape[1])])
+    logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C11 %12.6f C11_predicted %12.6f C11_error %12.6f C12 %12.6f C12_predicted %12.6f C12_error %12.6f C13 %12.6f C13_predicted %12.6f C13_error %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f C44 %12.6f C44_predicted %12.6f C44_error %12.6f C66 %12.6f C66_predicted %12.6f C66_error %12.6f e31 %12.6f e31_predicted %12.6f e31_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f e15 %12.6f e15_predicted %12.6f e15_error %12.6f gamma11 %12.6f gamma11_predicted %12.6f gamma11_error %12.6f gamma33 %12.6f gamma33_predicted %12.6f gamma33_error %12.6f' % formatting_tuple)
     return "Testing Finished!"
 
 
@@ -215,6 +218,17 @@ if __name__ == "__main__":
             'dimension': 3,
             'prefix': 'TVG', # TransVNetGenerative
         },
+        'Design2_local': {
+            'Dataset': Design_dataset,
+            # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
+            'volume_path': '../data/mat/Results', # On my local machine or CyBox
+            'list_dir': './lists/lists_Design',
+            'num_classes': 2,
+            'z_spacing': 1,
+            'dimension': 3,
+            'prefix': 'TVG', # TransVNetGenerative
+            'number_of_samplings': 6,
+        },
         'Design2': {
             'Dataset': Design_dataset,
             'volume_path': '/work/sheidaei/mhashemi/data/mat',
@@ -243,7 +257,7 @@ if __name__ == "__main__":
         args.index = dataset_config[dataset_name]['case_index_in_list']
     else:
         args.index = None
-    if dataset_name == 'Design2':
+    if dataset_name == 'Design2' or dataset_name == 'Design2_local':
         args.number_of_samplings = dataset_config[dataset_name]['number_of_samplings']
     else:
         args.index = None
@@ -259,18 +273,26 @@ if __name__ == "__main__":
     args.z_spacing = dataset_config[dataset_name]['z_spacing']
     args.exp = dataset_config[dataset_name]['prefix'] + '_' + dataset_name + str(args.img_size)
 
-    # name the same snapshot defined in train script!
-    snapshot_path = "../model/{}/{}".format(args.exp, dataset_config[dataset_name]['prefix'])
-    if args.pretrained_net_path: # If the whole TransVNet has been trained, and the new training should start based on that trained model
-        snapshot_path = snapshot_path + '_pretrained'
-    else: # If only the encoder (or part of it) has been trained, and the new training should start based on that trained model
-        snapshot_path = snapshot_path + '_encoderpretrained' if args.is_encoder_pretrained else snapshot_path
-    snapshot_path += '_' + args.vit_name
-    snapshot_path = snapshot_path + '_vitpatch' + str(args.vit_patches_size)
-    snapshot_path = snapshot_path + '_epo' + str(args.max_epochs)
-    snapshot_path = snapshot_path + '_bs' + str(args.batch_size)
-    snapshot_path = snapshot_path + '_lr' + str(args.base_lr)
-    snapshot_path = snapshot_path + '_seed' + str(args.seed) # if args.seed!=1234 else snapshot_path
+    if args.net_path:
+        snapshot = args.net_path
+        snapshot_name = snapshot.split('/')[-2]
+    else:
+        # name the same snapshot defined in train script!
+        snapshot_path = "../model/{}/{}".format(args.exp, dataset_config[dataset_name]['prefix'])
+        if args.pretrained_net_path: # If the whole TransVNet has been trained, and the new training should start based on that trained model
+            snapshot_path = snapshot_path + '_pretrained'
+        else: # If only the encoder (or part of it) has been trained, and the new training should start based on that trained model
+            snapshot_path = snapshot_path + '_encoderpretrained' if args.is_encoder_pretrained else snapshot_path
+        snapshot_path += '_' + args.vit_name
+        snapshot_path = snapshot_path + '_vitpatch' + str(args.vit_patches_size)
+        snapshot_path = snapshot_path + '_epo' + str(args.max_epochs)
+        snapshot_path = snapshot_path + '_bs' + str(args.batch_size)
+        snapshot_path = snapshot_path + '_lr' + str(args.base_lr)
+        snapshot_path = snapshot_path + '_seed' + str(args.seed) # if args.seed!=1234 else snapshot_path
+        # Determining the name of the last/best model trained previously
+        snapshot = os.path.join(snapshot_path, 'best_model.pth')
+        if not os.path.exists(snapshot): snapshot = snapshot.replace('best_model', 'epoch_'+str(args.max_epochs-1))
+        snapshot_name = snapshot_path.split('/')[-1]
     
     # Get the config of the network to be built/considered in training
     if dataset_config[dataset_name]['dimension'] == 3:
@@ -326,11 +348,8 @@ if __name__ == "__main__":
         net = torch.nn.DataParallel(net)
         net.to(device)
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
-    # Determining the name of the last/best model trained previously
-    snapshot = os.path.join(snapshot_path, 'best_model.pth')
-    if not os.path.exists(snapshot): snapshot = snapshot.replace('best_model', 'epoch_'+str(args.max_epochs-1))
+
     net.load_state_dict(torch.load(snapshot)) # Loading the parameters from the training results
-    snapshot_name = snapshot_path.split('/')[-1]
 
     log_folder = './test_log/' + args.exp
     os.makedirs(log_folder, exist_ok=True)
@@ -346,6 +365,6 @@ if __name__ == "__main__":
     else:
         test_save_path = None
 
-    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Design': inferrer_mat2}
+    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Design': inferrer_mat, 'Design_local': inferrer_mat2, 'Design2': inferrer_mat2, 'Design2_local': inferrer_mat2}
     inferrer[dataset_name](args, net, test_save_path)
     # sys.exit(0)

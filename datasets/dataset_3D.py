@@ -191,21 +191,21 @@ class Design_dataset(Dataset):
         property_path = f'{self.data_dir}/{volume_name+"_64x64x64.mat"}'
         # property_data = h5py.File(property_path, 'r')
         property_data = h5py.File(property_path, 'r').get('C_macro')
-        C11 = property_data[0, 0]
+        C11 = (property_data[0, 0] + property_data[1, 1])/2
         C12 = (property_data[0, 1] + property_data[1, 0])/2
-        C13 = (property_data[0, 2] + property_data[2, 0])/2
-        C33 = (property_data[1, 1] + property_data[2, 2])/2
+        C13 = (property_data[0, 2] + property_data[2, 0] + property_data[1, 2] + property_data[2, 1])/4
+        C33 = property_data[2, 2]
         C44 = (property_data[3, 3] + property_data[4, 4])/2
-        C66 = property_data[1, 1]
+        C66 = property_data[5, 5]
         gamma11 = (property_data[6, 6] + property_data[7, 7])/2
         gamma33 = property_data[8, 8]
-        e31 = abs(property_data[0, 8]) + abs(property_data[8, 0])
-        e33 = abs(property_data[0, 8]) + abs(property_data[8, 0])
-        e15 = abs(property_data[0, 8]) + abs(property_data[8, 0])
+        e31 = (property_data[8, 0] + property_data[8, 1])/2
+        e33 = property_data[8, 2]
+        e15 = (property_data[6, 4] + property_data[7, 3])/2
         label = torch.FloatTensor([C11, C12, C13, C33, C44, C66, e31, e33, e15, gamma11, gamma33])
         # Normalize the labels such that they represent N(0, 1)
-        mean = torch.FloatTensor([38.323, 15.7224, 11.898, 21.1556, 18.2747, 24.4512, -0.3501, 1.6984, 1.8966, 3.2065, 2.0996])
-        std = torch.FloatTensor([35.6838, 13.6047, 10.1844, 21.6407, 19.2492, 22.9862, 0.5574, 2.259, 2.2365, 2.4594, 1.9398])
+        mean = torch.FloatTensor([38.1987, 15.7224, 11.8707, 21.1556, 18.3433, 24.4512, -0.3486, 1.6984, 1.9056, 3.2017, 2.0996])
+        std = torch.FloatTensor([35.5903, 13.6047, 10.1752, 21.6407, 19.2872, 22.9862, 0.5550, 2.2590, 2.2424, 2.4518, 1.9398])
         label = (label - mean) / std
 
         file_path = os.path.join(self.data_dir, volume_name+'.mat')
