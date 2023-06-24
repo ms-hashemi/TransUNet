@@ -113,11 +113,11 @@ def get_conv_b16_3D_gen2_config():
     config = ml_collections.ConfigDict()
     config.patches = ml_collections.ConfigDict({'size': (8, 8, 8)})
     config.patches.grid = (4, 4, 4)
-    config.hidden_size = 192 # Should be divisible by 12!
+    config.hidden_size = 32 # Should be divisible by 12!
     config.transformer = ml_collections.ConfigDict()
-    config.transformer.mlp_dim = 3072
-    config.transformer.num_heads = 12
-    config.transformer.num_layers = 12
+    config.transformer.mlp_dim = 32
+    config.transformer.num_heads = 2
+    config.transformer.num_layers = 2
     config.transformer.attention_dropout_rate = 0.0
     config.transformer.dropout_rate = 0.1
 
@@ -129,7 +129,7 @@ def get_conv_b16_3D_gen2_config():
     config.encoder_channels = (3, 8, 16) # For the encoder blocks associated with 1/1, 1/2, and 1/4 of input image size
     config.number_down_scaled = 2 # The number of half down scaling after the last encoder block by nn.MaxPool3D(2) without any convolutions
     config.label_size = 11 # The number of latent variables, which, in material design case study, is equal to the dimension of the labels or material properties
-    config.decoder_channels = (128, 64, 32, 16) # First one is the first number of decoder input channels or head_channels
+    config.decoder_channels = (64, 32, 16, 8) # First one is the first number of decoder input channels or head_channels
     config.skip_channels = (0, 0, 0, 0) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
     config.n_classes = 2 # Number of classes for the image segmentation
     return config

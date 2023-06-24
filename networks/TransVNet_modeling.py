@@ -671,8 +671,8 @@ class EncoderForGenerativeModels(nn.Module):
             # nn.Tanh()
         )
         self.fc_label = nn.Sequential(
-            nn.Linear(config.hidden_size*n_patch, n_patch),
-            nn.Linear(n_patch, config.label_size)
+            nn.Linear(config.hidden_size*n_patch, config.label_size),
+            # nn.Linear(n_patch, config.label_size)
         )
 
     def forward(self, x, time):
@@ -766,11 +766,13 @@ class VisionTransformer(nn.Module):
             std = torch.exp(log_variance / 2)
             q = torch.distributions.Normal(mu, std)
             z = q.rsample()
-            # Mixing the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
-            l = []
-            for i in range(predicted_labels.shape[1]):
-                l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
-            decoder_input = torch.stack(l, 2)
+            # # Mixing the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+            # l = []
+            # for i in range(predicted_labels.shape[1]):
+            #     l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
+            # decoder_input = torch.stack(l, 2)
+            # Concatenate the sampled tensor zz(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+            decoder_input = torch.cat((z, predicted_labels), 1)
             # features = x.shape[-1]
             # Monte carlo KL divergence
             # 1. define the first two probabilities (in this case Normal for both)
@@ -872,6 +874,6 @@ CONFIGS3D = {
     'ViT-B_16': configs.get_b16_3D_config(), # No initial CNN in the encoder
     'Conv-ViT-B_16': configs.get_conv_b16_3D_config(), # Degradation config - basic
     'Conv-ViT-Gen-B_16': configs.get_conv_b16_3D_gen_config(), # Design/VAE config - basic
-    'Conv-ViT-Gen2-B_16': configs.get_conv_b16_3D_gen2_config() # Design/VAE config - basic
+    'Conv-ViT-Gen2-B_16': configs.get_conv_b16_3D_gen2_config() # Design/VAE config2 - basic
 }
 
