@@ -262,14 +262,14 @@ def trainer_mat(args, model, snapshot_path):
                 v += step
                 i += 1
         return L
-    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4, 0.5, 2)
+    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4, 0.5, 4)
 
     # Training epochs iterations
     if args.pretrained_net_path:
         iterator2 = range(int(os.path.basename(args.pretrained_net_path)[6:-4]) + 1, max_epoch)
     
-    # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
-    wd = 0.3
+    # # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+    # wd = 0.3
     
     for epoch_num in iterator2:
         # np.random.seed(epoch_num)
@@ -298,10 +298,10 @@ def trainer_mat(args, model, snapshot_path):
             optimizer.zero_grad()
 
             loss.backward()
-            # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
-            for group in optimizer.param_groups:
-                for param in group['params']:
-                    param.data = param.data.add(param.data, alpha=-wd * group['lr'])
+            # # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+            # for group in optimizer.param_groups:
+            #     for param in group['params']:
+            #         param.data = param.data.add(param.data, alpha=-wd * group['lr'])
             optimizer.step()
             # lr_ = base_lr * (1.0 - iter_num / max_iterations) ** 0.9
             # for param_group in optimizer.param_groups:
