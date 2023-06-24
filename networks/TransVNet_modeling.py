@@ -664,11 +664,11 @@ class EncoderForGenerativeModels(nn.Module):
             n_patch = n_patch * config.patches.grid[i]
         self.fc_mean = nn.Sequential(
             nn.Linear(config.hidden_size*n_patch, n_patch),
-            nn.Tanh()
+            # nn.Tanh()
         )
         self.fc_log_variance = nn.Sequential(
             nn.Linear(config.hidden_size*n_patch, n_patch),
-            nn.Tanh()
+            # nn.Tanh()
         )
         self.fc_label = nn.Sequential(
             nn.Linear(config.hidden_size*n_patch, n_patch),
