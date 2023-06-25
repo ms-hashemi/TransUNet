@@ -262,7 +262,24 @@ def trainer_mat(args, model, snapshot_path):
                 v += step
                 i += 1
         return L
-    L = frange_cycle_sigmoid(0.0, 1.0, max_epoch, 4, 0.5, 4)
+    def frange_cycle_linear(start, stop, n_epoch, n_cycle=4, ratio=0.5, suppress_from_cycle=4):
+        if int(suppress_from_cycle) > n_cycle:
+            suppress_from_cycle = n_cycle
+        L = np.ones(n_epoch)
+        period = n_epoch/n_cycle
+        step = (stop-start)/(period*ratio) # step is in [0,1]
+        
+        for c in range(int(suppress_from_cycle)):
+            v , i = start , 0
+            while v <= stop:
+                if i < ((1 - ratio)/2) * period - 1:
+                    L[int(i+c*period)] = start
+                else:
+                    L[int(i+c*period)] = v
+                    v += step
+                i += 1
+        return L
+    L = frange_cycle_linear(0.001, 1.0, max_epoch, 1, 0.5, 4)
 
     # Training epochs iterations
     if args.pretrained_net_path:

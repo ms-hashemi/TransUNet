@@ -552,7 +552,8 @@ class DecoderCup(nn.Module):
         self.config = config
         head_channels = config.decoder_channels[0]
         if config.classifier == 'gen':
-            first_in_channels = config.label_size
+            # first_in_channels = config.label_size
+            first_in_channels = 1
         else:
             first_in_channels = config.hidden_size
         if len(config.patches.size) == 3:
@@ -697,6 +698,15 @@ class DecoderForGenerativeModels(nn.Module):
     def __init__(self, config, img_size):
         super().__init__()
         self.config = config
+        # Distribution parameters
+        n_patch = 1
+        for i in range(len(config.patches.grid)):
+            n_patch = n_patch * config.patches.grid[i]
+        # Linear transformation on the mixed information (B, n_patch+label_size) of the latent space (B, n_patch) + labels (B, label_size) 
+        self.fc =  nn.Sequential(
+            nn.Linear(n_patch + config.label_size, n_patch),
+            # nn.Tanh()
+        )
         self.decoder = DecoderCup(config)
         if len(config.patches.size) == 3:
             self.morph_head = Morph3D(
@@ -714,6 +724,7 @@ class DecoderForGenerativeModels(nn.Module):
 
     def forward(self, x):
         # Decode the encoded input x to get a reconstructed image
+        x = torch.unsqueeze(self.fc(x), -1)
         x = self.decoder(x)
         if len(self.config.patches.size) == 3:
             x = self.morph_head(x)
@@ -773,7 +784,6 @@ class VisionTransformer(nn.Module):
             # decoder_input = torch.stack(l, 2)
             # Concatenate the sampled tensor zz(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
             decoder_input = torch.cat((z, predicted_labels), 1)
-            # features = x.shape[-1]
             # Monte carlo KL divergence
             # 1. define the first two probabilities (in this case Normal for both)
             p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std)) # Target latent distribution
