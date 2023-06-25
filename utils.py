@@ -200,10 +200,10 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                 # # Mixing the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
                 # l = []
                 # for i in range(predicted_labels.shape[1]):
-                #     l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
+                    # l.append(torch.unsqueeze(torch.mul(z[batch_index], torch.sigmoid(torch.unsqueeze(predicted_labels[batch_index, i], -1))), 0))
                 # decoder_input = torch.stack(l, 2)
-                # Concatenate the sampled tensor zz(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
-                decoder_input = torch.cat((z, predicted_labels), 1)
+                # Concatenate the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+                decoder_input = torch.unsqueeze(torch.cat((z[batch_index], predicted_labels[batch_index, :]), 0), 0)
                 decoder_output = net.module.decoder(decoder_input)
                 # # Gaussian likelihood for the reconstruction loss
                 # scale = torch.exp(net.module.log_scale)
