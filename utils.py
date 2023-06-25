@@ -197,11 +197,13 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
         for batch_index in range(batch_size):
             for sampling_trial in range(number_of_samplings):
                 z = p.sample()
-                # Mixing the sampled tensor z(batch_size, number_of_patches, label_size) with predicted_labels(batch_size, number_of_patches, label_size) to form the input tensor of the decoder for generative purposes
-                l = []
-                for i in range(predicted_labels.shape[1]):
-                    l.append(torch.unsqueeze(torch.mul(z[batch_index], torch.sigmoid(torch.unsqueeze(predicted_labels[batch_index, i], -1))), 0))
-                decoder_input = torch.stack(l, 2)
+                # # Mixing the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+                # l = []
+                # for i in range(predicted_labels.shape[1]):
+                #     l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
+                # decoder_input = torch.stack(l, 2)
+                # Concatenate the sampled tensor zz(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+                decoder_input = torch.cat((z, predicted_labels), 1)
                 decoder_output = net.module.decoder(decoder_input)
                 # # Gaussian likelihood for the reconstruction loss
                 # scale = torch.exp(net.module.log_scale)
@@ -227,7 +229,7 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
     # reconstruction_loss = -log_pxz
     dim = [i for i in range(1, len(image_batch.size()) - 1)]
     reconstruction_loss = torch.mean(ce_loss(decoder_output_best, image_batch.squeeze(1).long()), dim=dim)
-    # Normalize the labels such that they represent N(0, 1)
+    # Recover the normalized labels (the have been normalized to represent N(0, 1))
     mean = torch.FloatTensor([38.323, 15.7224, 11.898, 21.1556, 18.2747, 24.4512, -0.3501, 1.6984, 1.8966, 3.2065, 2.0996]).cuda()
     std = torch.FloatTensor([35.6838, 13.6047, 10.1844, 21.6407, 19.2492, 22.9862, 0.5574, 2.259, 2.2365, 2.4594, 1.9398]).cuda()
     absolute_errors = 100*((predicted_labels_generative_best*std + mean) - (label_batch*std + mean)) / (label_batch*std + mean)
@@ -239,7 +241,7 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
     for i in range(len(name_batch)):
         if test_save_path is not None:
             img_itk = sitk.GetImageFromArray(image_batch[i, :].cpu().detach().numpy().astype(np.float32))
-            prd_itk = sitk.GetImageFromArray(generative_output[i, :].cpu().detach().numpy().astype(np.float32))
+            prd_itk = sitk.GetImageFromArray(generative_output_best[i, :].cpu().detach().numpy().astype(np.float32))
             img_itk.SetSpacing((1, 1, 1))
             prd_itk.SetSpacing((1, 1, 1))
             sitk.WriteImage(prd_itk, test_save_path + '/'+ name_batch[i] + "_pred.nii.gz")

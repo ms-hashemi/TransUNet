@@ -279,7 +279,7 @@ def trainer_mat(args, model, snapshot_path):
                     v += step
                 i += 1
         return L
-    L = frange_cycle_linear(0.001, 1.0, max_epoch, 1, 0.5, 4)
+    L = frange_cycle_linear(0.01, 1.0, max_epoch, 4, 0.5, 4)
 
     # Training epochs iterations
     if args.pretrained_net_path:
@@ -310,8 +310,7 @@ def trainer_mat(args, model, snapshot_path):
             # MSE loss for label prediction in VAEs
             loss_pred = loss_mse(predicted_labels, label_batch)
             # Total loss value is the following composite function (each term is averaged among the input batch samples)
-            # loss = L[epoch_num]*kl - log_pxz + loss_pred
-            loss = L[epoch_num]*kl + loss_reconstruction + loss_pred
+            loss = L[epoch_num]*kl + 100*loss_reconstruction + loss_pred
             optimizer.zero_grad()
 
             loss.backward()
