@@ -285,8 +285,8 @@ def trainer_mat(args, model, snapshot_path):
     if args.pretrained_net_path:
         iterator2 = range(int(os.path.basename(args.pretrained_net_path)[6:-4]) + 1, max_epoch)
     
-    # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
-    wd = 0.3
+    # # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+    # wd = 0.3
     
     for epoch_num in iterator2:
         # np.random.seed(epoch_num)
@@ -316,10 +316,10 @@ def trainer_mat(args, model, snapshot_path):
             optimizer.zero_grad()
 
             loss.backward()
-            # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
-            for group in optimizer.param_groups:
-                for param in group['params']:
-                    param.data = param.data.add(param.data, alpha=-wd * group['lr'])
+            # # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+            # for group in optimizer.param_groups:
+            #     for param in group['params']:
+            #         param.data = param.data.add(param.data, alpha=-wd * group['lr'])
             optimizer.step()
             # lr_ = base_lr * (1.0 - iter_num / max_iterations) ** 0.9
             # for param_group in optimizer.param_groups:
@@ -328,13 +328,13 @@ def trainer_mat(args, model, snapshot_path):
             iter_num = iter_num + 1
             # writer.add_scalar('info/lr', lr_, iter_num)
             writer.add_scalar('info/loss', loss, iter_num)
-            # writer.add_scalar('info/annealing_multiplier', L[epoch_num], epoch_num)
-            # writer.add_scalar('info/loss_kl', kl, iter_num)
+            writer.add_scalar('info/annealing_multiplier', L[epoch_num], epoch_num)
+            writer.add_scalar('info/loss_kl', kl, iter_num)
             writer.add_scalar('info/loss_recon', loss_reconstruction, iter_num)
             writer.add_scalar('info/loss_pred', loss_pred, iter_num)
 
-            # logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, loss_reconstruction, loss_pred))
-            logging.info('iteration %d: loss: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, loss_reconstruction, loss_pred))
+            logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, loss_reconstruction, loss_pred))
+            # logging.info('iteration %d: loss: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, loss_reconstruction, loss_pred))
 
             # Saving the intermediate training results
             # if iter_num % 20 == 0:

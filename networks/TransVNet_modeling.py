@@ -843,8 +843,12 @@ class VisionTransformer(nn.Module):
             # # Concatenate the sampled tensor z(batch_size, number_of_patches) with the predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
             # decoder_input = torch.cat((z, predicted_labels), 1)
 
-            # Chennel-wise adding of each predicted label to the respective sampled channel
-            decoder_input = z + torch.unsqueeze(predicted_labels, -1)
+            # Chennel-wise addition of each predicted label to the respective sampled channel
+            l = []
+            for i in range(predicted_labels.shape[0]):
+                l_i = z[i, :] + torch.unsqueeze(predicted_labels[i, :], -1)
+                l.append(l_i.permute(1, 0))
+            decoder_input = torch.stack(l, 0)
 
             # # Latent distribution is the isotropic normalized properties distribution
             # decoder_input = predicted_labels

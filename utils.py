@@ -209,8 +209,8 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                 # # Concatenate the sampled tensor z(batch_size, number_of_patches) with the predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
                 # decoder_input = torch.unsqueeze(torch.cat((z[batch_index], predicted_labels[batch_index, :]), 0), 0)
                 
-                # Chennel-wise adding of each predicted label to the respective sampled channel
-                decoder_input = torch.unsqueeze(z[batch_index] + torch.unsqueeze(predicted_labels[batch_index, :], -1), 0)
+                # Chennel-wise addition of each predicted label to the respective sampled channel
+                decoder_input = torch.unsqueeze((z[batch_index, :] + torch.unsqueeze(predicted_labels[batch_index, :], -1)).permute(1, 0), 0)
                 
                 # # Test
                 # decoder_input = torch.unsqueeze(label_batch[batch_index], 0)
