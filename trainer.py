@@ -228,7 +228,7 @@ def trainer_mat(args, model, snapshot_path):
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     # model.to(device)
     model.train()
-    loss_mse = torch.nn.MSELoss()
+    loss_mse = torch.nn.MSELoss(reduction='none')
     ce_loss = torch.nn.CrossEntropyLoss()
     # optimizer = torch.optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
     optimizer = torch.optim.Adam(model.parameters(), lr=base_lr)
@@ -285,8 +285,8 @@ def trainer_mat(args, model, snapshot_path):
     if args.pretrained_net_path:
         iterator2 = range(int(os.path.basename(args.pretrained_net_path)[6:-4]) + 1, max_epoch)
     
-    # # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
-    # wd = 0.3
+    # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+    wd = 0.3
     
     for epoch_num in iterator2:
         # np.random.seed(epoch_num)
@@ -301,23 +301,25 @@ def trainer_mat(args, model, snapshot_path):
             predicted_labels, decoder_output, kl, log_pxz = model(image_batch, time_batch) # decoder_output is in fact the logits of the output image whose channels represent the categories/classes (each class = a material phase in this function)
             # output_image = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
             # Monte-Carlo estimation of the KL divergence loss
-            kl = kl.mean()
+            # kl = kl.mean()
             # Reconstruction loss in terms of log liklihood of seeing the output/decoder image given the input image (it is usually negative, so it will be negated in the total loss for minimization)
             # log_pxz = log_pxz.mean()
             # loss_reconstruction = -log_pxz
             loss_ce = ce_loss(decoder_output, image_batch.squeeze(1).long())
             loss_reconstruction = loss_ce
             # MSE loss for label prediction in VAEs
-            loss_pred = loss_mse(predicted_labels, label_batch)
-            # Total loss value is the following composite function (each term is averaged among the input batch samples)
-            loss = L[epoch_num]*kl + 100*loss_reconstruction + loss_pred
+            loss_pred = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
+            loss_pred = loss_pred.mean()
+            # Total loss value is the following composite function (each term is averaged among the input batch samples) (loss_reconstruction is also averaged among all voxels of the output image!)
+            # loss = L[epoch_num]*kl + 100*loss_reconstruction + loss_pred
+            loss = 100*loss_reconstruction + loss_pred
             optimizer.zero_grad()
 
             loss.backward()
-            # # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
-            # for group in optimizer.param_groups:
-            #     for param in group['params']:
-            #         param.data = param.data.add(param.data, alpha=-wd * group['lr'])
+            # https://www.fast.ai/posts/2018-07-02-adam-weight-decay.html
+            for group in optimizer.param_groups:
+                for param in group['params']:
+                    param.data = param.data.add(param.data, alpha=-wd * group['lr'])
             optimizer.step()
             # lr_ = base_lr * (1.0 - iter_num / max_iterations) ** 0.9
             # for param_group in optimizer.param_groups:
@@ -326,12 +328,13 @@ def trainer_mat(args, model, snapshot_path):
             iter_num = iter_num + 1
             # writer.add_scalar('info/lr', lr_, iter_num)
             writer.add_scalar('info/loss', loss, iter_num)
-            writer.add_scalar('info/annealing_multiplier', L[epoch_num], epoch_num)
-            writer.add_scalar('info/loss_kl', kl, iter_num)
+            # writer.add_scalar('info/annealing_multiplier', L[epoch_num], epoch_num)
+            # writer.add_scalar('info/loss_kl', kl, iter_num)
             writer.add_scalar('info/loss_recon', loss_reconstruction, iter_num)
             writer.add_scalar('info/loss_pred', loss_pred, iter_num)
 
-            logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, loss_reconstruction, loss_pred))
+            # logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, loss_reconstruction, loss_pred))
+            logging.info('iteration %d: loss: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, loss_reconstruction, loss_pred))
 
             # Saving the intermediate training results
             # if iter_num % 20 == 0:

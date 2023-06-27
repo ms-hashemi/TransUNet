@@ -7,8 +7,8 @@
             "program": "${file}",
             "justMyCode": true,
             // "args": ["--dataset", "Design_local", "--vit_name", "Conv-ViT-Gen-B_16", "--gpu", "1", "--batch_size", "2", "--pretrained_net_path", "../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs32_lr0.01_seed1234/epoch_99.pth"]
-            // "args": ["--dataset", "Design_local", "--img_size", "64",  "--vit_patches_size", "4", "--vit_name", "Conv-ViT-Gen2-B_16", "--gpu", "1", "--batch_size", "2", "--base_lr", "0.003", "--max_epochs", "200"]
-            "args": ["--dataset", "Design2_local", "--img_size", "64",  "--vit_patches_size", "4", "--vit_name", "Conv-ViT-Gen2-B_16", "--gpu", "1", "--batch_size_test", "2", "--net_path", "../model/TVG_Design[64, 64, 64]/TVG_encoderpretrained_Conv-ViT-Gen2-B_16_vitpatch[4, 4, 4]_epo200_bs32_lr0.003_seed1234/epoch_199.pth"]
+            "args": ["--dataset", "Design_local", "--img_size", "64",  "--vit_patches_size", "4", "--vit_name", "Conv-ViT-Gen2-B_16", "--gpu", "1", "--batch_size", "16", "--base_lr", "0.003", "--max_epochs", "200", "--is_encoder_pretrained", "False"]
+            // "args": ["--dataset", "Design2_local", "--img_size", "64",  "--vit_patches_size", "4", "--vit_name", "Conv-ViT-Gen2-B_16", "--gpu", "1", "--batch_size_test", "2", "--net_path", "../model/TVG_Design[64, 64, 64]/TVG_encoderpretrained_Conv-ViT-Gen2-B_16_vitpatch[4, 4, 4]_epo200_bs32_lr0.003_seed1234/epoch_199.pth"]
         }
     ]
 }

@@ -663,14 +663,14 @@ class EncoderForGenerativeModels(nn.Module):
         n_patch = 1
         for i in range(len(config.patches.grid)):
             n_patch = n_patch * config.patches.grid[i]
-        self.fc_mean = nn.Sequential(
-            nn.Linear(config.hidden_size*n_patch, n_patch),
-            # nn.Tanh()
-        )
-        self.fc_log_variance = nn.Sequential(
-            nn.Linear(config.hidden_size*n_patch, n_patch),
-            # nn.Tanh()
-        )
+        # self.fc_mean = nn.Sequential(
+        #     nn.Linear(config.hidden_size*n_patch, n_patch),
+        #     # nn.Tanh()
+        # )
+        # self.fc_log_variance = nn.Sequential(
+        #     nn.Linear(config.hidden_size*n_patch, n_patch),
+        #     # nn.Tanh()
+        # )
         self.fc_label = nn.Sequential(
             nn.Linear(config.hidden_size*n_patch, config.label_size),
             # nn.Linear(n_patch, config.label_size)
@@ -685,10 +685,11 @@ class EncoderForGenerativeModels(nn.Module):
         x_encoded, attn_weights, features = self.transformer(x, time)
         B, n_patch, hidden = x_encoded.size()  # reshape from (B, n_patch, hidden) to (B, h, w, hidden)
         x_encoded = x_encoded.contiguous().view(B, hidden*n_patch)
-        mu = self.fc_mean(x_encoded)
-        log_variance = self.fc_log_variance(x_encoded)
+        # mu = self.fc_mean(x_encoded)
+        # log_variance = self.fc_log_variance(x_encoded)
         predicted_labels = self.fc_label(x_encoded)
-        return (mu, log_variance, predicted_labels)
+        # return (mu, log_variance, predicted_labels, features)
+        return (predicted_labels, features)
 
 
 class DecoderForGenerativeModels(nn.Module):
@@ -704,7 +705,7 @@ class DecoderForGenerativeModels(nn.Module):
             n_patch = n_patch * config.patches.grid[i]
         # Linear transformation on the mixed information (B, n_patch+label_size) of the latent space (B, n_patch) + labels (B, label_size) 
         self.fc =  nn.Sequential(
-            nn.Linear(n_patch + config.label_size, n_patch),
+            nn.Linear(config.label_size, n_patch), # n_patch + config.label_size
             # nn.Tanh()
         )
         self.decoder = DecoderCup(config)
@@ -722,10 +723,10 @@ class DecoderForGenerativeModels(nn.Module):
                 kernel_size=3,
             )
 
-    def forward(self, x):
+    def forward(self, x, features):
         # Decode the encoded input x to get a reconstructed image
         x = torch.unsqueeze(self.fc(x), -1)
-        x = self.decoder(x)
+        x = self.decoder(x, features)
         if len(self.config.patches.size) == 3:
             x = self.morph_head(x)
             # x = self.spatial_transformer(src, x)
@@ -743,8 +744,8 @@ class VisionTransformer(nn.Module):
         if self.classifier == 'gen':
             self.encoder = EncoderForGenerativeModels(config, img_size, vis)
             self.transformer = self.encoder.transformer
-            # For the Gaussian likelihood used in reconstruction loss calculation
-            self.log_scale = nn.Parameter(torch.zeros(img_size))
+            # # For the Gaussian likelihood used in reconstruction loss calculation
+            # self.log_scale = nn.Parameter(torch.zeros(img_size))
             self.decoder = DecoderForGenerativeModels(config, img_size)
         else:
             self.transformer = Transformer(config, img_size, vis)
@@ -772,30 +773,38 @@ class VisionTransformer(nn.Module):
             x = x.repeat(1,3,1,1)
         if self.classifier == 'gen':
             # KL divergence estimation in the current batch using the VAE's encoder part (model.encoder)
-            mu, log_variance, predicted_labels = self.encoder(x, time)
-            # Sample z from q(z|x)
-            std = torch.exp(log_variance / 2)
-            q = torch.distributions.Normal(mu, std)
-            z = q.rsample()
+            # mu, log_variance, predicted_labels, features = self.encoder(x, time)
+            predicted_labels, features = self.encoder(x, time)
+            # # Sample z from q(z|x)
+            # std = torch.exp(log_variance / 2)
+            # q = torch.distributions.Normal(mu, std)
+            # z = q.rsample()
             # # Mixing the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
             # l = []
             # for i in range(predicted_labels.shape[1]):
             #     l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
             # decoder_input = torch.stack(l, 2)
-            # Concatenate the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
-            decoder_input = torch.cat((z, predicted_labels), 1)
-            # Monte carlo KL divergence
-            # 1. define the first two probabilities (in this case Normal for both)
-            p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std)) # Target latent distribution
-            q = torch.distributions.Normal(mu, std) # Network-calculated latent distribution
-            # 2. get the probabilities from the equation
-            log_qzx = q.log_prob(z)
-            log_pz = p.log_prob(z)
-            # kl
-            kl = (log_qzx - log_pz)
-            kl = kl.sum(-1)
+            # # Concatenate the sampled tensor z(batch_size, number_of_patches) with the predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+            # decoder_input = torch.cat((z, predicted_labels), 1)
+            # # Chennel-wise adding of each predicted label to the respective sampled channel
+            # decoder_input = z + predicted_labels
+            # Latent distribution is the isotropic normalized properties distribution
+            decoder_input = predicted_labels
+            # # For testing!
+            # decoder_input = mu
+            # # Monte carlo KL divergence
+            # # 1. define the first two probabilities (in this case Normal for both)
+            # p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std)) # Target latent distribution
+            # q = torch.distributions.Normal(mu, std) # Network-calculated latent distribution
+            # # 2. get the probabilities from the equation
+            # log_qzx = q.log_prob(z)
+            # log_pz = p.log_prob(z)
+            # # kl
+            # kl = (log_qzx - log_pz)
+            # kl = kl.sum(-1)
+            kl = None
             # Decoder output given a random sample of the encoder distribution and its predicted labels
-            decoder_output = self.decoder(decoder_input)
+            decoder_output = self.decoder(decoder_input, features)
             # # Gaussian likelihood for the reconstruction loss
             # scale = torch.exp(self.log_scale)
             # dist = torch.distributions.Normal(decoder_output, scale)
@@ -817,57 +826,67 @@ class VisionTransformer(nn.Module):
                 x = self.segmentation_head(x)
             return x
 
-    def load_from(self, weights):
+    def load_from(self, weights):        
         if weights:
-            with torch.no_grad():
+            self.transformer.encoder.encoder_norm.weight.requires_grad_(False)
+            self.transformer.encoder.encoder_norm.weight.copy_(np2th(weights["Transformer/encoder_norm/scale"]))
+            self.transformer.encoder.encoder_norm.bias.requires_grad_(False)
+            self.transformer.encoder.encoder_norm.bias.copy_(np2th(weights["Transformer/encoder_norm/bias"]))
+            # Encoder whole
+            for bname, block in self.transformer.encoder.named_children():
+                for uname, unit in block.named_children():
+                    unit.requires_grad_(False)
+                    unit.load_from(weights, n_block=uname)
+        # if weights: # Not suitable for 3D tasks due to the following line comment
+        #     with torch.no_grad(): # Disables gradient calculation even for the previous layers! For more info, see https://pytorch.org/docs/stable/notes/autograd.html#locally-disable-grad-doc
 
-                # res_weight = weights
-                # self.transformer.embeddings.patch_embeddings.weight.copy_(np2th(weights["embedding/kernel"], conv=True))
-                # self.transformer.embeddings.patch_embeddings.bias.copy_(np2th(weights["embedding/bias"]))
+        #         # res_weight = weights
+        #         # self.transformer.embeddings.patch_embeddings.weight.copy_(np2th(weights["embedding/kernel"], conv=True))
+        #         # self.transformer.embeddings.patch_embeddings.bias.copy_(np2th(weights["embedding/bias"]))
 
-                self.transformer.encoder.encoder_norm.weight.copy_(np2th(weights["Transformer/encoder_norm/scale"]))
-                self.transformer.encoder.encoder_norm.bias.copy_(np2th(weights["Transformer/encoder_norm/bias"]))
+        #         self.transformer.encoder.encoder_norm.weight.copy_(np2th(weights["Transformer/encoder_norm/scale"]))
+        #         self.transformer.encoder.encoder_norm.bias.copy_(np2th(weights["Transformer/encoder_norm/bias"]))
 
-                # posemb = np2th(weights["Transformer/posembed_input/pos_embedding"])
+        #         # posemb = np2th(weights["Transformer/posembed_input/pos_embedding"])
 
-                # posemb_new = self.transformer.embeddings.position_embeddings
-                # print("size of pre_trained = {}\n".format(posemb.shape))
-                # print("size of new = {}\n".format(posemb_new.shape))
-                # if posemb.size() == posemb_new.size():
-                #     self.transformer.embeddings.position_embeddings.copy_(posemb)
-                # elif posemb.size()[1]-1 == posemb_new.size()[1]:
-                #     posemb = posemb[:, 1:]
-                #     self.transformer.embeddings.position_embeddings.copy_(posemb)
-                # else:
-                #     logger.info("load_pretrained: resized variant: %s to %s" % (posemb.size(), posemb_new.size()))
-                #     ntok_new = posemb_new.size(1)
-                #     if self.classifier == "seg":
-                #         _, posemb_grid = posemb[:, :1], posemb[0, 1:]
-                #     gs_old = int(np.sqrt(len(posemb_grid)))
-                #     gs_new = int(np.sqrt(ntok_new))
-                #     print('load_pretrained: grid-size from %s to %s' % (gs_old, gs_new))
-                #     posemb_grid = posemb_grid.reshape(gs_old, gs_old, -1)
-                #     zoom = (gs_new / gs_old, gs_new / gs_old, 1)
-                #     posemb_grid = ndimage.zoom(posemb_grid, zoom, order=1)  # th2np
-                #     posemb_grid = posemb_grid.reshape(1, gs_new * gs_new, -1)
-                #     posemb = posemb_grid
-                #     self.transformer.embeddings.position_embeddings.copy_(np2th(posemb))
+        #         # posemb_new = self.transformer.embeddings.position_embeddings
+        #         # print("size of pre_trained = {}\n".format(posemb.shape))
+        #         # print("size of new = {}\n".format(posemb_new.shape))
+        #         # if posemb.size() == posemb_new.size():
+        #         #     self.transformer.embeddings.position_embeddings.copy_(posemb)
+        #         # elif posemb.size()[1]-1 == posemb_new.size()[1]:
+        #         #     posemb = posemb[:, 1:]
+        #         #     self.transformer.embeddings.position_embeddings.copy_(posemb)
+        #         # else:
+        #         #     logger.info("load_pretrained: resized variant: %s to %s" % (posemb.size(), posemb_new.size()))
+        #         #     ntok_new = posemb_new.size(1)
+        #         #     if self.classifier == "seg":
+        #         #         _, posemb_grid = posemb[:, :1], posemb[0, 1:]
+        #         #     gs_old = int(np.sqrt(len(posemb_grid)))
+        #         #     gs_new = int(np.sqrt(ntok_new))
+        #         #     print('load_pretrained: grid-size from %s to %s' % (gs_old, gs_new))
+        #         #     posemb_grid = posemb_grid.reshape(gs_old, gs_old, -1)
+        #         #     zoom = (gs_new / gs_old, gs_new / gs_old, 1)
+        #         #     posemb_grid = ndimage.zoom(posemb_grid, zoom, order=1)  # th2np
+        #         #     posemb_grid = posemb_grid.reshape(1, gs_new * gs_new, -1)
+        #         #     posemb = posemb_grid
+        #         #     self.transformer.embeddings.position_embeddings.copy_(np2th(posemb))
 
-                # Encoder whole
-                for bname, block in self.transformer.encoder.named_children():
-                    for uname, unit in block.named_children():
-                        unit.load_from(weights, n_block=uname)
+        #         # Encoder whole
+        #         for bname, block in self.transformer.encoder.named_children():
+        #             for uname, unit in block.named_children():
+        #                 unit.load_from(weights, n_block=uname)
 
-                # if self.transformer.embeddings.hybrid:
-                #     self.transformer.embeddings.hybrid_model.root.conv.weight.copy_(np2th(res_weight["conv_root/kernel"], conv=True))
-                #     gn_weight = np2th(res_weight["gn_root/scale"]).view(-1)
-                #     gn_bias = np2th(res_weight["gn_root/bias"]).view(-1)
-                #     self.transformer.embeddings.hybrid_model.root.gn.weight.copy_(gn_weight)
-                #     self.transformer.embeddings.hybrid_model.root.gn.bias.copy_(gn_bias)
+        #         # if self.transformer.embeddings.hybrid:
+        #         #     self.transformer.embeddings.hybrid_model.root.conv.weight.copy_(np2th(res_weight["conv_root/kernel"], conv=True))
+        #         #     gn_weight = np2th(res_weight["gn_root/scale"]).view(-1)
+        #         #     gn_bias = np2th(res_weight["gn_root/bias"]).view(-1)
+        #         #     self.transformer.embeddings.hybrid_model.root.gn.weight.copy_(gn_weight)
+        #         #     self.transformer.embeddings.hybrid_model.root.gn.bias.copy_(gn_bias)
 
-                #     for bname, block in self.transformer.embeddings.hybrid_model.body.named_children():
-                #         for uname, unit in block.named_children():
-                #             unit.load_from(res_weight, n_block=bname, n_unit=uname)
+        #         #     for bname, block in self.transformer.embeddings.hybrid_model.body.named_children():
+        #         #         for uname, unit in block.named_children():
+        #         #             unit.load_from(res_weight, n_block=bname, n_unit=uname)
 
 CONFIGS = {
     'ViT-B_16': configs.get_b16_config(),
@@ -884,6 +903,6 @@ CONFIGS3D = {
     'ViT-B_16': configs.get_b16_3D_config(), # No initial CNN in the encoder
     'Conv-ViT-B_16': configs.get_conv_b16_3D_config(), # Degradation config - basic
     'Conv-ViT-Gen-B_16': configs.get_conv_b16_3D_gen_config(), # Design/VAE config - basic
-    'Conv-ViT-Gen2-B_16': configs.get_conv_b16_3D_gen2_config() # Design/VAE config2 - basic
+    'Conv-ViT-Gen2-B_16': configs.get_conv_b16_3D_gen2_config() # Design/VAE config2
 }
 

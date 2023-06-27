@@ -27,7 +27,16 @@ parser.add_argument('--vit_patches_size', type=int, default=8, help='The patch s
 parser.add_argument('--net_path', type=str, default=False, help='The path to the trained network file to be used for testing: the default value (False) means that it is not specified, so the path should be found by the following arguments. However, if the full path (including the file name) is specified by an input string, the program will find the network directly without using the following arguments.')
 parser.add_argument('--vit_name', type=str, default='Conv-ViT-B_16', help='The name of the model/network architecture to be built/considered; detailed in "configs.py"')
 parser.add_argument('--pretrained_net_path', type=str, default=False, help='If the training should start from a pretrained state/weights, the full path and name is given by this argument; otherwise (the default argument value of False), the training is started normally.') # '../model/TV_Design[160, 160, 160]/TV_pretrain_Conv-ViT-Gen-B_16_skip4_vitpatch[8, 8, 8]_epo100_bs24_lr0.01_seed1234/epoch_99.pth'
-parser.add_argument('--is_encoder_pretrained', type=bool, default=True, help='Whether the encoder or part(s) of it are pretrained; the default value is True')
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+parser.add_argument('--is_encoder_pretrained', type=str2bool, nargs='?', const=True, default=True, help='Whether the encoder or part(s) of it are pretrained; the default value is True')
 parser.add_argument('--deterministic', type=int,  default=1, help='Whether to use deterministic inference')
 parser.add_argument('--max_epochs', type=int, default=100, help='Maximum number of training epochs')
 parser.add_argument('--batch_size', type=int, default=32, help='Training batch size per gpu')

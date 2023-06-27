@@ -184,9 +184,11 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
     loss_mse = torch.nn.MSELoss(reduction='none')
     ce_loss = torch.nn.CrossEntropyLoss(reduction='none')
     with torch.no_grad():
-        mu, log_variance, predicted_labels = net.module.encoder(image_batch, time_batch)
-        surrogate_model_error = torch.mean(loss_mse(predicted_labels, label_batch), dim=1)
-        p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
+        # mu, log_variance, predicted_labels = net.module.encoder(image_batch, time_batch)
+        predicted_labels, features = net.module.encoder(image_batch, time_batch)
+        surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
+        # p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
+        p = torch.distributions.Normal(torch.zeros_like(predicted_labels), torch.ones_like(predicted_labels)) # Target latent distribution
         batch_size = predicted_labels.size()[0]
         generative_error_best = (torch.ones(batch_size)*float('Inf')).cuda()
         sh = list(image_batch.shape)
@@ -197,14 +199,14 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
         for batch_index in range(batch_size):
             for sampling_trial in range(number_of_samplings):
                 z = p.sample()
-                # # Mixing the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+                # # Mixing the sampled tensor z(batch_size, number_of_patches) with the predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
                 # l = []
                 # for i in range(predicted_labels.shape[1]):
                     # l.append(torch.unsqueeze(torch.mul(z[batch_index], torch.sigmoid(torch.unsqueeze(predicted_labels[batch_index, i], -1))), 0))
                 # decoder_input = torch.stack(l, 2)
-                # Concatenate the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
-                decoder_input = torch.unsqueeze(torch.cat((z[batch_index], predicted_labels[batch_index, :]), 0), 0)
-                decoder_output = net.module.decoder(decoder_input)
+                # # Concatenate the sampled tensor z(batch_size, number_of_patches) with the predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
+                # decoder_input = torch.unsqueeze(torch.cat((z[batch_index], predicted_labels[batch_index, :]), 0), 0)
+                decoder_output = net.module.decoder(z)
                 # # Gaussian likelihood for the reconstruction loss
                 # scale = torch.exp(net.module.log_scale)
                 # dist = torch.distributions.Normal(decoder_output, scale)
@@ -217,8 +219,9 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                 # generative_output = dist.sample()
                 generative_output = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
 
-                mu2, log_variance2, predicted_labels_generative = net.module.encoder(generative_output.unsqueeze(1), time_batch)
-                generative_error = torch.mean(loss_mse(predicted_labels_generative, label_batch[batch_index, :].unsqueeze(0)), dim=1)
+                # mu2, log_variance2, predicted_labels_generative = net.module.encoder(generative_output.unsqueeze(1), time_batch)
+                predicted_labels_generative, _ = net.module.encoder(generative_output.unsqueeze(1), time_batch)
+                generative_error = torch.sum(loss_mse(predicted_labels_generative, label_batch[batch_index, :].unsqueeze(0)), dim=1)
                 if generative_error < generative_error_best[batch_index]:
                     generative_error_best[batch_index] = generative_error.detach().clone()
                     decoder_output_best[batch_index, :] = decoder_output.detach().clone()
