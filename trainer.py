@@ -301,7 +301,7 @@ def trainer_mat(args, model, snapshot_path):
             predicted_labels, decoder_output, kl, log_pxz = model(image_batch, time_batch) # decoder_output is in fact the logits of the output image whose channels represent the categories/classes (each class = a material phase in this function)
             # output_image = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
             # Monte-Carlo estimation of the KL divergence loss
-            # kl = kl.mean()
+            kl = kl.mean()
             # Reconstruction loss in terms of log liklihood of seeing the output/decoder image given the input image (it is usually negative, so it will be negated in the total loss for minimization)
             # log_pxz = log_pxz.mean()
             # loss_reconstruction = -log_pxz
@@ -311,8 +311,8 @@ def trainer_mat(args, model, snapshot_path):
             loss_pred = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
             loss_pred = loss_pred.mean()
             # Total loss value is the following composite function (each term is averaged among the input batch samples) (loss_reconstruction is also averaged among all voxels of the output image!)
-            # loss = L[epoch_num]*kl + 100*loss_reconstruction + loss_pred
-            loss = 100*loss_reconstruction + loss_pred
+            loss = L[epoch_num]*kl + 100*loss_reconstruction + loss_pred
+            # loss = 100*loss_reconstruction + loss_pred
             optimizer.zero_grad()
 
             loss.backward()
