@@ -161,7 +161,7 @@ def inferrer_mat2(args, model, test_save_path=None):
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
         image_batch, label_batch, time_batch, name_batch = sampled_batch["image"], sampled_batch["label"], sampled_batch["time"], sampled_batch['case_name']
         image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
-        # Method in "utils.py" to run the model/network in the evaluation model on multiple inputs in parallel using GPU (at the end of it, the results are transferred to CPU for further calculations).
+        # Method in "utils.py" to run the model/network in the evaluation mode on multiple inputs in parallel using GPU (at the end of it, the results are transferred to CPU for further calculations).
         name_batch, metric_batch = test_multiple_volumes_generative2(image_batch, label_batch, time_batch, model, name_batch, test_save_path, number_of_samplings)
         for i in range(len(name_batch)):
             formatting_tuple = tuple([name_batch[i]] + [metric_batch[i, j] for j in range(metric_avg.shape[1])])
@@ -170,7 +170,8 @@ def inferrer_mat2(args, model, test_save_path=None):
             counter = counter + 1
     # Average metrics
     formatting_tuple = tuple(['average'] + [metric_avg[0, i]/counter for i in range(metric_avg.shape[1])])
-    logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C11 %12.6f C11_predicted %12.6f C11_error %12.6f C12 %12.6f C12_predicted %12.6f C12_error %12.6f C13 %12.6f C13_predicted %12.6f C13_error %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f C44 %12.6f C44_predicted %12.6f C44_error %12.6f C66 %12.6f C66_predicted %12.6f C66_error %12.6f e31 %12.6f e31_predicted %12.6f e31_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f e15 %12.6f e15_predicted %12.6f e15_error %12.6f gamma11 %12.6f gamma11_predicted %12.6f gamma11_error %12.6f gamma33 %12.6f gamma33_predicted %12.6f gamma33_error %12.6f' % formatting_tuple)
+    # logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C11 %12.6f C11_predicted %12.6f C11_error %12.6f C12 %12.6f C12_predicted %12.6f C12_error %12.6f C13 %12.6f C13_predicted %12.6f C13_error %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f C44 %12.6f C44_predicted %12.6f C44_error %12.6f C66 %12.6f C66_predicted %12.6f C66_error %12.6f e31 %12.6f e31_predicted %12.6f e31_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f e15 %12.6f e15_predicted %12.6f e15_error %12.6f gamma11 %12.6f gamma11_predicted %12.6f gamma11_error %12.6f gamma33 %12.6f gamma33_predicted %12.6f gamma33_error %12.6f' % formatting_tuple)
+    logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f' % formatting_tuple)
     return "Testing Finished!"
 
 

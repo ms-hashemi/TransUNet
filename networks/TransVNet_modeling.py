@@ -864,7 +864,7 @@ class VisionTransformer(nn.Module):
             log_qzx = q.log_prob(z)
             log_pz = p.log_prob(z)
             # kl
-            kl = (log_qzx - log_pz)
+            kl = torch.abs(log_qzx - log_pz)
             kl = kl.sum(-1)
             # kl = None
 

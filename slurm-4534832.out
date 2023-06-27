@@ -1,15 +1,0 @@
-/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
-  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
-Namespace(dataset='Design', img_size=[160, 160, 160], vit_name='Conv-ViT-Gen-B_16', pretrained_net_path='../model/TVG_Design[160, 160, 160]/TVG_encoderpretrained_Conv-ViT-Gen-B_16_vitpatch[8, 8, 8]_epo100_bs32_lr0.01_seed1234/epoch_99.pth', is_encoder_pretrained=True, vit_patches_size=[8, 8, 8], deterministic=1, max_epochs=100, batch_size=32, base_lr=0.01, seed=1234, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, num_classes=2, root_path='/work/sheidaei/mhashemi/data/mat', list_dir='./lists/lists_Design', exp='TVG_Design[160, 160, 160]', distributed=False)
-10 iterations per epoch. 1000 max iterations 
-  0%|                                         | 0/100 [00:00<?, ?it/s]iteration 1: loss: 1.388772, loss_kl: 55.887222, loss_recon: 0.670844, loss_pred: 234.463364
-iteration 2: loss: 17.711535, loss_kl: 69.946854, loss_recon: 0.828478, loss_pred: 6758.046875
-iteration 3: loss: 1.552593, loss_kl: 63.298798, loss_recon: 0.681695, loss_pred: 288.917542
-iteration 4: loss: 0.887844, loss_kl: 59.096024, loss_recon: 0.680901, loss_pred: 24.597391
-iteration 5: loss: 0.947020, loss_kl: 65.157135, loss_recon: 0.670201, loss_pred: 46.796642
-iteration 6: loss: 0.984423, loss_kl: 64.941353, loss_recon: 0.669925, loss_pred: 62.250900
-iteration 7: loss: 1.001491, loss_kl: 66.983803, loss_recon: 0.676401, loss_pred: 64.491867
-iteration 8: loss: 0.963822, loss_kl: 67.031288, loss_recon: 0.682213, loss_pred: 46.859688
-iteration 9: loss: 0.897524, loss_kl: 69.581665, loss_recon: 0.670506, loss_pred: 22.230747
-iteration 10: loss: 0.840049, loss_kl: 64.509552, loss_recon: 0.664881, loss_pred: 6.333332
-slurmstepd: error: *** JOB 4534832 ON nova21-gpu-9 CANCELLED AT 2023-06-15T15:22:52 ***

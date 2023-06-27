@@ -244,8 +244,11 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
     dim = [i for i in range(1, len(image_batch.size()) - 1)]
     reconstruction_loss = torch.mean(ce_loss(decoder_output_best, image_batch.squeeze(1).long()), dim=dim)
     # Recover the normalized labels (the have been normalized to represent N(0, 1))
-    mean = torch.FloatTensor([38.323, 15.7224, 11.898, 21.1556, 18.2747, 24.4512, -0.3501, 1.6984, 1.8966, 3.2065, 2.0996]).cuda()
-    std = torch.FloatTensor([35.6838, 13.6047, 10.1844, 21.6407, 19.2492, 22.9862, 0.5574, 2.259, 2.2365, 2.4594, 1.9398]).cuda()
+    # mean = torch.FloatTensor([38.1987, 15.7224, 11.8707, 21.1556, 18.3433, 24.4512, -0.3486, 1.6984, 1.9056, 3.2017, 2.0996])
+    # std = torch.FloatTensor([35.5903, 13.6047, 10.1752, 21.6407, 19.2872, 22.9862, 0.5550, 2.2590, 2.2424, 2.4518, 1.9398])
+    # Only C33 and e33
+    mean = torch.FloatTensor([21.1556, 1.6984]).cuda()
+    std = torch.FloatTensor([21.6407, 2.2590]).cuda()
     absolute_errors = 100*((predicted_labels_generative_best*std + mean) - (label_batch*std + mean)) / (label_batch*std + mean)
     l = [surrogate_model_error, generative_error_best, reconstruction_loss]
     for i in range(label_batch.shape[1]):
