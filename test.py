@@ -155,7 +155,7 @@ def inferrer_mat2(args, model, test_save_path=None):
     logging.info("{} test iterations per epoch".format(len(testloader)))
     # handler = logging.StreamHandler()
     # handler.terminator = ""
-    metric_avg = torch.zeros(1, 3 + 11*3).cuda() # The main metrics are (surrogate_model_error, generative_error, log_pxz). The rest are related to the labels.
+    metric_avg = torch.zeros(1, 3 + args.label_size*3).cuda() # The main metrics are (surrogate_model_error, generative_error, log_pxz). The rest are related to the labels.
     counter = 0 # Number of cases tested (for the average calculation)
     model.eval()
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
@@ -165,7 +165,7 @@ def inferrer_mat2(args, model, test_save_path=None):
         name_batch, metric_batch = test_multiple_volumes_generative2(image_batch, label_batch, time_batch, model, name_batch, test_save_path, number_of_samplings)
         for i in range(len(name_batch)):
             formatting_tuple = tuple([name_batch[i]] + [metric_batch[i, j] for j in range(metric_avg.shape[1])])
-            logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C11 %12.6f C11_predicted %12.6f C11_error %12.6f C12 %12.6f C12_predicted %12.6f C12_error %12.6f C13 %12.6f C13_predicted %12.6f C13_error %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f C44 %12.6f C44_predicted %12.6f C44_error %12.6f C66 %12.6f C66_predicted %12.6f C66_error %12.6f e31 %12.6f e31_predicted %12.6f e31_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f e15 %12.6f e15_predicted %12.6f e15_error %12.6f gamma11 %12.6f gamma11_predicted %12.6f gamma11_error %12.6f gamma33 %12.6f gamma33_predicted %12.6f gamma33_error %12.6f' % formatting_tuple)
+            logging.info('name %7s surrogate_model_error %12.6f generative_error %12.6f reconstruction_loss %12.6f C33 %12.6f C33_predicted %12.6f C33_error %12.6f e33 %12.6f e33_predicted %12.6f e33_error %12.6f' % formatting_tuple)
             metric_avg = metric_avg + metric_batch[i, :]
             counter = counter + 1
     # Average metrics
@@ -316,6 +316,8 @@ if __name__ == "__main__":
         config = CONFIGS3D[args.vit_name]
     else:
         config = CONFIGS[args.vit_name]
+    if config.classifier == 'gen':
+        args.label_size = config.label_size
     config.n_classes = args.num_classes
     if args.vit_name.upper().find('R50') != -1 or args.vit_name.upper().find('CONV') != -1: # If ResNet50/CNN is going to be used in a hybrid encoder
         grid = []
