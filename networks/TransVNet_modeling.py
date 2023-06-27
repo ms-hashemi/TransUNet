@@ -723,7 +723,7 @@ class DecoderForGenerativeModels(nn.Module):
                 kernel_size=3,
             )
 
-    def forward(self, x, features):
+    def forward(self, x, features=None):
         # Decode the encoded input x to get a reconstructed image
         x = torch.unsqueeze(self.fc(x), -1)
         x = self.decoder(x, features)
@@ -804,7 +804,7 @@ class VisionTransformer(nn.Module):
             # kl = kl.sum(-1)
             kl = None
             # Decoder output given a random sample of the encoder distribution and its predicted labels
-            decoder_output = self.decoder(decoder_input, features)
+            decoder_output = self.decoder(decoder_input, None)
             # # Gaussian likelihood for the reconstruction loss
             # scale = torch.exp(self.log_scale)
             # dist = torch.distributions.Normal(decoder_output, scale)
