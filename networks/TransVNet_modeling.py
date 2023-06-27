@@ -183,9 +183,9 @@ class Embeddings3D(nn.Module):
 
         if config.patches.get("grid") is not None:   # CNN Encoder
             # Image size at the end of the CNN encoder transformations:
-            img_size_CNN_output = [img_size[0] // (2**config.number_down_scaled),
-                img_size[1] // (2**config.number_down_scaled),
-                img_size[2] // (2**config.number_down_scaled)
+            img_size_CNN_output = [img_size[0] // (2**(len(config.encoder_channels) - 1)),
+                img_size[1] // (2**(len(config.encoder_channels) - 1)),
+                img_size[2] // (2**(len(config.encoder_channels) - 1))
             ]
             grid_size = config.patches["grid"]  # For finding the number of image patches which will constitute the input sequence of the transformer
             patch_size = (img_size_CNN_output[0] // grid_size[0], img_size_CNN_output[1] // grid_size[1], img_size_CNN_output[2] // grid_size[2])
@@ -204,7 +204,7 @@ class Embeddings3D(nn.Module):
                                        out_channels=config.hidden_size,
                                        kernel_size=patch_size,
                                        stride=patch_size)
-        self.time_embeddings = Conv1d(in_channels=1,out_channels=self.config.hidden_size,kernel_size=1)
+        self.time_embeddings = Conv1d(in_channels=1, out_channels=config.hidden_size, kernel_size=1)
         # Positions are embedded into the same space of embedded image patches, but the additional embedding
         # shown in "n_patches+1" belongs to the time variable
         # self.position_embeddings = nn.Parameter(torch.zeros(1, n_patches+1, config.hidden_size))
@@ -262,40 +262,74 @@ class Block(nn.Module):
 
     def load_from(self, weights, n_block):
         ROOT = f"Transformer/encoderblock_{n_block}"
-        with torch.no_grad():
-            query_weight = np2th(weights[pjoin(ROOT, ATTENTION_Q, "kernel")]).view(self.hidden_size, self.hidden_size).t()
-            key_weight = np2th(weights[pjoin(ROOT, ATTENTION_K, "kernel")]).view(self.hidden_size, self.hidden_size).t()
-            value_weight = np2th(weights[pjoin(ROOT, ATTENTION_V, "kernel")]).view(self.hidden_size, self.hidden_size).t()
-            out_weight = np2th(weights[pjoin(ROOT, ATTENTION_OUT, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+        # with torch.no_grad():
+        #     query_weight = np2th(weights[pjoin(ROOT, ATTENTION_Q, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+        #     key_weight = np2th(weights[pjoin(ROOT, ATTENTION_K, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+        #     value_weight = np2th(weights[pjoin(ROOT, ATTENTION_V, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+        #     out_weight = np2th(weights[pjoin(ROOT, ATTENTION_OUT, "kernel")]).view(self.hidden_size, self.hidden_size).t()
 
-            query_bias = np2th(weights[pjoin(ROOT, ATTENTION_Q, "bias")]).view(-1)
-            key_bias = np2th(weights[pjoin(ROOT, ATTENTION_K, "bias")]).view(-1)
-            value_bias = np2th(weights[pjoin(ROOT, ATTENTION_V, "bias")]).view(-1)
-            out_bias = np2th(weights[pjoin(ROOT, ATTENTION_OUT, "bias")]).view(-1)
+        #     query_bias = np2th(weights[pjoin(ROOT, ATTENTION_Q, "bias")]).view(-1)
+        #     key_bias = np2th(weights[pjoin(ROOT, ATTENTION_K, "bias")]).view(-1)
+        #     value_bias = np2th(weights[pjoin(ROOT, ATTENTION_V, "bias")]).view(-1)
+        #     out_bias = np2th(weights[pjoin(ROOT, ATTENTION_OUT, "bias")]).view(-1)
 
-            self.attn.query.weight.copy_(query_weight)
-            self.attn.key.weight.copy_(key_weight)
-            self.attn.value.weight.copy_(value_weight)
-            self.attn.out.weight.copy_(out_weight)
-            self.attn.query.bias.copy_(query_bias)
-            self.attn.key.bias.copy_(key_bias)
-            self.attn.value.bias.copy_(value_bias)
-            self.attn.out.bias.copy_(out_bias)
+        #     self.attn.query.weight.copy_(query_weight)
+        #     self.attn.key.weight.copy_(key_weight)
+        #     self.attn.value.weight.copy_(value_weight)
+        #     self.attn.out.weight.copy_(out_weight)
+        #     self.attn.query.bias.copy_(query_bias)
+        #     self.attn.key.bias.copy_(key_bias)
+        #     self.attn.value.bias.copy_(value_bias)
+        #     self.attn.out.bias.copy_(out_bias)
 
-            mlp_weight_0 = np2th(weights[pjoin(ROOT, FC_0, "kernel")]).t()
-            mlp_weight_1 = np2th(weights[pjoin(ROOT, FC_1, "kernel")]).t()
-            mlp_bias_0 = np2th(weights[pjoin(ROOT, FC_0, "bias")]).t()
-            mlp_bias_1 = np2th(weights[pjoin(ROOT, FC_1, "bias")]).t()
+        #     mlp_weight_0 = np2th(weights[pjoin(ROOT, FC_0, "kernel")]).t()
+        #     mlp_weight_1 = np2th(weights[pjoin(ROOT, FC_1, "kernel")]).t()
+        #     mlp_bias_0 = np2th(weights[pjoin(ROOT, FC_0, "bias")]).t()
+        #     mlp_bias_1 = np2th(weights[pjoin(ROOT, FC_1, "bias")]).t()
 
-            self.ffn.fc1.weight.copy_(mlp_weight_0)
-            self.ffn.fc2.weight.copy_(mlp_weight_1)
-            self.ffn.fc1.bias.copy_(mlp_bias_0)
-            self.ffn.fc2.bias.copy_(mlp_bias_1)
+        #     self.ffn.fc1.weight.copy_(mlp_weight_0)
+        #     self.ffn.fc2.weight.copy_(mlp_weight_1)
+        #     self.ffn.fc1.bias.copy_(mlp_bias_0)
+        #     self.ffn.fc2.bias.copy_(mlp_bias_1)
 
-            self.attention_norm.weight.copy_(np2th(weights[pjoin(ROOT, ATTENTION_NORM, "scale")]))
-            self.attention_norm.bias.copy_(np2th(weights[pjoin(ROOT, ATTENTION_NORM, "bias")]))
-            self.ffn_norm.weight.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "scale")]))
-            self.ffn_norm.bias.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "bias")]))
+        #     self.attention_norm.weight.copy_(np2th(weights[pjoin(ROOT, ATTENTION_NORM, "scale")]))
+        #     self.attention_norm.bias.copy_(np2th(weights[pjoin(ROOT, ATTENTION_NORM, "bias")]))
+        #     self.ffn_norm.weight.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "scale")]))
+        #     self.ffn_norm.bias.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "bias")]))
+        # Above code is not right if previous network layers are needed to be trained. So changed it into the below piece of code
+        query_weight = np2th(weights[pjoin(ROOT, ATTENTION_Q, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+        key_weight = np2th(weights[pjoin(ROOT, ATTENTION_K, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+        value_weight = np2th(weights[pjoin(ROOT, ATTENTION_V, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+        out_weight = np2th(weights[pjoin(ROOT, ATTENTION_OUT, "kernel")]).view(self.hidden_size, self.hidden_size).t()
+
+        query_bias = np2th(weights[pjoin(ROOT, ATTENTION_Q, "bias")]).view(-1)
+        key_bias = np2th(weights[pjoin(ROOT, ATTENTION_K, "bias")]).view(-1)
+        value_bias = np2th(weights[pjoin(ROOT, ATTENTION_V, "bias")]).view(-1)
+        out_bias = np2th(weights[pjoin(ROOT, ATTENTION_OUT, "bias")]).view(-1)
+
+        self.attn.query.weight.copy_(query_weight)
+        self.attn.key.weight.copy_(key_weight)
+        self.attn.value.weight.copy_(value_weight)
+        self.attn.out.weight.copy_(out_weight)
+        self.attn.query.bias.copy_(query_bias)
+        self.attn.key.bias.copy_(key_bias)
+        self.attn.value.bias.copy_(value_bias)
+        self.attn.out.bias.copy_(out_bias)
+
+        mlp_weight_0 = np2th(weights[pjoin(ROOT, FC_0, "kernel")]).t()
+        mlp_weight_1 = np2th(weights[pjoin(ROOT, FC_1, "kernel")]).t()
+        mlp_bias_0 = np2th(weights[pjoin(ROOT, FC_0, "bias")]).t()
+        mlp_bias_1 = np2th(weights[pjoin(ROOT, FC_1, "bias")]).t()
+
+        self.ffn.fc1.weight.copy_(mlp_weight_0)
+        self.ffn.fc2.weight.copy_(mlp_weight_1)
+        self.ffn.fc1.bias.copy_(mlp_bias_0)
+        self.ffn.fc2.bias.copy_(mlp_bias_1)
+
+        self.attention_norm.weight.copy_(np2th(weights[pjoin(ROOT, ATTENTION_NORM, "scale")]))
+        self.attention_norm.bias.copy_(np2th(weights[pjoin(ROOT, ATTENTION_NORM, "bias")]))
+        self.ffn_norm.weight.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "scale")]))
+        self.ffn_norm.bias.copy_(np2th(weights[pjoin(ROOT, MLP_NORM, "bias")]))
 
 
 class Encoder(nn.Module):
@@ -552,8 +586,8 @@ class DecoderCup(nn.Module):
         self.config = config
         head_channels = config.decoder_channels[0]
         if config.classifier == 'gen':
-            # first_in_channels = config.label_size
-            first_in_channels = 1
+            first_in_channels = config.label_size
+            # first_in_channels = 1
         else:
             first_in_channels = config.hidden_size
         if len(config.patches.size) == 3:
@@ -663,6 +697,10 @@ class EncoderForGenerativeModels(nn.Module):
         n_patch = 1
         for i in range(len(config.patches.grid)):
             n_patch = n_patch * config.patches.grid[i]
+        self.conv = nn.Sequential(
+            Conv1d(in_channels=config.hidden_size, out_channels=1, kernel_size=1),
+            # nn.Tanh()
+        )
         # self.fc_mean = nn.Sequential(
         #     nn.Linear(config.hidden_size*n_patch, n_patch),
         #     # nn.Tanh()
@@ -671,9 +709,18 @@ class EncoderForGenerativeModels(nn.Module):
         #     nn.Linear(config.hidden_size*n_patch, n_patch),
         #     # nn.Tanh()
         # )
-        self.fc_label = nn.Sequential(
-            nn.Linear(config.hidden_size*n_patch, config.label_size),
+        # self.fc_label = nn.Sequential(
+        #     nn.Linear(config.hidden_size*n_patch, config.label_size),
             # nn.Linear(n_patch, config.label_size)
+        # )
+        self.conv_mean = nn.Sequential(
+            Conv1d(in_channels=n_patch, out_channels=n_patch, groups=n_patch, kernel_size=1)
+        )
+        self.conv_log_variance = nn.Sequential(
+            Conv1d(in_channels=n_patch, out_channels=n_patch, groups=n_patch, kernel_size=1)
+        )
+        self.fc_label = nn.Sequential(
+            nn.Linear(n_patch, config.label_size)
         )
 
     def forward(self, x, time):
@@ -684,12 +731,18 @@ class EncoderForGenerativeModels(nn.Module):
             x = x.repeat(1,3,1,1)
         x_encoded, attn_weights, features = self.transformer(x, time)
         B, n_patch, hidden = x_encoded.size()  # reshape from (B, n_patch, hidden) to (B, h, w, hidden)
-        x_encoded = x_encoded.contiguous().view(B, hidden*n_patch)
+        # x_encoded = x_encoded.contiguous().view(B, hidden*n_patch)
         # mu = self.fc_mean(x_encoded)
         # log_variance = self.fc_log_variance(x_encoded)
+        # predicted_labels = self.fc_label(x_encoded)
+        x_encoded = x_encoded.permute(0, 2, 1)
+        x_encoded = torch.squeeze(self.conv(x_encoded), 1)
+        x_encoded_variational = torch.unsqueeze(x_encoded, -1)
+        mu = torch.squeeze(self.conv_mean(x_encoded_variational), -1)
+        log_variance = torch.squeeze(self.conv_log_variance(x_encoded_variational), -1)
         predicted_labels = self.fc_label(x_encoded)
-        # return (mu, log_variance, predicted_labels, features)
-        return (predicted_labels, features)
+        return (mu, log_variance, predicted_labels, features)
+        # return (predicted_labels, features)
 
 
 class DecoderForGenerativeModels(nn.Module):
@@ -703,11 +756,11 @@ class DecoderForGenerativeModels(nn.Module):
         n_patch = 1
         for i in range(len(config.patches.grid)):
             n_patch = n_patch * config.patches.grid[i]
-        # Linear transformation on the mixed information (B, n_patch+label_size) of the latent space (B, n_patch) + labels (B, label_size) 
-        self.fc =  nn.Sequential(
-            nn.Linear(config.label_size, n_patch), # n_patch + config.label_size
-            # nn.Tanh()
-        )
+        # # Linear transformation on the mixed information (B, n_patch+label_size) of the latent space (B, n_patch) + labels (B, label_size) 
+        # self.fc =  nn.Sequential(
+        #     nn.Linear(config.label_size, n_patch), # n_patch + config.label_size
+        #     # nn.Tanh()
+        # )
         self.decoder = DecoderCup(config)
         if len(config.patches.size) == 3:
             self.morph_head = Morph3D(
@@ -725,7 +778,7 @@ class DecoderForGenerativeModels(nn.Module):
 
     def forward(self, x, features=None):
         # Decode the encoded input x to get a reconstructed image
-        x = torch.unsqueeze(self.fc(x), -1)
+        # x = torch.unsqueeze(self.fc(x), -1)
         x = self.decoder(x, features)
         if len(self.config.patches.size) == 3:
             x = self.morph_head(x)
@@ -773,38 +826,47 @@ class VisionTransformer(nn.Module):
             x = x.repeat(1,3,1,1)
         if self.classifier == 'gen':
             # KL divergence estimation in the current batch using the VAE's encoder part (model.encoder)
-            # mu, log_variance, predicted_labels, features = self.encoder(x, time)
-            predicted_labels, features = self.encoder(x, time)
-            # # Sample z from q(z|x)
-            # std = torch.exp(log_variance / 2)
-            # q = torch.distributions.Normal(mu, std)
-            # z = q.rsample()
+            mu, log_variance, predicted_labels, features = self.encoder(x, time)
+            # predicted_labels, features = self.encoder(x, time)
+
+            # Sample z from q(z|x)
+            std = torch.exp(log_variance / 2)
+            q = torch.distributions.Normal(mu, std)
+            z = q.rsample()
+
             # # Mixing the sampled tensor z(batch_size, number_of_patches) with predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
             # l = []
             # for i in range(predicted_labels.shape[1]):
             #     l.append(torch.mul(z, torch.sigmoid(torch.unsqueeze(predicted_labels[:, i], -1))))
             # decoder_input = torch.stack(l, 2)
+
             # # Concatenate the sampled tensor z(batch_size, number_of_patches) with the predicted_labels(batch_size, label_size) to form the input tensor of the decoder for generative purposes
             # decoder_input = torch.cat((z, predicted_labels), 1)
-            # # Chennel-wise adding of each predicted label to the respective sampled channel
-            # decoder_input = z + predicted_labels
-            # Latent distribution is the isotropic normalized properties distribution
-            decoder_input = predicted_labels
+
+            # Chennel-wise adding of each predicted label to the respective sampled channel
+            decoder_input = z + torch.unsqueeze(predicted_labels, -1)
+
+            # # Latent distribution is the isotropic normalized properties distribution
+            # decoder_input = predicted_labels
+
             # # For testing!
             # decoder_input = mu
-            # # Monte carlo KL divergence
-            # # 1. define the first two probabilities (in this case Normal for both)
-            # p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std)) # Target latent distribution
-            # q = torch.distributions.Normal(mu, std) # Network-calculated latent distribution
-            # # 2. get the probabilities from the equation
-            # log_qzx = q.log_prob(z)
-            # log_pz = p.log_prob(z)
-            # # kl
-            # kl = (log_qzx - log_pz)
-            # kl = kl.sum(-1)
-            kl = None
+
+            # Monte carlo KL divergence
+            # 1. define the first two probabilities (in this case Normal for both)
+            p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(std)) # Target latent distribution
+            q = torch.distributions.Normal(mu, std) # Network-calculated latent distribution
+            # 2. get the probabilities from the equation
+            log_qzx = q.log_prob(z)
+            log_pz = p.log_prob(z)
+            # kl
+            kl = (log_qzx - log_pz)
+            kl = kl.sum(-1)
+            # kl = None
+
             # Decoder output given a random sample of the encoder distribution and its predicted labels
             decoder_output = self.decoder(decoder_input, None)
+
             # # Gaussian likelihood for the reconstruction loss
             # scale = torch.exp(self.log_scale)
             # dist = torch.distributions.Normal(decoder_output, scale)
@@ -815,6 +877,7 @@ class VisionTransformer(nn.Module):
             # else:
             #     log_pxz = log_pxz.mean(dim=(1, 2, 3))
             log_pxz = None
+
             return (predicted_labels, decoder_output, kl, log_pxz)
         else:
             x, _, features = self.transformer(x, time)
