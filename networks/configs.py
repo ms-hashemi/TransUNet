@@ -117,7 +117,7 @@ def get_conv_b16_3D_gen2_config():
     config.transformer = ml_collections.ConfigDict()
     config.transformer.mlp_dim = 288 #3072 #384
     config.transformer.num_heads = 3 #12 #3
-    config.transformer.num_layers = 2 #12 #3
+    config.transformer.num_layers = 3 #12 #3
     config.transformer.attention_dropout_rate = 0.0
     config.transformer.dropout_rate = 0.1
 
@@ -126,11 +126,11 @@ def get_conv_b16_3D_gen2_config():
     config.resnet_pretrained_path = None
     config.pretrained_path = '../model/vit_checkpoint/imagenet21k/ViT-B_16.npz'
 
-    config.encoder_channels = (3, 8, 16) # For the encoder blocks associated with 1/1, 1/2, and 1/4 of input image size
+    config.encoder_channels = (3, 8, 16, 32) # For the encoder blocks associated with 1/1, 1/2, and 1/4 of input image size
     # config.number_down_scaled = 2 # The number of half down scaling after the last encoder block by nn.MaxPool3D(2) without any convolutions
     config.label_size = 2 # The number of latent variables, which, in material design case study, is equal to the dimension of the labels or material properties
-    config.decoder_channels = (64, 32, 16, 8) # First one is the first number of decoder input channels or head_channels
-    config.skip_channels = (0, 0, 0, 0) #(16, 16, 8, 3) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
+    config.decoder_channels = (32, 16, 8) # First one is the first number of decoder input channels or head_channels
+    config.skip_channels = (0, 0, 0) #(16, 8, 3) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
     config.n_classes = 2 # Number of classes for the image segmentation
     return config
 
