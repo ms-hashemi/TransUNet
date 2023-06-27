@@ -187,8 +187,8 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
         mu, log_variance, predicted_labels, features = net.module.encoder(image_batch, time_batch)
         # predicted_labels, features = net.module.encoder(image_batch, time_batch)
         surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
-        # p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
-        p = torch.distributions.Normal(torch.zeros_like(predicted_labels), torch.ones_like(predicted_labels)) # Target latent distribution
+        p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
+        # p = torch.distributions.Normal(torch.zeros_like(predicted_labels), torch.ones_like(predicted_labels)) # Target latent distribution
         batch_size = predicted_labels.size()[0]
         generative_error_best = (torch.ones(batch_size)*float('Inf')).cuda()
         sh = list(image_batch.shape)
