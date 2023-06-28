@@ -184,7 +184,7 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
     loss_mse = torch.nn.MSELoss(reduction='none')
     ce_loss = torch.nn.CrossEntropyLoss(reduction='none')
     with torch.no_grad():
-        mu, log_variance, predicted_labels, features = net.module.encoder(image_batch, time_batch)
+        mu, log_variance, predicted_labels, features = net.module.encoder(image_batch, torch.tensor([-1]).cuda())
         # predicted_labels, features = net.module.encoder(image_batch, time_batch)
         surrogate_model_error = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
         p = torch.distributions.Normal(torch.zeros_like(mu), torch.ones_like(mu)) # Target latent distribution
@@ -215,7 +215,7 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                 # # Test
                 # decoder_input = torch.unsqueeze(label_batch[batch_index], 0)
                 
-                decoder_output = net.module.decoder(decoder_input)
+                decoder_output = net.module.decoder(decoder_input, None, torch.unsqueeze(time_batch[batch_index], 0))
                 
                 # # Gaussian likelihood for the reconstruction loss
                 # scale = torch.exp(net.module.log_scale)
@@ -230,7 +230,7 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                 
                 generative_output = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
 
-                mu2, log_variance2, predicted_labels_generative, features = net.module.encoder(generative_output.unsqueeze(1), time_batch)
+                mu2, log_variance2, predicted_labels_generative, features = net.module.encoder(generative_output.unsqueeze(1), torch.tensor([-1]).cuda())
                 # predicted_labels_generative, _ = net.module.encoder(generative_output.unsqueeze(1), time_batch)
                 generative_error = torch.sum(loss_mse(predicted_labels_generative, label_batch[batch_index, :].unsqueeze(0)), dim=1)
                 if generative_error < generative_error_best[batch_index]:

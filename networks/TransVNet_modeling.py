@@ -761,30 +761,104 @@ class DecoderForGenerativeModels(nn.Module):
         #     nn.Linear(config.label_size, n_patch), # n_patch + config.label_size
         #     # nn.Tanh()
         # )
-        self.decoder = DecoderCup(config)
+        # self.decoder = DecoderCup(config)
+        self.decoder1 = DecoderCup(config)
+        self.decoder2 = DecoderCup(config)
+        self.decoder3 = DecoderCup(config)
+        self.decoder4 = DecoderCup(config)
         if len(config.patches.size) == 3:
-            self.morph_head = Morph3D(
+            self.morph_head1 = Morph3D(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
+            self.morph_head2 = Morph3D(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
+            self.morph_head3 = Morph3D(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
+            self.morph_head4 = Morph3D(
                 in_channels=config['decoder_channels'][-1],
                 out_channels=config['n_classes'],
                 kernel_size=3,
             )
             self.spatial_transformer = SpatialTransformer(_triple(img_size) if len(img_size) == 1 else img_size)
         else:
-            self.segmentation_head = SegmentationHead(
+            self.segmentation_head1 = SegmentationHead(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
+            self.segmentation_head2 = SegmentationHead(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
+            self.segmentation_head3 = SegmentationHead(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
+            self.segmentation_head4 = SegmentationHead(
                 in_channels=config['decoder_channels'][-1],
                 out_channels=config['n_classes'],
                 kernel_size=3,
             )
 
-    def forward(self, x, features=None):
+    def forward(self, x, features=None, time=0):
         # Decode the encoded input x to get a reconstructed image
         # x = torch.unsqueeze(self.fc(x), -1)
-        x = self.decoder(x, features)
+        # x = self.decoder(x, features)
+        batch_size = x.shape[0]
+        idx1 = ((0.2 <= time) == (time < 0.2 + 0.175)).nonzero()
+        idx2 = ((0.2 + 0.175 <= time) == (time < 0.2 + 2*0.175)).nonzero()
+        idx3 = ((0.2 + 2*0.175 <= time) == (time < 0.2 + 3*0.175)).nonzero()
+        idx4 = ((0.2 + 3*0.175 <= time) == (time <= 0.2 + 4*0.175)).nonzero()
+        x1 = self.decoder1(torch.index_select(x, 0, idx1[:, 0]), features)
         if len(self.config.patches.size) == 3:
-            x = self.morph_head(x)
+            x1 = self.morph_head1(x1)
             # x = self.spatial_transformer(src, x)
         else:
-            x = self.segmentation_head(x)
+            x1 = self.segmentation_head1(x1)
+        x2 = self.decoder2(torch.index_select(x, 0, idx2[:, 0]), features)
+        if len(self.config.patches.size) == 3:
+            x2 = self.morph_head1(x2)
+            # x = self.spatial_transformer(src, x)
+        else:
+            x2 = self.segmentation_head2(x2)
+        x3 = self.decoder3(torch.index_select(x, 0, idx3[:, 0]), features)
+        if len(self.config.patches.size) == 3:
+            x3 = self.morph_head1(x3)
+            # x = self.spatial_transformer(src, x)
+        else:
+            x3 = self.segmentation_head3(x3)
+        x4 = self.decoder4(torch.index_select(x, 0, idx4[:, 0]), features)
+        if len(self.config.patches.size) == 3:
+            x4 = self.morph_head1(x4)
+            # x = self.spatial_transformer(src, x)
+        else:
+            x4 = self.segmentation_head4(x4)
+        x = []
+        c1, c2, c3, c4 = 0, 0, 0, 0
+        for i in range(batch_size):
+            if i in idx1[:, 0]:
+                x.append(x1[c1])
+                c1 = c1 + 1
+            if i in idx2[:, 0]:
+                x.append(x2[c2])
+                c1 = c1 + 1
+            if i in idx3[:, 0]:
+                x.append(x3[c3])
+                c1 = c1 + 1
+            if i in idx4[:, 0]:
+                x.append(x4[c4])
+                c1 = c1 + 1
+        x = torch.tensor(x)
         return x
 
 
@@ -826,7 +900,7 @@ class VisionTransformer(nn.Module):
             x = x.repeat(1,3,1,1)
         if self.classifier == 'gen':
             # KL divergence estimation in the current batch using the VAE's encoder part (model.encoder)
-            mu, log_variance, predicted_labels, features = self.encoder(x, time)
+            mu, log_variance, predicted_labels, features = self.encoder(x, torch.tensor([-1]).cuda()) # -1 indicates that no additional embeddings such as that of time in bone degradation is needed here.
             # predicted_labels, features = self.encoder(x, time)
 
             # Sample z from q(z|x)
@@ -869,7 +943,7 @@ class VisionTransformer(nn.Module):
             # kl = None
 
             # Decoder output given a random sample of the encoder distribution and its predicted labels
-            decoder_output = self.decoder(decoder_input, None)
+            decoder_output = self.decoder(decoder_input, None, time)
 
             # # Gaussian likelihood for the reconstruction loss
             # scale = torch.exp(self.log_scale)

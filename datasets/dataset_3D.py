@@ -186,7 +186,9 @@ class Design_dataset(Dataset):
         return len(self.sample_list)
 
     def __getitem__(self, idx):
-        volume_name = self.sample_list[idx].strip('\n').split()[0]
+        # volume_name = self.sample_list[idx].strip('\n').split()[0]
+        volume_name, time = self.sample_list[idx].strip('\n').split()
+        time = float(time)
         # property_path = os.path.join(self.data_dir, volume_name+'_64x64x64.mat')
         property_path = f'{self.data_dir}/{volume_name+"_64x64x64.mat"}'
         # property_data = h5py.File(property_path, 'r')
@@ -231,7 +233,8 @@ class Design_dataset(Dataset):
         #         image_i = image_zip.open(info)
         #         image[:, index] = np.array(Image.open(image_i))
 
-        sample = {'image': image, 'time': torch.tensor([-1], dtype=torch.float32), 'label': label} # Time = -1 will let the network know that the data is not (time-)sequential!
+        # sample = {'image': image, 'time': torch.tensor([-1], dtype=torch.float32), 'label': label} # Time = -1 will let the network know that the data is not (time-)sequential!
+        sample = {'image': image, 'time': torch.tensor(time, dtype=torch.float32), 'label': label}
         if self.transform:
             sample = self.transform(sample)
         sample['case_name'] = self.sample_list[idx].strip('\n')
