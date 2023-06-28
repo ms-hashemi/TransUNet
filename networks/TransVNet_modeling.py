@@ -851,14 +851,15 @@ class DecoderForGenerativeModels(nn.Module):
                 c1 = c1 + 1
             if i in idx2[:, 0]:
                 x.append(x2[c2])
-                c1 = c1 + 1
+                c2 = c2 + 1
             if i in idx3[:, 0]:
                 x.append(x3[c3])
-                c1 = c1 + 1
+                c3 = c3 + 1
             if i in idx4[:, 0]:
                 x.append(x4[c4])
-                c1 = c1 + 1
-        x = torch.tensor(x)
+                c4 = c4 + 1
+        x = torch.stack(x, 0)
+
         return x
 
 
