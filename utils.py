@@ -217,18 +217,9 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                 
                 decoder_output = net.module.decoder(decoder_input, None, torch.unsqueeze(time_batch[batch_index], 0))
                 
-                # # Gaussian likelihood for the reconstruction loss
-                # scale = torch.exp(net.module.log_scale)
-                # dist = torch.distributions.Normal(decoder_output, scale)
-                # # Measure prob of seeing image under p(x|y,z)
-                # log_pxz = dist.log_prob(image_batch[:,:net.module.config['n_classes'],:]) # Reconstruction loss in VAEs
-                # if len(net.module.config.patches.size) == 3:
-                #     log_pxz = log_pxz.mean(dim=(1, 2, 3, 4))
-                # else:
-                #     log_pxz = log_pxz.mean(dim=(1, 2, 3))
-                # generative_output = dist.sample()
-                
-                generative_output = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
+                # Segmented output or the final label image
+                generative_output = (torch.distributions.Normal(decoder_output, torch.exp(net.module.log_scale)).sample() >= 0.5).float()
+                # generative_output = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1)
 
                 mu2, log_variance2, predicted_labels_generative, features = net.module.encoder(generative_output.unsqueeze(1), torch.tensor([-1]).cuda())
                 # predicted_labels_generative, _ = net.module.encoder(generative_output.unsqueeze(1), time_batch)
@@ -239,17 +230,29 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                     generative_output_best[batch_index, :] = generative_output.detach().clone()
                     predicted_labels_generative_best[batch_index, :] = predicted_labels_generative.detach().clone()
 
-
-    # reconstruction_loss = -log_pxz
-    dim = [i for i in range(1, len(image_batch.size()) - 1)]
-    reconstruction_loss = torch.mean(ce_loss(decoder_output_best, image_batch.squeeze(1).long()), dim=dim)
+    # Reconstruction loss
+    # Gaussian likelihood
+    scale = torch.exp(net.module.log_scale)
+    dist = torch.distributions.Normal(generative_output_best, scale)
+    # Measure prob of seeing image under p(x|y,z)
+    log_pxz = dist.log_prob(image_batch) # Reconstruction loss in VAEs
+    if len(net.module.config.patches.size) == 3:
+        log_pxz = log_pxz.sum(dim=(1, 2, 3, 4))
+    else:
+        log_pxz = log_pxz.sum(dim=(1, 2, 3))
+    reconstruction_loss = -log_pxz
+    # Cross entropy
+    # dim = [i for i in range(1, len(image_batch.size()) - 1)]
+    # reconstruction_loss = torch.mean(ce_loss(decoder_output_best, image_batch.squeeze(1).long()), dim=dim)
+    
     # Recover the normalized labels (the have been normalized to represent N(0, 1))
-    # mean = torch.FloatTensor([38.1987, 15.7224, 11.8707, 21.1556, 18.3433, 24.4512, -0.3486, 1.6984, 1.9056, 3.2017, 2.0996])
-    # std = torch.FloatTensor([35.5903, 13.6047, 10.1752, 21.6407, 19.2872, 22.9862, 0.5550, 2.2590, 2.2424, 2.4518, 1.9398])
-    # Only C33 and e33
-    mean = torch.FloatTensor([21.1556, 1.6984]).cuda()
-    std = torch.FloatTensor([21.6407, 2.2590]).cuda()
-    absolute_errors = 100*((predicted_labels_generative_best*std + mean) - (label_batch*std + mean)) / (label_batch*std + mean)
+    mean = torch.FloatTensor([38.1987, 15.7224, 11.8707, 21.1556, 18.3433, 24.4512, -0.3486, 1.6984, 1.9056, 3.2017, 2.0996]).cuda()
+    std = torch.FloatTensor([35.5903, 13.6047, 10.1752, 21.6407, 19.2872, 22.9862, 0.5550, 2.2590, 2.2424, 2.4518, 1.9398]).cuda()
+    # # Only C33 and e33
+    # mean = torch.FloatTensor([21.1556, 1.6984]).cuda()
+    # std = torch.FloatTensor([21.6407, 2.2590]).cuda()
+    absolute_errors = 100*torch.abs((predicted_labels_generative_best*std + mean) - (label_batch*std + mean)) / (label_batch*std + mean)
+    
     l = [surrogate_model_error, generative_error_best, reconstruction_loss]
     for i in range(label_batch.shape[1]):
         l.extend([label_batch[:, i]*std[i] + mean[i], predicted_labels_generative_best[:, i]*std[i] + mean[i], absolute_errors[:, i]])

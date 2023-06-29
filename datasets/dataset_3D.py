@@ -96,7 +96,7 @@ class RandomGenerator2(object):
                 raise ValueError('Dimension of image is not 3 or 4.')
             image[image>1] = 1
         image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
-        sample['image'] = image.to(torch.uint8)
+        sample['image'] = image.to(torch.float32)
         return sample
 
 
@@ -140,7 +140,7 @@ class Resize2(object):
                 raise ValueError('Dimension of image is not 3 or 4.')
             image[image>1] = 1
         image = torch.from_numpy(image.astype(np.uint8)).unsqueeze(0) # check later if unsqueeze is needed for our 3D images
-        sample['image'] = image.to(torch.uint8)
+        sample['image'] = image.to(torch.float32)
         return sample
 
 
@@ -209,8 +209,8 @@ class Design_dataset(Dataset):
         mean = torch.FloatTensor([38.1987, 15.7224, 11.8707, 21.1556, 18.3433, 24.4512, -0.3486, 1.6984, 1.9056, 3.2017, 2.0996])
         std = torch.FloatTensor([35.5903, 13.6047, 10.1752, 21.6407, 19.2872, 22.9862, 0.5550, 2.2590, 2.2424, 2.4518, 1.9398])
         label = (label - mean) / std
-        # Only C33 and e33
-        label = torch.FloatTensor([label[3], label[8]])
+        # # Only C33 and e33
+        # label = torch.FloatTensor([label[3], label[8]])
 
         file_path = os.path.join(self.data_dir, volume_name+'.mat')
         image = h5py.File(file_path, 'r').get('phase_IND_original')

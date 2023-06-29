@@ -309,16 +309,15 @@ def trainer_mat(args, model, snapshot_path):
             image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
             # logging.info('iteration %d: anomaly detection in image_batch: %f, time_batch: %f, label_batch: %f' % (iter_num, torch.isnan(image_batch).any() or torch.isinf(image_batch).any(), torch.isnan(time_batch).any() or torch.isinf(time_batch).any(), torch.isnan(label_batch).any() or torch.isinf(label_batch).any())) 
             predicted_labels, decoder_output, kl, log_pxz = model(image_batch, time_batch) # decoder_output is in fact the logits of the output image whose channels represent the categories/classes (each class = a material phase in this function)
-            # output_image = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1) # Segmented output
 
-            # Monte-Carlo estimation of the KL divergence loss
+            # Monte-Carlo estimation of the KL divergence loss (take average among the batch samples)
             kl = kl.mean()
             
             # Reconstruction loss in terms of log liklihood of seeing the output/decoder image given the input image (it is usually negative, so it will be negated in the total loss for minimization)
-            # log_pxz = log_pxz.mean()
-            # loss_reconstruction = -log_pxz
-            loss_ce = torch.sum(ce_loss(decoder_output, image_batch.squeeze(1).long()), dim=dim)
-            loss_reconstruction = loss_ce.mean()
+            log_pxz = log_pxz.mean()
+            loss_reconstruction = -log_pxz
+            # loss_ce = torch.sum(ce_loss(decoder_output, image_batch.squeeze(1).long()), dim=dim)
+            # loss_reconstruction = loss_ce.mean()
             
             # MSE loss for label prediction in VAEs
             loss_pred = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
@@ -336,6 +335,7 @@ def trainer_mat(args, model, snapshot_path):
             #     for param in group['params']:
             #         param.data = param.data.add(param.data, alpha=-wd * group['lr'])
             optimizer.step()
+            # For SGD optimization
             # lr_ = base_lr * (1.0 - iter_num / max_iterations) ** 0.9
             # for param_group in optimizer.param_groups:
             #     param_group['lr'] = lr_
