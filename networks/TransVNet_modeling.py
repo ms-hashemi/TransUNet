@@ -433,7 +433,7 @@ class DownSample(nn.Sequential):
             kernel_size,
             stride=stride,
             padding=padding,
-            bias=not (use_batchnorm),
+            bias=True# bias=not (use_batchnorm),
         )
         relu = nn.ReLU(inplace=True)
 
