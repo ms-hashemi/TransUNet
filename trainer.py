@@ -232,14 +232,14 @@ def trainer_mat(args, model, snapshot_path):
     ce_loss = torch.nn.CrossEntropyLoss(reduction='none')
     if hasattr(model, "module"):
         if len(model.module.config.patches.size) == 3:
-            dim = (1, 2, 3, 4)
-        else:
             dim = (1, 2, 3)
+        else:
+            dim = (1, 2)
     else:
         if len(model.config.patches.size) == 3:
-            dim = (1, 2, 3, 4)
-        else:
             dim = (1, 2, 3)
+        else:
+            dim = (1, 2)
     # optimizer = torch.optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
     optimizer = torch.optim.Adam(model.parameters(), lr=base_lr)
     writer = SummaryWriter(snapshot_path + '/log')
