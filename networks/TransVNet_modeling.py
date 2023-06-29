@@ -697,7 +697,7 @@ class EncoderForGenerativeModels(nn.Module):
     """
     def __init__(self, config, img_size, vis):
         super().__init__()
-        config.use_batchnorm = True#False
+        config.use_batchnorm = False
         self.config = config
         self.transformer = Transformer(config, img_size, vis)
         # Distribution parameters
@@ -758,7 +758,7 @@ class DecoderForGenerativeModels(nn.Module):
     """
     def __init__(self, config, img_size):
         super().__init__()
-        config.use_batchnorm = True#False
+        config.use_batchnorm = False
         self.config = config
         # Distribution parameters
         n_patch = 1
