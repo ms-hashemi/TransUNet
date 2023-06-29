@@ -387,7 +387,7 @@ class Conv2dReLU(nn.Sequential):
         )
         relu = nn.ReLU(inplace=True)
 
-        bn = nn.BatchNorm2d(out_channels)
+        bn = nn.BatchNorm2d(out_channels) if use_batchnorm else nn.Identity()
 
         super(Conv2dReLU, self).__init__(conv, bn, relu)
 
@@ -412,7 +412,7 @@ class Conv3dReLU(nn.Sequential):
         )
         relu = nn.ReLU(inplace=True)
 
-        bn = nn.BatchNorm3d(out_channels)
+        bn = nn.BatchNorm3d(out_channels) if use_batchnorm else nn.Identity()
 
         super(Conv3dReLU, self).__init__(conv, bn, relu)
 
@@ -437,7 +437,7 @@ class DownSample(nn.Sequential):
         )
         relu = nn.ReLU(inplace=True)
 
-        bn = nn.BatchNorm3d(out_channels)
+        bn = nn.BatchNorm3d(out_channels) if use_batchnorm else nn.Identity()
 
         super(DownSample, self).__init__(conv, bn, relu)
 
@@ -451,6 +451,8 @@ class CNNFeatures3D(nn.Module):
     ):
         super().__init__()
         self.config = config
+        if self.config.get("use_batchnorm") is not None: # For the generative encoder
+            use_batchnorm = self.config.use_batchnorm
         in_channels = list([in_channels]) + list(config.encoder_channels[:-1])
         out_channels = config.encoder_channels
         self.out_channels = config.encoder_channels[-1]
@@ -463,7 +465,7 @@ class CNNFeatures3D(nn.Module):
             (f'block{i:d}', nn.Sequential(OrderedDict([
                 ('conv1', Conv3dReLU(in_channels[i], out_channels[i], kernel_size=3, padding=1, use_batchnorm=use_batchnorm)),
                 ('conv2', Conv3dReLU(out_channels[i], out_channels[i], kernel_size=3, padding=1, use_batchnorm=use_batchnorm)),
-                ('down', DownSample(out_channels[i], out_channels[i]))
+                ('down', DownSample(out_channels[i], out_channels[i], kernel_size=1, padding=0, stride=2, use_batchnorm=use_batchnorm))
                 ]))) for i in range(1, len(config.encoder_channels))
         ]))
     
@@ -584,6 +586,10 @@ class DecoderCup(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.config = config
+        if self.config.get("use_batchnorm") is not None: # For the generative encoder
+            use_batchnorm = self.config.use_batchnorm
+        else:
+            use_batchnorm = True
         head_channels = config.decoder_channels[0]
         if config.classifier == 'gen':
             first_in_channels = config.label_size
@@ -596,7 +602,7 @@ class DecoderCup(nn.Module):
                 head_channels,
                 kernel_size=3,
                 padding=1,
-                use_batchnorm=True,
+                use_batchnorm=use_batchnorm,
             )
         else:
             self.conv_more = Conv2dReLU(
@@ -604,7 +610,7 @@ class DecoderCup(nn.Module):
                 head_channels,
                 kernel_size=3,
                 padding=1,
-                use_batchnorm=True,
+                use_batchnorm=use_batchnorm,
             )
         # in_channels = config.decoder_channels[:-1]
         in_channels = [first_in_channels] + list(config.decoder_channels[:-1])
@@ -615,11 +621,11 @@ class DecoderCup(nn.Module):
 
         if len(config.patches.size) == 3:
             blocks = [
-                DecoderBlock3D(in_ch, out_ch, sk_ch) for in_ch, out_ch, sk_ch in zip(in_channels, out_channels, skip_channels)
+                DecoderBlock3D(in_ch, out_ch, sk_ch, use_batchnorm) for in_ch, out_ch, sk_ch in zip(in_channels, out_channels, skip_channels)
             ]
         else:
             blocks = [
-                DecoderBlock(in_ch, out_ch, sk_ch) for in_ch, out_ch, sk_ch in zip(in_channels, out_channels, skip_channels)
+                DecoderBlock(in_ch, out_ch, sk_ch, use_batchnorm) for in_ch, out_ch, sk_ch in zip(in_channels, out_channels, skip_channels)
             ]
         self.blocks = nn.ModuleList(blocks)
 
@@ -691,6 +697,7 @@ class EncoderForGenerativeModels(nn.Module):
     """
     def __init__(self, config, img_size, vis):
         super().__init__()
+        config.use_batchnorm = True#False
         self.config = config
         self.transformer = Transformer(config, img_size, vis)
         # Distribution parameters
@@ -751,6 +758,7 @@ class DecoderForGenerativeModels(nn.Module):
     """
     def __init__(self, config, img_size):
         super().__init__()
+        config.use_batchnorm = True#False
         self.config = config
         # Distribution parameters
         n_patch = 1
