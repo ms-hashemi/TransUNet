@@ -792,7 +792,7 @@ class DecoderForGenerativeModels(nn.Module):
         #     nn.Linear(config.label_size, n_patch), # n_patch + config.label_size
         #     # nn.Tanh()
         # )
-        if self.config.get("n_decoder_CUPs") is not None: # For the generative decoder
+        if self.config.get("n_decoder_CUPs") is None: # For the generative decoder
             self.decoder = DecoderCup(config)
             if len(config.patches.size) == 3:
                 self.morph_head = Morph3D(
@@ -821,12 +821,12 @@ class DecoderForGenerativeModels(nn.Module):
                     kernel_size=3,
                 )
         else:
-            self.decoder = [DecoderCup(config) for i in range(self.config.n_decoder_CUPs)]
-            self.decoder_output = [DecoderForGenerativeOutput(config, in_channels=config['decoder_channels'][-1], out_channels=config['n_classes'], kernel_size=3) for i in range(self.config.n_decoder_CUPs)]
+            self.decoder = nn.ModuleList([DecoderCup(config) for i in range(self.config.n_decoder_CUPs)])
+            self.decoder_output = nn.ModuleList([DecoderForGenerativeOutput(config, in_channels=config['decoder_channels'][-1], out_channels=config['n_classes'], kernel_size=3) for i in range(self.config.n_decoder_CUPs)])
         
     def forward(self, x, features=None, time=0):
         # Decode the encoded input x to get a reconstructed image
-        if self.config.get("n_decoder_CUPs") is not None: # For the generative decoder
+        if self.config.get("n_decoder_CUPs") is None: # For the generative decoder
             # x = torch.unsqueeze(self.fc(x), -1)
             x = self.decoder(x, features)
             if len(self.config.patches.size) == 3:
@@ -858,7 +858,7 @@ class DecoderForGenerativeModels(nn.Module):
             for i in range(batch_size):
                 for j in range(len(idx)):
                     if i in idx[j][:, 0]:
-                        x.append(x[j][counter[j]])
+                        x.append(xx[j][counter[j]])
                         counter[j] = counter[j] + 1
             x = torch.stack(x, 0)
             return x
@@ -951,7 +951,7 @@ class VisionTransformer(nn.Module):
             scale = torch.exp(self.log_scale)
             dist = torch.distributions.Normal(decoder_output, scale)
             # Measure prob of seeing image under p(x|y,z)
-            log_pxz = dist.log_prob(x) # Reconstruction loss in VAEs
+            log_pxz = dist.log_prob(torch.unsqueeze(x[:, 0, :], 1)) # Reconstruction loss in VAEs
             if len(self.config.patches.size) == 3:
                 log_pxz = log_pxz.sum(dim=(1, 2, 3, 4))
             else:

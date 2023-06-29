@@ -83,7 +83,7 @@ if __name__ == "__main__":
             # 'root_path': '/work/sheidaei/mhashemi/data/mat',
             'root_path': '../data/mat/Results', # On my local machine or CyBox
             'list_dir': './lists/lists_Design',
-            'num_classes': 2,
+            'num_classes': 1,
             'dimension': 3,
             'prefix': 'TVG', # TransVNetGenerative
         },
@@ -91,7 +91,7 @@ if __name__ == "__main__":
             'root_path': '/work/sheidaei/mhashemi/data/mat',
             # 'root_path': '../data/mat/Results', # On my local machine or CyBox
             'list_dir': './lists/lists_Design',
-            'num_classes': 2,
+            'num_classes': 1,
             'dimension': 3,
             'prefix': 'TVG', # TransVNetGenerative
         },
