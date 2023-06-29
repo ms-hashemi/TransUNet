@@ -1,0 +1,197 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(dataset='Design', img_size=[64, 64, 64], vit_patches_size=[1, 1, 1], vit_name='Conv-ViT-Gen2-B_16', pretrained_net_path=False, is_encoder_pretrained=False, deterministic=1, max_epochs=200, batch_size=60, base_lr=0.001, seed=1234, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, num_classes=2, root_path='/work/sheidaei/mhashemi/data/mat', list_dir='./lists/lists_Design', exp='TVG_Design[64, 64, 64]', distributed=False)
+6 iterations per epoch. 1200 max iterations 
+  0%|                                         | 0/200 [00:00<?, ?it/s]iteration 1: loss: 15.525223, loss_kl: 342.368896, loss_recon: 0.693146, loss_pred: 5.170071
+iteration 2: loss: 28.549004, loss_kl: 1129.553467, loss_recon: 0.692403, loss_pred: 10.329442
+iteration 3: loss: 16.784927, loss_kl: 396.270844, loss_recon: 0.689953, loss_pred: 5.922685
+iteration 4: loss: 14.621189, loss_kl: 280.324036, loss_recon: 0.682606, loss_pred: 4.991889
+iteration 5: loss: 14.757734, loss_kl: 325.180939, loss_recon: 0.670866, loss_pred: 4.797269
+iteration 6: loss: 17.139605, loss_kl: 340.784271, loss_recon: 0.643008, loss_pred: 7.301682
+  0%|▏                             | 1/200 [01:48<5:59:31, 108.40s/it]iteration 7: loss: 14.583963, loss_kl: 311.936859, loss_recon: 0.653924, loss_pred: 4.925354
+iteration 8: loss: 13.486045, loss_kl: 280.721558, loss_recon: 0.641402, loss_pred: 4.264812
+iteration 9: loss: 13.547192, loss_kl: 276.303802, loss_recon: 0.618789, loss_pred: 4.596260
+iteration 10: loss: 13.679329, loss_kl: 307.209564, loss_recon: 0.633626, loss_pred: 4.270976
+iteration 11: loss: 13.576006, loss_kl: 348.910309, loss_recon: 0.627223, loss_pred: 3.814676
+iteration 12: loss: 13.657375, loss_kl: 375.213898, loss_recon: 0.628309, loss_pred: 3.622143
+  1%|▎                              | 2/200 [02:46<4:19:17, 78.57s/it]iteration 13: loss: 12.959961, loss_kl: 375.770233, loss_recon: 0.636123, loss_pred: 2.841024
+iteration 14: loss: 13.405567, loss_kl: 363.538177, loss_recon: 0.618358, loss_pred: 3.586605
+iteration 15: loss: 12.030073, loss_kl: 343.957703, loss_recon: 0.631705, loss_pred: 2.273451
+iteration 16: loss: 12.138924, loss_kl: 325.783142, loss_recon: 0.624477, loss_pred: 2.636324
+iteration 17: loss: 12.631048, loss_kl: 314.683746, loss_recon: 0.614843, loss_pred: 3.335783
+iteration 18: loss: 11.437365, loss_kl: 305.457764, loss_recon: 0.623133, loss_pred: 2.151455
+  2%|▍                              | 3/200 [03:44<3:47:05, 69.16s/it]iteration 19: loss: 11.259023, loss_kl: 294.788513, loss_recon: 0.635810, loss_pred: 1.953034
+iteration 20: loss: 11.845501, loss_kl: 291.392029, loss_recon: 0.625546, loss_pred: 2.676117
+iteration 21: loss: 11.992700, loss_kl: 294.477570, loss_recon: 0.619493, loss_pred: 2.852996
+iteration 22: loss: 11.668158, loss_kl: 292.404297, loss_recon: 0.621794, loss_pred: 2.526177
+iteration 23: loss: 11.946961, loss_kl: 297.538971, loss_recon: 0.614417, loss_pred: 2.827403
+iteration 24: loss: 12.820402, loss_kl: 291.619293, loss_recon: 0.596846, loss_pred: 3.935754
+  2%|▌                              | 4/200 [04:38<3:26:57, 63.35s/it]iteration 25: loss: 11.338036, loss_kl: 300.973419, loss_recon: 0.624816, loss_pred: 2.080141
+iteration 26: loss: 11.780005, loss_kl: 301.238037, loss_recon: 0.621223, loss_pred: 2.555395
+iteration 27: loss: 11.122103, loss_kl: 296.971283, loss_recon: 0.626274, loss_pred: 1.889646
+iteration 28: loss: 11.712312, loss_kl: 286.662598, loss_recon: 0.615924, loss_pred: 2.686447
+iteration 29: loss: 11.710459, loss_kl: 282.870514, loss_recon: 0.614790, loss_pred: 2.733854
+iteration 30: loss: 11.535140, loss_kl: 278.189392, loss_recon: 0.620948, loss_pred: 2.543770
+  2%|▊                              | 5/200 [05:31<3:13:11, 59.45s/it]iteration 31: loss: 11.515985, loss_kl: 275.245026, loss_recon: 0.618197, loss_pred: 2.581563
+iteration 32: loss: 11.420084, loss_kl: 276.024628, loss_recon: 0.618105, loss_pred: 2.478785
+iteration 33: loss: 10.881374, loss_kl: 276.761902, loss_recon: 0.627360, loss_pred: 1.840157
+iteration 34: loss: 11.469784, loss_kl: 275.810760, loss_recon: 0.609672, loss_pred: 2.614958
+iteration 35: loss: 11.168820, loss_kl: 279.372986, loss_recon: 0.622496, loss_pred: 2.150130
+iteration 36: loss: 10.743873, loss_kl: 281.792969, loss_recon: 0.636383, loss_pred: 1.562115
+  3%|▉                              | 6/200 [06:22<3:02:58, 56.59s/it]iteration 37: loss: 11.411055, loss_kl: 275.512177, loss_recon: 0.621686, loss_pred: 2.439075
+iteration 38: loss: 11.476582, loss_kl: 271.045837, loss_recon: 0.609785, loss_pred: 2.668270
+iteration 39: loss: 11.040407, loss_kl: 269.511902, loss_recon: 0.621179, loss_pred: 2.133495
+iteration 40: loss: 10.927781, loss_kl: 271.566498, loss_recon: 0.619614, loss_pred: 2.015971
+iteration 41: loss: 10.973590, loss_kl: 265.865875, loss_recon: 0.625345, loss_pred: 2.061481
+iteration 42: loss: 10.932224, loss_kl: 264.311157, loss_recon: 0.623676, loss_pred: 2.052353
+  4%|█                              | 7/200 [07:15<2:59:01, 55.65s/it]iteration 43: loss: 11.210709, loss_kl: 267.228821, loss_recon: 0.616767, loss_pred: 2.370748
+iteration 44: loss: 11.191860, loss_kl: 266.010315, loss_recon: 0.609948, loss_pred: 2.432276
+iteration 45: loss: 11.183256, loss_kl: 263.197388, loss_recon: 0.612873, loss_pred: 2.422547
+iteration 46: loss: 10.696292, loss_kl: 266.805817, loss_recon: 0.627285, loss_pred: 1.755387
+iteration 47: loss: 11.029617, loss_kl: 260.578613, loss_recon: 0.622440, loss_pred: 2.199428
+iteration 48: loss: 11.275233, loss_kl: 252.177063, loss_recon: 0.613087, loss_pred: 2.622592
+  4%|█▏                             | 8/200 [08:08<2:55:10, 54.74s/it]iteration 49: loss: 11.197946, loss_kl: 258.714935, loss_recon: 0.611248, loss_pred: 2.498316
+iteration 50: loss: 10.911138, loss_kl: 262.261566, loss_recon: 0.621850, loss_pred: 2.070026
+iteration 51: loss: 10.766248, loss_kl: 259.861206, loss_recon: 0.616252, loss_pred: 2.005118
+iteration 52: loss: 11.183877, loss_kl: 257.616547, loss_recon: 0.617893, loss_pred: 2.428781
+iteration 53: loss: 11.299019, loss_kl: 256.620544, loss_recon: 0.621245, loss_pred: 2.520362
+iteration 54: loss: 10.322451, loss_kl: 261.073914, loss_recon: 0.627278, loss_pred: 1.438934
+  4%|█▍                             | 9/200 [08:58<2:49:41, 53.31s/it]iteration 55: loss: 10.870654, loss_kl: 254.234421, loss_recon: 0.617469, loss_pred: 2.153623
+iteration 56: loss: 11.182930, loss_kl: 252.341644, loss_recon: 0.610649, loss_pred: 2.553020
+iteration 57: loss: 10.996714, loss_kl: 255.709137, loss_recon: 0.612420, loss_pred: 2.315421
+iteration 58: loss: 11.004581, loss_kl: 256.018433, loss_recon: 0.618464, loss_pred: 2.259757
+iteration 59: loss: 10.629105, loss_kl: 251.818680, loss_recon: 0.622977, loss_pred: 1.881153
+iteration 60: loss: 10.693673, loss_kl: 250.686844, loss_recon: 0.614848, loss_pred: 2.038321
+  5%|█▌                            | 10/200 [09:49<2:46:08, 52.46s/it]iteration 61: loss: 10.771909, loss_kl: 249.205124, loss_recon: 0.618122, loss_pred: 2.098634
+iteration 62: loss: 10.719566, loss_kl: 250.146683, loss_recon: 0.611149, loss_pred: 2.106611
+iteration 63: loss: 10.696915, loss_kl: 247.882034, loss_recon: 0.609932, loss_pred: 2.118774
+iteration 64: loss: 10.522210, loss_kl: 247.317719, loss_recon: 0.613103, loss_pred: 1.918002
+iteration 65: loss: 10.279141, loss_kl: 248.011688, loss_recon: 0.627268, loss_pred: 1.526340
+iteration 66: loss: 9.671045, loss_kl: 247.943893, loss_recon: 0.622171, loss_pred: 0.969893
+  6%|█▋                            | 11/200 [10:39<2:43:18, 51.84s/it]iteration 67: loss: 10.124855, loss_kl: 252.928299, loss_recon: 0.612254, loss_pred: 1.473028
+iteration 68: loss: 10.588078, loss_kl: 262.349243, loss_recon: 0.609408, loss_pred: 1.870503
+iteration 69: loss: 10.344490, loss_kl: 254.057632, loss_recon: 0.628497, loss_pred: 1.518940
+iteration 70: loss: 9.779991, loss_kl: 250.900391, loss_recon: 0.613016, loss_pred: 1.140828
+iteration 71: loss: 9.677727, loss_kl: 249.072296, loss_recon: 0.620814, loss_pred: 0.978864
+iteration 72: loss: 10.078455, loss_kl: 253.340240, loss_recon: 0.615381, loss_pred: 1.391247
+  6%|█▊                            | 12/200 [11:30<2:41:37, 51.58s/it]iteration 73: loss: 9.582131, loss_kl: 250.415970, loss_recon: 0.607183, loss_pred: 1.006142
+iteration 74: loss: 9.791133, loss_kl: 254.067001, loss_recon: 0.618563, loss_pred: 1.064831
+iteration 75: loss: 9.272198, loss_kl: 246.952057, loss_recon: 0.618626, loss_pred: 0.616422
+iteration 76: loss: 9.380055, loss_kl: 249.516998, loss_recon: 0.627053, loss_pred: 0.614358
+iteration 77: loss: 9.341859, loss_kl: 253.155350, loss_recon: 0.626020, loss_pred: 0.550107
+iteration 78: loss: 9.104073, loss_kl: 244.521317, loss_recon: 0.625088, loss_pred: 0.407980
+  6%|█▉                            | 13/200 [12:21<2:39:56, 51.32s/it]iteration 79: loss: 18.652987, loss_kl: 242.642197, loss_recon: 0.621936, loss_pred: 0.398572
+iteration 80: loss: 18.731419, loss_kl: 245.214310, loss_recon: 0.614637, loss_pred: 0.422415
+iteration 81: loss: 18.628525, loss_kl: 243.307159, loss_recon: 0.615449, loss_pred: 0.405999
+iteration 82: loss: 18.592396, loss_kl: 241.418320, loss_recon: 0.610654, loss_pred: 0.511506
+iteration 83: loss: 18.527197, loss_kl: 240.913574, loss_recon: 0.622066, loss_pred: 0.357228
+iteration 84: loss: 19.104265, loss_kl: 242.537247, loss_recon: 0.617169, loss_pred: 0.902729
+  7%|██                            | 14/200 [13:12<2:38:32, 51.14s/it]iteration 85: loss: 30.185619, loss_kl: 245.603302, loss_recon: 0.624566, loss_pred: 2.032143
+iteration 86: loss: 29.069904, loss_kl: 237.641556, loss_recon: 0.634340, loss_pred: 1.528877
+iteration 87: loss: 27.639479, loss_kl: 229.467239, loss_recon: 0.637265, loss_pred: 0.798349
+iteration 88: loss: 28.046144, loss_kl: 229.421066, loss_recon: 0.629563, loss_pred: 1.286156
+iteration 89: loss: 27.229763, loss_kl: 223.840759, loss_recon: 0.624879, loss_pred: 1.014378
+iteration 90: loss: 26.897701, loss_kl: 223.883240, loss_recon: 0.616517, loss_pred: 0.762149
+  8%|██▎                           | 15/200 [14:02<2:37:02, 50.93s/it]iteration 91: loss: 35.987381, loss_kl: 224.571518, loss_recon: 0.610806, loss_pred: 0.954507
+iteration 92: loss: 35.154350, loss_kl: 219.062057, loss_recon: 0.640031, loss_pred: 0.538841
+iteration 93: loss: 35.208645, loss_kl: 216.850601, loss_recon: 0.644038, loss_pred: 0.837902
+iteration 94: loss: 34.170914, loss_kl: 212.860413, loss_recon: 0.609632, loss_pred: 0.658174
+iteration 95: loss: 33.419701, loss_kl: 206.294724, loss_recon: 0.613846, loss_pred: 0.710478
+iteration 96: loss: 32.009373, loss_kl: 195.229401, loss_recon: 0.630548, loss_pred: 0.558342
+  8%|██▍                           | 16/200 [14:52<2:35:33, 50.73s/it]iteration 97: loss: 40.407867, loss_kl: 193.980103, loss_recon: 0.624705, loss_pred: 1.494573
+iteration 98: loss: 40.005856, loss_kl: 192.651703, loss_recon: 0.624553, loss_pred: 1.317780
+iteration 99: loss: 38.807499, loss_kl: 185.616699, loss_recon: 0.627185, loss_pred: 1.277798
+iteration 100: loss: 37.559639, loss_kl: 177.747101, loss_recon: 0.622199, loss_pred: 1.405038
+iteration 101: loss: 37.342609, loss_kl: 177.455002, loss_recon: 0.615434, loss_pred: 1.304850
+iteration 102: loss: 36.446774, loss_kl: 175.976349, loss_recon: 0.612582, loss_pred: 0.686533
+  8%|██▌                           | 17/200 [15:43<2:34:14, 50.57s/it]iteration 103: loss: 42.071400, loss_kl: 169.500778, loss_recon: 0.618844, loss_pred: 0.626802
+iteration 104: loss: 41.591061, loss_kl: 166.105560, loss_recon: 0.616398, loss_pred: 0.877119
+iteration 105: loss: 41.056843, loss_kl: 164.666656, loss_recon: 0.614161, loss_pred: 0.664567
+iteration 106: loss: 40.324284, loss_kl: 159.188583, loss_recon: 0.618184, loss_pred: 1.031218
+iteration 107: loss: 39.056099, loss_kl: 153.789124, loss_recon: 0.609123, loss_pred: 0.976729
+iteration 108: loss: 39.018173, loss_kl: 153.917648, loss_recon: 0.624591, loss_pred: 0.757395
+  9%|██▋                           | 18/200 [16:33<2:33:20, 50.55s/it]iteration 109: loss: 44.014999, loss_kl: 148.236481, loss_recon: 0.617337, loss_pred: 1.138277
+iteration 110: loss: 43.639751, loss_kl: 145.579422, loss_recon: 0.620942, loss_pred: 1.384868
+iteration 111: loss: 43.154961, loss_kl: 143.781967, loss_recon: 0.616421, loss_pred: 1.390340
+iteration 112: loss: 42.538471, loss_kl: 140.616165, loss_recon: 0.610176, loss_pred: 1.620151
+iteration 113: loss: 41.891949, loss_kl: 140.180603, loss_recon: 0.611672, loss_pred: 1.066512
+iteration 114: loss: 41.677795, loss_kl: 137.808746, loss_recon: 0.606214, loss_pred: 1.494207
+ 10%|██▊                           | 19/200 [17:26<2:34:51, 51.34s/it]iteration 115: loss: 46.197838, loss_kl: 136.010498, loss_recon: 0.618948, loss_pred: 0.946148
+iteration 116: loss: 45.995388, loss_kl: 132.410706, loss_recon: 0.610762, loss_pred: 1.859411
+iteration 117: loss: 45.905041, loss_kl: 135.064255, loss_recon: 0.615230, loss_pred: 0.962286
+iteration 118: loss: 44.727276, loss_kl: 129.538528, loss_recon: 0.616771, loss_pred: 1.356099
+iteration 119: loss: 43.698532, loss_kl: 127.481583, loss_recon: 0.613015, loss_pred: 0.955666
+iteration 120: loss: 42.893818, loss_kl: 123.987785, loss_recon: 0.623737, loss_pred: 1.047159
+ 10%|███                           | 20/200 [18:16<2:32:36, 50.87s/it]iteration 121: loss: 47.601803, loss_kl: 122.948463, loss_recon: 0.612996, loss_pred: 1.292291
+iteration 122: loss: 47.296932, loss_kl: 122.192734, loss_recon: 0.614287, loss_pred: 1.221476
+iteration 123: loss: 46.210941, loss_kl: 119.288040, loss_recon: 0.616252, loss_pred: 1.065096
+iteration 124: loss: 46.064995, loss_kl: 118.451698, loss_recon: 0.617786, loss_pred: 1.177123
+iteration 125: loss: 45.181541, loss_kl: 115.763321, loss_recon: 0.607115, loss_pred: 1.278937
+iteration 126: loss: 44.548668, loss_kl: 114.663795, loss_recon: 0.620320, loss_pred: 0.873337
+ 10%|███▏                          | 21/200 [19:06<2:30:59, 50.61s/it]iteration 127: loss: 48.636665, loss_kl: 113.105782, loss_recon: 0.604513, loss_pred: 1.149576
+iteration 128: loss: 48.085369, loss_kl: 111.277283, loss_recon: 0.608586, loss_pred: 1.227515
+iteration 129: loss: 47.608036, loss_kl: 109.887505, loss_recon: 0.618105, loss_pred: 1.164202
+iteration 130: loss: 46.814232, loss_kl: 107.724777, loss_recon: 0.621166, loss_pred: 1.132214
+iteration 131: loss: 46.778423, loss_kl: 107.377411, loss_recon: 0.608943, loss_pred: 1.345908
+iteration 132: loss: 45.356876, loss_kl: 104.540054, loss_recon: 0.619089, loss_pred: 0.862515
+ 11%|███▎                          | 22/200 [19:57<2:30:11, 50.63s/it]iteration 133: loss: 50.394558, loss_kl: 105.843590, loss_recon: 0.620031, loss_pred: 1.221748
+iteration 134: loss: 54.987751, loss_kl: 114.056107, loss_recon: 0.627028, loss_pred: 2.410691
+iteration 135: loss: 55.122082, loss_kl: 111.854767, loss_recon: 0.617441, loss_pred: 3.534641
+iteration 136: loss: 48.454197, loss_kl: 101.007027, loss_recon: 0.621461, loss_pred: 1.230735
+iteration 137: loss: 53.609535, loss_kl: 111.068428, loss_recon: 0.610579, loss_pred: 2.409964
+iteration 138: loss: 48.266209, loss_kl: 100.136841, loss_recon: 0.597822, loss_pred: 1.632436
+ 12%|███▍                          | 23/200 [20:47<2:29:11, 50.57s/it]iteration 139: loss: 53.228638, loss_kl: 101.112846, loss_recon: 0.631990, loss_pred: 1.852855
+iteration 140: loss: 51.405197, loss_kl: 97.832428, loss_recon: 0.616181, loss_pred: 1.649253
+iteration 141: loss: 51.364048, loss_kl: 97.719650, loss_recon: 0.609300, loss_pred: 1.727170
+iteration 142: loss: 51.007450, loss_kl: 96.980545, loss_recon: 0.615132, loss_pred: 1.641593
+iteration 143: loss: 49.585583, loss_kl: 93.077141, loss_recon: 0.605850, loss_pred: 2.051911
+iteration 144: loss: 49.792709, loss_kl: 94.521751, loss_recon: 0.612158, loss_pred: 1.552235
+ 12%|███▌                          | 24/200 [21:40<2:30:36, 51.34s/it]iteration 145: loss: 52.515751, loss_kl: 91.849373, loss_recon: 0.616630, loss_pred: 1.784134
+iteration 146: loss: 52.372993, loss_kl: 92.732605, loss_recon: 0.616242, loss_pred: 1.216717
+iteration 147: loss: 51.761505, loss_kl: 91.411331, loss_recon: 0.617983, loss_pred: 1.228906
+iteration 148: loss: 50.221783, loss_kl: 87.851303, loss_recon: 0.612636, loss_pred: 1.469976
+iteration 149: loss: 50.485992, loss_kl: 87.344055, loss_recon: 0.611389, loss_pred: 1.992764
+iteration 150: loss: 50.570965, loss_kl: 87.448639, loss_recon: 0.595458, loss_pred: 2.186299
+ 12%|███▊                          | 25/200 [22:31<2:28:47, 51.01s/it]iteration 151: loss: 52.402493, loss_kl: 85.510994, loss_recon: 0.605327, loss_pred: 1.473054
+iteration 152: loss: 51.408863, loss_kl: 83.455177, loss_recon: 0.619583, loss_pred: 1.415761
+iteration 153: loss: 50.860001, loss_kl: 82.717964, loss_recon: 0.619065, loss_pred: 1.258955
+iteration 154: loss: 50.113712, loss_kl: 80.646439, loss_recon: 0.608513, loss_pred: 1.705335
+iteration 155: loss: 49.733131, loss_kl: 80.210037, loss_recon: 0.612145, loss_pred: 1.517453
+iteration 156: loss: 49.018711, loss_kl: 79.215927, loss_recon: 0.621448, loss_pred: 1.231707
+ 13%|███▉                          | 26/200 [23:22<2:28:20, 51.15s/it]iteration 157: loss: 51.616055, loss_kl: 78.132683, loss_recon: 0.613805, loss_pred: 1.379921
+iteration 158: loss: 51.436256, loss_kl: 77.563591, loss_recon: 0.621651, loss_pred: 1.442857
+iteration 159: loss: 51.159916, loss_kl: 77.271812, loss_recon: 0.612092, loss_pred: 1.426777
+iteration 160: loss: 50.436565, loss_kl: 76.095306, loss_recon: 0.615427, loss_pred: 1.334098
+iteration 161: loss: 49.530823, loss_kl: 73.935997, loss_recon: 0.604032, loss_pred: 1.761025
+iteration 162: loss: 49.179634, loss_kl: 73.228226, loss_recon: 0.611439, loss_pred: 1.735229
+ 14%|████                          | 27/200 [24:14<2:28:19, 51.44s/it]iteration 163: loss: 50.385258, loss_kl: 71.029495, loss_recon: 0.618067, loss_pred: 1.302777
+iteration 164: loss: 50.062908, loss_kl: 70.623337, loss_recon: 0.604797, loss_pred: 1.358441
+iteration 165: loss: 49.780651, loss_kl: 70.093452, loss_recon: 0.612521, loss_pred: 1.318991
+iteration 166: loss: 49.569862, loss_kl: 69.555771, loss_recon: 0.614577, loss_pred: 1.412411
+iteration 167: loss: 48.671951, loss_kl: 68.089981, loss_recon: 0.612698, loss_pred: 1.418625
+iteration 168: loss: 50.478458, loss_kl: 70.844437, loss_recon: 0.602422, loss_pred: 1.664205
+ 14%|████▏                         | 28/200 [25:07<2:28:41, 51.87s/it]iteration 169: loss: 51.197983, loss_kl: 67.685562, loss_recon: 0.612016, loss_pred: 1.515391
+iteration 170: loss: 50.910393, loss_kl: 67.405807, loss_recon: 0.615477, loss_pred: 1.373242
+iteration 171: loss: 48.672302, loss_kl: 63.692822, loss_recon: 0.619371, loss_pred: 1.485893
+iteration 172: loss: 48.115959, loss_kl: 62.928234, loss_recon: 0.607571, loss_pred: 1.539642
+iteration 173: loss: 48.299709, loss_kl: 63.136337, loss_recon: 0.609367, loss_pred: 1.571491
+iteration 174: loss: 47.861263, loss_kl: 61.809696, loss_recon: 0.593602, loss_pred: 2.144520
+ 14%|████▎                         | 29/200 [25:57<2:26:21, 51.35s/it]iteration 175: loss: 50.255577, loss_kl: 62.095558, loss_recon: 0.606844, loss_pred: 1.763449
+iteration 176: loss: 48.702309, loss_kl: 60.327972, loss_recon: 0.607356, loss_pred: 1.412681
+iteration 177: loss: 48.403545, loss_kl: 59.789303, loss_recon: 0.619884, loss_pred: 1.356654
+iteration 178: loss: 48.029030, loss_kl: 59.201542, loss_recon: 0.604810, loss_pred: 1.534433
+iteration 179: loss: 46.828617, loss_kl: 57.611767, loss_recon: 0.616880, loss_pred: 1.299453
+iteration 180: loss: 46.452972, loss_kl: 57.035370, loss_recon: 0.620484, loss_pred: 1.281564
+ 15%|████▌                         | 30/200 [26:49<2:25:49, 51.47s/it]iteration 181: loss: 48.879524, loss_kl: 57.056065, loss_recon: 0.613211, loss_pred: 1.507294
+iteration 182: loss: 50.795017, loss_kl: 59.119339, loss_recon: 0.612378, loss_pred: 1.939781
+iteration 183: loss: 53.959290, loss_kl: 63.163147, loss_recon: 0.624843, loss_pred: 2.056535
+iteration 184: loss: 49.196365, loss_kl: 57.026615, loss_recon: 0.615500, loss_pred: 1.822526
+iteration 185: loss: 47.010201, loss_kl: 54.529057, loss_recon: 0.614805, loss_pred: 1.448539
+iteration 186: loss: 49.957500, loss_kl: 58.067871, loss_recon: 0.613444, loss_pred: 1.851603
+ 16%|████▋                         | 31/200 [27:40<2:24:46, 51.40s/it]iteration 187: loss: 50.482098, loss_kl: 55.728718, loss_recon: 0.611074, loss_pred: 1.883786
+iteration 188: loss: 47.455292, loss_kl: 52.166458, loss_recon: 0.612341, loss_pred: 1.560176
+iteration 189: loss: 50.269997, loss_kl: 55.661335, loss_recon: 0.620314, loss_pred: 1.630661
+iteration 190: loss: 47.217220, loss_kl: 51.493118, loss_recon: 0.603738, loss_pred: 1.921495
+iteration 191: loss: 46.331150, loss_kl: 50.893459, loss_recon: 0.619307, loss_pred: 1.336910
+iteration 192: loss: 47.390659, loss_kl: 52.159695, loss_recon: 0.633369, loss_pred: 1.290425
+ 16%|████▊                         | 32/200 [28:30<2:22:13, 50.80s/it]slurmstepd: error: *** JOB 4546899 ON nova21-gpu-10 CANCELLED AT 2023-06-28T22:18:35 ***

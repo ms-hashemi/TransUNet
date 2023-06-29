@@ -1,0 +1,71 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(dataset='Design', img_size=[64, 64, 64], vit_patches_size=[1, 1, 1], vit_name='Conv-ViT-Gen2-B_16', pretrained_net_path=False, is_encoder_pretrained=False, deterministic=1, max_epochs=200, batch_size=60, base_lr=0.001, seed=1234, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, num_classes=2, root_path='/work/sheidaei/mhashemi/data/mat', list_dir='./lists/lists_Design', exp='TVG_Design[64, 64, 64]', distributed=False)
+6 iterations per epoch. 1200 max iterations 
+  0%|                                         | 0/200 [00:00<?, ?it/s]iteration 1: loss: 748.270752, loss_kl: 342.368896, loss_recon: 0.693146, loss_pred: 5.170071
+iteration 2: loss: 726.406860, loss_kl: 377.117798, loss_recon: 0.692465, loss_pred: 3.017071
+iteration 3: loss: 725.416870, loss_kl: 997.078979, loss_recon: 0.685233, loss_pred: 3.021275
+iteration 4: loss: 706.957092, loss_kl: 583.760132, loss_recon: 0.675305, loss_pred: 2.581494
+iteration 5: loss: 707.443970, loss_kl: 366.561371, loss_recon: 0.680476, loss_pred: 2.330260
+iteration 6: loss: 707.420959, loss_kl: 276.036224, loss_recon: 0.649005, loss_pred: 5.565608
+  0%|▏                              | 1/200 [01:32<5:07:21, 92.67s/it]iteration 7: loss: 683.175476, loss_kl: 322.906281, loss_recon: 0.655638, loss_pred: 2.430888
+iteration 8: loss: 705.515381, loss_kl: 380.482941, loss_recon: 0.681657, loss_pred: 2.005360
+iteration 9: loss: 671.837585, loss_kl: 331.754639, loss_recon: 0.637309, loss_pred: 3.121125
+iteration 10: loss: 678.998962, loss_kl: 312.725739, loss_recon: 0.640169, loss_pred: 3.570302
+iteration 11: loss: 676.273315, loss_kl: 328.470947, loss_recon: 0.642242, loss_pred: 3.074655
+iteration 12: loss: 666.797852, loss_kl: 384.169098, loss_recon: 0.637590, loss_pred: 2.536613
+  1%|▎                              | 2/200 [02:29<3:56:31, 71.68s/it]iteration 13: loss: 659.321472, loss_kl: 462.864288, loss_recon: 0.637129, loss_pred: 1.756370
+iteration 14: loss: 656.636108, loss_kl: 534.368774, loss_recon: 0.620960, loss_pred: 3.033232
+iteration 15: loss: 654.600098, loss_kl: 545.241211, loss_recon: 0.627074, loss_pred: 2.207322
+iteration 16: loss: 650.606323, loss_kl: 512.632324, loss_recon: 0.622945, loss_pred: 2.253517
+iteration 17: loss: 651.031677, loss_kl: 483.704193, loss_recon: 0.618662, loss_pred: 2.753225
+iteration 18: loss: 648.559387, loss_kl: 469.222260, loss_recon: 0.625842, loss_pred: 1.802529
+  2%|▍                              | 3/200 [03:27<3:34:37, 65.37s/it]iteration 19: loss: 657.619507, loss_kl: 464.518646, loss_recon: 0.634786, loss_pred: 1.818792
+iteration 20: loss: 656.306885, loss_kl: 442.000427, loss_recon: 0.629596, loss_pred: 2.229039
+iteration 21: loss: 648.940918, loss_kl: 426.710571, loss_recon: 0.620138, loss_pred: 2.453550
+iteration 22: loss: 650.100098, loss_kl: 413.953857, loss_recon: 0.622897, loss_pred: 2.306384
+iteration 23: loss: 645.058533, loss_kl: 403.252899, loss_recon: 0.614796, loss_pred: 2.622978
+iteration 24: loss: 637.744751, loss_kl: 403.506104, loss_recon: 0.598282, loss_pred: 3.542810
+  2%|▌                              | 4/200 [04:22<3:19:38, 61.12s/it]iteration 25: loss: 648.936523, loss_kl: 423.886444, loss_recon: 0.625419, loss_pred: 1.927914
+iteration 26: loss: 651.517822, loss_kl: 430.713989, loss_recon: 0.623178, loss_pred: 2.403283
+iteration 27: loss: 648.950806, loss_kl: 426.096710, loss_recon: 0.626139, loss_pred: 1.855074
+iteration 28: loss: 644.172729, loss_kl: 405.431793, loss_recon: 0.614733, loss_pred: 2.538514
+iteration 29: loss: 646.683167, loss_kl: 397.443207, loss_recon: 0.616739, loss_pred: 2.597013
+iteration 30: loss: 645.862976, loss_kl: 383.399811, loss_recon: 0.618526, loss_pred: 2.350261
+  2%|▊                              | 5/200 [05:12<3:05:56, 57.21s/it]iteration 31: loss: 646.252258, loss_kl: 389.716217, loss_recon: 0.618454, loss_pred: 2.390096
+iteration 32: loss: 643.795227, loss_kl: 378.956177, loss_recon: 0.615797, loss_pred: 2.420829
+iteration 33: loss: 647.982605, loss_kl: 361.223328, loss_recon: 0.625570, loss_pred: 1.880080
+iteration 34: loss: 638.778687, loss_kl: 343.057678, loss_recon: 0.609669, loss_pred: 2.567929
+iteration 35: loss: 645.397644, loss_kl: 331.932495, loss_recon: 0.620147, loss_pred: 2.193121
+iteration 36: loss: 655.329163, loss_kl: 332.716919, loss_recon: 0.635958, loss_pred: 1.604356
+  3%|▉                              | 6/200 [06:02<2:57:10, 54.80s/it]iteration 37: loss: 646.298340, loss_kl: 330.229218, loss_recon: 0.618245, loss_pred: 2.475131
+iteration 38: loss: 638.275513, loss_kl: 329.286224, loss_recon: 0.608775, loss_pred: 2.620766
+iteration 39: loss: 645.235718, loss_kl: 325.805115, loss_recon: 0.620671, loss_pred: 2.130630
+iteration 40: loss: 637.747559, loss_kl: 324.309662, loss_recon: 0.614416, loss_pred: 2.008890
+iteration 41: loss: 649.183044, loss_kl: 320.118774, loss_recon: 0.625589, loss_pred: 2.039331
+iteration 42: loss: 645.245789, loss_kl: 327.601654, loss_recon: 0.621669, loss_pred: 2.030128
+  4%|█                              | 7/200 [06:54<2:53:41, 54.00s/it]iteration 43: loss: 640.893921, loss_kl: 332.046692, loss_recon: 0.614026, loss_pred: 2.354773
+iteration 44: loss: 636.987549, loss_kl: 330.618896, loss_recon: 0.608820, loss_pred: 2.486142
+iteration 45: loss: 639.372681, loss_kl: 322.622681, loss_recon: 0.611547, loss_pred: 2.459961
+iteration 46: loss: 646.810913, loss_kl: 315.845734, loss_recon: 0.626493, loss_pred: 1.715981
+iteration 47: loss: 646.025513, loss_kl: 306.266785, loss_recon: 0.621293, loss_pred: 2.166961
+iteration 48: loss: 639.366150, loss_kl: 291.349884, loss_recon: 0.611039, loss_pred: 2.541330
+  4%|█▏                             | 8/200 [07:48<2:52:00, 53.75s/it]iteration 49: loss: 638.824402, loss_kl: 302.717194, loss_recon: 0.611020, loss_pred: 2.477700
+iteration 50: loss: 640.923401, loss_kl: 303.477234, loss_recon: 0.617886, loss_pred: 2.000268
+iteration 51: loss: 639.108582, loss_kl: 296.190521, loss_recon: 0.615996, loss_pred: 2.015056
+iteration 52: loss: 641.452881, loss_kl: 295.576294, loss_recon: 0.614265, loss_pred: 2.423249
+iteration 53: loss: 644.975769, loss_kl: 302.885437, loss_recon: 0.617017, loss_pred: 2.493030
+iteration 54: loss: 647.459839, loss_kl: 311.316162, loss_recon: 0.628340, loss_pred: 1.600670
+  4%|█▍                             | 9/200 [08:37<2:46:45, 52.39s/it]iteration 55: loss: 640.568542, loss_kl: 298.256195, loss_recon: 0.616563, loss_pred: 2.102306
+iteration 56: loss: 639.343201, loss_kl: 291.798004, loss_recon: 0.610650, loss_pred: 2.577509
+iteration 57: loss: 636.443909, loss_kl: 299.614471, loss_recon: 0.610076, loss_pred: 2.337210
+iteration 58: loss: 644.832092, loss_kl: 310.393951, loss_recon: 0.618621, loss_pred: 2.310740
+iteration 59: loss: 645.411133, loss_kl: 302.458893, loss_recon: 0.622679, loss_pred: 1.970788
+iteration 60: loss: 635.924316, loss_kl: 294.445282, loss_recon: 0.612341, loss_pred: 2.063857
+  5%|█▌                            | 10/200 [09:27<2:43:41, 51.69s/it]iteration 61: loss: 643.088013, loss_kl: 286.332031, loss_recon: 0.617764, loss_pred: 2.246078
+iteration 62: loss: 636.573853, loss_kl: 290.877197, loss_recon: 0.610675, loss_pred: 2.299058
+iteration 63: loss: 638.087585, loss_kl: 296.779572, loss_recon: 0.610601, loss_pred: 2.451863
+iteration 64: loss: 641.238037, loss_kl: 302.103882, loss_recon: 0.614800, loss_pred: 2.341711
+iteration 65: loss: 644.371948, loss_kl: 289.525269, loss_recon: 0.621456, loss_pred: 2.002078
+iteration 66: loss: 644.013977, loss_kl: 284.076630, loss_recon: 0.624328, loss_pred: 1.684549
+  6%|█▋                            | 11/200 [10:17<2:41:26, 51.25s/it]slurmstepd: error: *** JOB 4546965 ON nova21-gpu-10 CANCELLED AT 2023-06-28T23:27:00 ***

@@ -697,7 +697,7 @@ class EncoderForGenerativeModels(nn.Module):
     """
     def __init__(self, config, img_size, vis):
         super().__init__()
-        config.use_batchnorm = False
+        config.use_batchnorm = True
         self.config = config
         self.transformer = Transformer(config, img_size, vis)
         # Distribution parameters
@@ -758,7 +758,7 @@ class DecoderForGenerativeModels(nn.Module):
     """
     def __init__(self, config, img_size):
         super().__init__()
-        config.use_batchnorm = False
+        config.use_batchnorm = True
         self.config = config
         # Distribution parameters
         n_patch = 1
@@ -774,6 +774,7 @@ class DecoderForGenerativeModels(nn.Module):
         self.decoder2 = DecoderCup(config)
         self.decoder3 = DecoderCup(config)
         self.decoder4 = DecoderCup(config)
+        self.decoder5 = DecoderCup(config)
         if len(config.patches.size) == 3:
             self.morph_head1 = Morph3D(
                 in_channels=config['decoder_channels'][-1],
@@ -791,6 +792,11 @@ class DecoderForGenerativeModels(nn.Module):
                 kernel_size=3,
             )
             self.morph_head4 = Morph3D(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
+            self.morph_head5 = Morph3D(
                 in_channels=config['decoder_channels'][-1],
                 out_channels=config['n_classes'],
                 kernel_size=3,
@@ -817,16 +823,22 @@ class DecoderForGenerativeModels(nn.Module):
                 out_channels=config['n_classes'],
                 kernel_size=3,
             )
+            self.segmentation_head5 = SegmentationHead(
+                in_channels=config['decoder_channels'][-1],
+                out_channels=config['n_classes'],
+                kernel_size=3,
+            )
 
     def forward(self, x, features=None, time=0):
         # Decode the encoded input x to get a reconstructed image
         # x = torch.unsqueeze(self.fc(x), -1)
         # x = self.decoder(x, features)
         batch_size = x.shape[0]
-        idx1 = ((0.2 <= time) == (time < 0.2 + 0.175)).nonzero()
-        idx2 = ((0.2 + 0.175 <= time) == (time < 0.2 + 2*0.175)).nonzero()
-        idx3 = ((0.2 + 2*0.175 <= time) == (time < 0.2 + 3*0.175)).nonzero()
-        idx4 = ((0.2 + 3*0.175 <= time) == (time <= 0.2 + 4*0.175)).nonzero()
+        idx1 = ((0.2 <= time) == (time < 0.2 + 0.15)).nonzero()
+        idx2 = ((0.2 + 0.15 <= time) == (time < 0.2 + 2*0.15)).nonzero()
+        idx3 = ((0.2 + 2*0.15 <= time) == (time < 0.2 + 3*0.15)).nonzero()
+        idx4 = ((0.2 + 3*0.15 <= time) == (time < 0.2 + 4*0.15)).nonzero()
+        idx5 = ((0.2 + 4*0.15 <= time) == (time <= 0.2 + 5*0.15)).nonzero()
         x1 = self.decoder1(torch.index_select(x, 0, idx1[:, 0]), features)
         if len(self.config.patches.size) == 3:
             x1 = self.morph_head1(x1)
@@ -851,8 +863,14 @@ class DecoderForGenerativeModels(nn.Module):
             # x = self.spatial_transformer(src, x)
         else:
             x4 = self.segmentation_head4(x4)
+        x5 = self.decoder1(torch.index_select(x, 0, idx5[:, 0]), features)
+        if len(self.config.patches.size) == 3:
+            x5 = self.morph_head5(x5)
+            # x = self.spatial_transformer(src, x)
+        else:
+            x5 = self.segmentation_head5(x5)
         x = []
-        c1, c2, c3, c4 = 0, 0, 0, 0
+        c1, c2, c3, c4, c5 = 0, 0, 0, 0, 0
         for i in range(batch_size):
             if i in idx1[:, 0]:
                 x.append(x1[c1])
@@ -866,6 +884,9 @@ class DecoderForGenerativeModels(nn.Module):
             if i in idx4[:, 0]:
                 x.append(x4[c4])
                 c4 = c4 + 1
+            if i in idx5[:, 0]:
+                x.append(x5[c5])
+                c5 = c5 + 1
         x = torch.stack(x, 0)
 
         return x

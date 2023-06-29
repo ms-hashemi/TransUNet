@@ -229,7 +229,17 @@ def trainer_mat(args, model, snapshot_path):
     # model.to(device)
     model.train()
     loss_mse = torch.nn.MSELoss(reduction='none')
-    ce_loss = torch.nn.CrossEntropyLoss()
+    ce_loss = torch.nn.CrossEntropyLoss(reduction='none')
+    if hasattr(model, "module"):
+        if len(model.module.config.patches.size) == 3:
+            dim = (1, 2, 3, 4)
+        else:
+            dim = (1, 2, 3)
+    else:
+        if len(model.config.patches.size) == 3:
+            dim = (1, 2, 3, 4)
+        else:
+            dim = (1, 2, 3)
     # optimizer = torch.optim.SGD(model.parameters(), lr=base_lr, momentum=0.9, weight_decay=0.0001)
     optimizer = torch.optim.Adam(model.parameters(), lr=base_lr)
     writer = SummaryWriter(snapshot_path + '/log')
@@ -307,15 +317,15 @@ def trainer_mat(args, model, snapshot_path):
             # Reconstruction loss in terms of log liklihood of seeing the output/decoder image given the input image (it is usually negative, so it will be negated in the total loss for minimization)
             # log_pxz = log_pxz.mean()
             # loss_reconstruction = -log_pxz
-            loss_ce = ce_loss(decoder_output, image_batch.squeeze(1).long())
-            loss_reconstruction = loss_ce
+            loss_ce = torch.sum(ce_loss(decoder_output, image_batch.squeeze(1).long()), dim=dim)
+            loss_reconstruction = loss_ce.mean()
             
             # MSE loss for label prediction in VAEs
             loss_pred = torch.sum(loss_mse(predicted_labels, label_batch), dim=1)
             loss_pred = loss_pred.mean()
             
             # Total loss value is the following composite function (each term is averaged among the input batch samples) (loss_reconstruction is also averaged among all voxels of the output image!)
-            loss = L[epoch_num]*kl + 10*loss_reconstruction + loss_pred
+            loss = L[epoch_num]*kl + loss_reconstruction + 100*loss_pred
             # loss = 100*loss_reconstruction + loss_pred
             
             optimizer.zero_grad()
@@ -356,7 +366,7 @@ def trainer_mat(args, model, snapshot_path):
 
         # Periodic saving of the trained model according to the current training epoch number
         save_interval = int(max_epoch / 5)
-        if epoch_num > int(max_epoch / 2) and (epoch_num + 1) % save_interval == 0:
+        if (epoch_num + 1) % save_interval == 0: #epoch_num > int(max_epoch / 2) and 
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)
             logging.info("save model to {}".format(save_mode_path))
