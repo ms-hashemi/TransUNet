@@ -324,7 +324,7 @@ def trainer_mat(args, model, snapshot_path):
             loss_pred = loss_pred.mean()
             
             # Total loss value is the following composite function (each term is averaged among the input batch samples) (loss_reconstruction is also averaged among all voxels of the output image!)
-            loss = L[epoch_num]*kl + loss_reconstruction + 100*loss_pred
+            loss = 10*L[epoch_num]*kl + loss_reconstruction + 100*loss_pred
             # loss = 100*loss_reconstruction + loss_pred
             
             optimizer.zero_grad()
