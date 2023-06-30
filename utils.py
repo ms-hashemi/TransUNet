@@ -218,7 +218,7 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
                 decoder_output = net.module.decoder(decoder_input, None, torch.unsqueeze(time_batch[batch_index], 0))
                 
                 # Segmented output or the final label image
-                generative_output = (torch.distributions.Normal(decoder_output, torch.exp(net.module.log_scale)).sample() >= 0.5).float()
+                generative_output = torch.squeeze((torch.distributions.Normal(decoder_output, torch.exp(net.module.log_scale)).sample() >= 0.5).float(), 1)
                 # generative_output = torch.argmax(torch.softmax(decoder_output, dim=1), dim=1)
 
                 mu2, log_variance2, predicted_labels_generative, features = net.module.encoder(generative_output.unsqueeze(1), torch.tensor([-1]).cuda())
