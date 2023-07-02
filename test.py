@@ -155,7 +155,7 @@ def inferrer_mat2(args, model, test_save_path=None):
     logging.info("{} test iterations per epoch".format(len(testloader)))
     # handler = logging.StreamHandler()
     # handler.terminator = ""
-    metric_avg = torch.zeros(1, 3 + args.label_size*3).cuda() # The main metrics are (surrogate_model_error, generative_error, log_pxz). The rest are related to the labels.
+    metric_avg = torch.zeros(1, 3 + args.label_size*5).cuda() # The main metrics are (surrogate_model_error, generative_error, log_pxz). The rest are related to the labels.
     counter = 0 # Number of cases tested (for the average calculation)
     model.eval()
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
