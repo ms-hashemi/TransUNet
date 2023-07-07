@@ -44,7 +44,8 @@ def get_b16_3D_config():
     config.resnet_pretrained_path = None
     config.pretrained_path = '../model/vit_checkpoint/imagenet21k/ViT-B_16.npz'
 
-    config.decoder_channels = (512, 256, 128, 64, 16)
+    config.decoder_channels = (128, 64, 32, 16)
+    config.skip_channels = (0, 0, 0, 0) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
     config.n_classes = 2
     return config
 
@@ -73,7 +74,7 @@ def get_conv_b16_3D_config():
     # config.number_down_scaled = 2 # The number of half down scaling after the last encoder block by nn.MaxPool3D(2) without any convolutions
     config.decoder_channels = (128, 32, 16, 8, 3) # First one is the first number of decoder input channels or head_channels
     config.skip_channels = (16, 16, 16, 8, 3) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
-    config.n_classes = 3 # Number of classes for the image segmentation
+    config.n_classes = 2 # Number of classes for the image segmentation
     return config
 
 

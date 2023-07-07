@@ -72,6 +72,13 @@ if __name__ == "__main__":
             'dimension': 2,
             'prefix': 'TU', # TransUNet
         },
+        'Degradation_local': {
+            'root_path': '../data/deg/Selected', # On my local machine or CyBox,
+            'list_dir': './lists/lists_Degradation',
+            'num_classes': 2,
+            'dimension': 3,
+            'prefix': 'TVD', # TransVNetDegradation
+        },
         'Degradation': {
             'root_path': '/work/sheidaei/mhashemi/data/deg',
             'list_dir': './lists/lists_Degradation',
@@ -184,6 +191,6 @@ if __name__ == "__main__":
         else:
             model.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
 
-    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Design': trainer_mat, 'Design_local': trainer_mat}
+    trainer = {'Synapse': trainer_synapse, 'Degradation': trainer_deg, 'Degradation_local': trainer_deg, 'Design': trainer_mat, 'Design_local': trainer_mat}
     trainer[dataset_name](args, model, snapshot_path)
     # sys.exit(0)

@@ -201,6 +201,16 @@ if __name__ == "__main__":
             'dimension': 2,
             'prefix': 'TU', # TransUNet
         },
+        'Degradation_local': {
+            'dataset_name': 'Degradation',
+            'Dataset': Degradation_dataset,
+            'volume_path': '../data/deg/Selected',
+            'list_dir': './lists/lists_Degradation',
+            'num_classes': 2,
+            'z_spacing': 1,
+            'dimension': 3,
+            'prefix': 'TVD', # TransVNetDegradation
+        },
         'Degradation': {
             'dataset_name': 'Degradation',
             'Dataset': Degradation_dataset,

@@ -167,8 +167,9 @@ def trainer_deg(args, model, snapshot_path):
             writer.add_scalar('info/lr', lr_, iter_num)
             writer.add_scalar('info/total_loss', loss, iter_num)
             writer.add_scalar('info/loss_ce', loss_ce, iter_num)
+            writer.add_scalar('info/loss_dice', loss_ce, iter_num)
 
-            logging.info('iteration %d : loss : %f, loss_ce: %f' % (iter_num, loss.item(), loss_ce.item()))
+            logging.info('iteration %6d: loss: %f, loss_ce: %f, loss_dice: %f' % (iter_num, loss.item(), loss_ce.item(), loss_dice.item()))
 
             # Saving the intermediate training results
             if iter_num % 20 == 0:
@@ -348,7 +349,7 @@ def trainer_mat(args, model, snapshot_path):
             writer.add_scalar('info/loss_recon', loss_reconstruction, iter_num)
             writer.add_scalar('info/loss_pred', loss_pred, iter_num)
 
-            logging.info('iteration %d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, loss_reconstruction, loss_pred))
+            logging.info('iteration %6d: loss: %f, loss_kl: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, kl, loss_reconstruction, loss_pred))
             # logging.info('iteration %d: loss: %f, loss_recon: %f, loss_pred: %f' % (iter_num, loss, loss_reconstruction, loss_pred))
 
             # Saving the intermediate training results
