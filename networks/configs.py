@@ -44,8 +44,8 @@ def get_b16_3D_config():
     config.resnet_pretrained_path = None
     config.pretrained_path = '../model/vit_checkpoint/imagenet21k/ViT-B_16.npz'
 
-    config.decoder_channels = (128, 64, 32, 16)
-    config.skip_channels = (0, 0, 0, 0) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
+    config.decoder_channels = (128, 64, 32)
+    config.skip_channels = (0, 0, 0) # For the decoder blocks associated with 1/16, 1/8, 1/4, 1/2, and 1/1 of input image size. Put zero if no skip connection is desired at a block!
     config.n_classes = 2
     return config
 

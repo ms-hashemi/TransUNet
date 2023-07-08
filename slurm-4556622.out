@@ -1,0 +1,29 @@
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Namespace(dataset='Degradation', img_size=[64, 64, 64], vit_patches_size=[4, 4, 4], vit_name='ViT-B_16', pretrained_net_path=False, is_encoder_pretrained=False, deterministic=1, max_epochs=4, batch_size=48, base_lr=0.01, seed=1234, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, num_classes=2, root_path='/work/sheidaei/mhashemi/data/deg', list_dir='./lists/lists_Degradation', exp='TVD_Degradation[64, 64, 64]', distributed=False)
+169 iterations per epoch. 676 max iterations 
+  0%|                                           | 0/4 [00:00<?, ?it/s]  0%|                                           | 0/4 [04:19<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/mhashemi/TransVNet/train.py", line 195, in <module>
+    trainer[dataset_name](args, model, snapshot_path)
+  File "/home/mhashemi/TransVNet/trainer.py", line 155, in trainer_deg
+    loss_ce = ce_loss(outputs, label_batch[:].long())
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/modules/loss.py", line 1174, in forward
+    return F.cross_entropy(input, target, weight=self.weight,
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/nn/functional.py", line 3029, in cross_entropy
+    return torch._C._nn.cross_entropy_loss(input, target, weight, _Reduction.get_enum(reduction), ignore_index, label_smoothing)
+RuntimeError: Expected target size [192, 32, 32, 32], got [192, 64, 64, 64]
+/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
+  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
+Traceback (most recent call last):
+  File "/home/mhashemi/TransVNet/test.py", line 384, in <module>
+    net.load_state_dict(torch.load(snapshot)) # Loading the parameters from the training results
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 791, in load
+    with _open_file_like(f, 'rb') as opened_file:
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 271, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 252, in __init__
+    super().__init__(open(name, mode))
+FileNotFoundError: [Errno 2] No such file or directory: '../model/TVD_Degradation[64, 64, 64]/TVD_ViT-B_16_vitpatch[4, 4, 4]_epo4_bs48_lr0.01_seed1234/epoch_3.pth'
