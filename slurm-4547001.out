@@ -1,23 +1,0 @@
-/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
-  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
-Namespace(dataset='Design', img_size=[64, 64, 64], vit_patches_size=[1, 1, 1], vit_name='Conv-ViT-Gen2-B_16', pretrained_net_path=False, is_encoder_pretrained=False, deterministic=1, max_epochs=200, batch_size=35, base_lr=0.001, seed=1234, gpu=4, world_size=-1, rank=-1, dist_url='env://', dist_backend='nccl', local_rank=-1, num_classes=2, root_path='/work/sheidaei/mhashemi/data/mat', list_dir='./lists/lists_Design', exp='TVG_Design[64, 64, 64]', distributed=False)
-9 iterations per epoch. 1800 max iterations 
-  0%|                                         | 0/200 [00:00<?, ?it/s]  0%|                                         | 0/200 [00:47<?, ?it/s]
-Traceback (most recent call last):
-  File "/home/mhashemi/TransVNet/train.py", line 188, in <module>
-    trainer[dataset_name](args, model, snapshot_path)
-  File "/home/mhashemi/TransVNet/trainer.py", line 320, in trainer_mat
-    loss_ce = torch.sum(ce_loss(decoder_output, image_batch.squeeze(1).long()), dim=dim)
-IndexError: Dimension out of range (expected to be in range of [-4, 3], but got 4)
-/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/functional.py:504: UserWarning: torch.meshgrid: in an upcoming release, it will be required to pass the indexing argument. (Triggered internally at /opt/conda/conda-bld/pytorch_1682343997789/work/aten/src/ATen/native/TensorShape.cpp:3483.)
-  return _VF.meshgrid(tensors, **kwargs)  # type: ignore[attr-defined]
-Traceback (most recent call last):
-  File "/home/mhashemi/TransVNet/test.py", line 371, in <module>
-    net.load_state_dict(torch.load(snapshot)) # Loading the parameters from the training results
-  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 791, in load
-    with _open_file_like(f, 'rb') as opened_file:
-  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 271, in _open_file_like
-    return _open_file(name_or_buffer, mode)
-  File "/work/sheidaei/conda/envs/mytorch/lib/python3.9/site-packages/torch/serialization.py", line 252, in __init__
-    super().__init__(open(name, mode))
-FileNotFoundError: [Errno 2] No such file or directory: '../model/TVG_Design[64, 64, 64]/TVG_Conv-ViT-Gen2-B_16_vitpatch[1, 1, 1]_epo200_bs35_lr0.001_seed1234/epoch_199.pth'
