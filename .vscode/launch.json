@@ -8,8 +8,8 @@
             "justMyCode": true,
             // "args": ["--dataset", "Design_local", "--img_size", "64",  "--vit_patches_size", "1", "--vit_name", "Conv-ViT-Gen2-B_16", "--gpu", "1", "--batch_size", "2", "--base_lr", "0.001", "--max_epochs", "200", "--is_encoder_pretrained", "False"]
             // "args": ["--dataset", "Design2_local", "--img_size", "64",  "--vit_patches_size", "1", "--vit_name", "Conv-ViT-Gen2-B_16", "--gpu", "1", "--batch_size_test", "2", "--net_path", "../model/TVG_Design[64, 64, 64]/TVG_Conv-ViT-Gen2-B_16_vitpatch[1, 1, 1]_epo200_bs35_lr0.001_seed1234/epoch_199.pth"]
-            "args": ["--dataset", "Degradation_local", "--img_size", "64",  "--vit_patches_size", "4", "--vit_name", "ViT-B_16", "--gpu", "1", "--batch_size", "2", "--base_lr", "0.01", "--max_epochs", "1", "--is_encoder_pretrained", "False"]
-            // "args": ["--dataset", "Degradation_local", "--img_size", "64",  "--vit_patches_size", "4", "--vit_name", "ViT-B_16", "--gpu", "1", "--batch_size", "2", "--base_lr", "0.01", "--max_epochs", "1", "--is_encoder_pretrained", "False", "--batch_size_test", "16"] //, "--net_path", "../model/TVD_Degradation[64, 64, 64]/TVD_ViT-B_16_vitpatch[1, 1, 1]_epo2_bs16_lr0.01_seed1234/epoch_2.pth"
+            "args": ["--dataset", "Degradation_local", "--img_size", "64",  "--vit_patches_size", "8", "--vit_name", "ViT-B_16", "--gpu", "1", "--batch_size", "2", "--base_lr", "0.01", "--max_epochs", "1", "--is_encoder_pretrained", "False"]
+            // "args": ["--dataset", "Degradation_local", "--img_size", "64",  "--vit_patches_size", "8", "--vit_name", "ViT-B_16", "--gpu", "1", "--batch_size", "2", "--base_lr", "0.01", "--max_epochs", "1", "--is_encoder_pretrained", "False", "--batch_size_test", "16"] //, "--net_path", "../model/TVD_Degradation[64, 64, 64]/TVD_ViT-B_16_vitpatch[1, 1, 1]_epo2_bs16_lr0.01_seed1234/epoch_2.pth"
         }
     ]
 }
