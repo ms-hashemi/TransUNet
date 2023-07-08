@@ -185,7 +185,7 @@ def trainer_deg(args, model, snapshot_path):
                 writer.add_images('train/GroundTruth', labs, iter_num, None, 'CHWN')
 
         # Periodic saving of the trained model according to the current training epoch number
-        save_interval = int(max_epoch / 5)
+        save_interval = int(max_epoch / 5) if max_epoch >= 5 else 1
         if (epoch_num + 1) % save_interval == 0:
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)
@@ -366,7 +366,7 @@ def trainer_mat(args, model, snapshot_path):
             #     writer.add_images('train/GroundTruth', labs, iter_num, None, 'CHWN')
 
         # Periodic saving of the trained model according to the current training epoch number
-        save_interval = int(max_epoch / 5)
+        save_interval = int(max_epoch / 5) if max_epoch >= 5 else 1
         if (epoch_num + 1) % save_interval == 0: #epoch_num > int(max_epoch / 2) and 
             save_mode_path = os.path.join(snapshot_path, 'epoch_' + str(epoch_num) + '.pth')
             torch.save(model.state_dict(), save_mode_path)

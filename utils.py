@@ -105,32 +105,31 @@ def test_single_volume(image, label, net, classes, patch_size=[256, 256], test_s
     return metric_list
 
 
-def test_multiple_volumes(image, label, time, net, classes, patch_size=[160, 160, 160], test_save_path=None, case=None, z_spacing=1):
+def test_multiple_volumes_sequencing(image_batch, label_batch, time_batch, net, classes, patch_size=[160, 160, 160], test_save_path=None, name_batch=None, z_spacing=1):
     """The TransVNet test function for segmented sequencing tasks"""
     with torch.no_grad():
-        out = torch.argmax(torch.softmax(net(image, time), dim=1), dim=1)
-        prediction = out.cpu().detach().numpy()
-        label = label.cpu().detach().numpy()
-    metric_list = np.zeros(shape=(classes-1, 2)) # np.array([[0.0, 0.0]])
-    metric_i = np.array([0.0, 0.0])
-    batch_size = prediction.shape[0]
-    for i in range(1, classes):
-        for batch_sample in range(batch_size):
-            metric_i += np.array(calculate_metric_percase(prediction[batch_sample, ...] == i, label[batch_sample, ...] == i))
-        # metric_list = np.append(metric_list, np.expand_dims(metric_i, axis=0), axis=0) # metric_list.append(metric_i)
-        metric_list[i-1][:] = metric_i
+        out = torch.argmax(torch.softmax(net(image_batch, time_batch), dim=1), dim=1)
+        prediction_batch = out.cpu().detach().numpy()
+        label_batch = label_batch.cpu().detach().numpy()
+    batch_size = prediction_batch.shape[0]
+    metric_list = np.zeros(shape=(batch_size, 2 * (classes - 1)))
+    for batch_sample in range(batch_size):
+        for i in range(1, classes):
+            metric_list[batch_sample][2 * (i - 1):2 * (i - 1) + 2] = np.array(calculate_metric_percase(prediction_batch[batch_sample, ...] == i, label_batch[batch_sample, ...] == i))
 
     if test_save_path is not None:
-        img_itk = sitk.GetImageFromArray(image.astype(np.float32))
-        prd_itk = sitk.GetImageFromArray(prediction.astype(np.float32))
-        lab_itk = sitk.GetImageFromArray(label.astype(np.float32))
-        img_itk.SetSpacing((1, 1, z_spacing))
-        prd_itk.SetSpacing((1, 1, z_spacing))
-        lab_itk.SetSpacing((1, 1, z_spacing))
-        sitk.WriteImage(prd_itk, test_save_path + '/'+ case + "_pred.nii.gz")
-        sitk.WriteImage(img_itk, test_save_path + '/'+ case + "_img.nii.gz")
-        sitk.WriteImage(lab_itk, test_save_path + '/'+ case + "_gt.nii.gz")
-    return metric_list
+        for i in range(len(name_batch)):
+            img_itk = sitk.GetImageFromArray(image_batch[i, :].astype(np.float32))
+            prd_itk = sitk.GetImageFromArray(prediction_batch[i, :].astype(np.float32))
+            lab_itk = sitk.GetImageFromArray(label_batch[i, :].astype(np.float32))
+            img_itk.SetSpacing((1, 1, z_spacing))
+            prd_itk.SetSpacing((1, 1, z_spacing))
+            lab_itk.SetSpacing((1, 1, z_spacing))
+            sitk.WriteImage(prd_itk, test_save_path + '/'+ name_batch[i] + '_%8.6f' % (time_batch[i]) + "_pred.nii.gz") # Segmented predicted image at next time
+            sitk.WriteImage(img_itk, test_save_path + '/'+ name_batch[i] + '_%8.6f' % (time_batch[i]) + "_img.nii.gz") # Segmented input image at time t
+            sitk.WriteImage(lab_itk, test_save_path + '/'+ name_batch[i] + '_%8.6f' % (time_batch[i]) + "_gt.nii.gz") # Segmented target image at next time
+        
+    return (name_batch, time_batch, metric_list)
 
 
 def test_multiple_volumes_generative(image_batch, label_batch, time_batch, net, name_batch, test_save_path=None):
@@ -167,8 +166,8 @@ def test_multiple_volumes_generative(image_batch, label_batch, time_batch, net, 
     reconstruction_loss = torch.mean(ce_loss(decoder_output, image_batch.squeeze(1).long()), dim=dim)
     metric_list = torch.stack((surrogate_model_error, generative_error, reconstruction_loss), 1)
 
-    for i in range(len(name_batch)):
-        if test_save_path is not None:
+    if test_save_path is not None:
+        for i in range(len(name_batch)):
             img_itk = sitk.GetImageFromArray(image_batch[i, :].cpu().detach().numpy().astype(np.float32))
             prd_itk = sitk.GetImageFromArray(generative_output[i, :].cpu().detach().numpy().astype(np.float32))
             img_itk.SetSpacing((1, 1, 1))
@@ -259,8 +258,8 @@ def test_multiple_volumes_generative2(image_batch, label_batch, time_batch, net,
         l.extend([label_batch[:, i]*std[i] + mean[i], predicted_surrogate_labels[:, i]*std[i] + mean[i], absolute_surrogate_errors[:, i], predicted_labels_generative_best[:, i]*std[i] + mean[i], absolute_generative_errors[:, i]])
     metric_list = torch.stack(l, 1)
 
-    for i in range(len(name_batch)):
-        if test_save_path is not None:
+    if test_save_path is not None:
+        for i in range(len(name_batch)):
             img_itk = sitk.GetImageFromArray(image_batch[i, :].cpu().detach().numpy().astype(np.float32))
             prd_itk = sitk.GetImageFromArray(generative_output_best[i, :].cpu().detach().numpy().astype(np.float32))
             img_itk.SetSpacing((1, 1, 1))

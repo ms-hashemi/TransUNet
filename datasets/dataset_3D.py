@@ -171,7 +171,7 @@ class Degradation_dataset(Dataset):
         sample = {'image': image, 'time': (float)(time-1)/(float)(36), 'label': label}
         if self.transform:
             sample = self.transform(sample)
-        sample['case_name'] = self.sample_list[idx].strip('\n')[8:-4]
+        sample['case_name'] = volume_name[8:-4]
         return sample
 
 

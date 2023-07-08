@@ -11,7 +11,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from datasets.dataset_synapse import Synapse_dataset
-from utils import test_single_volume, test_multiple_volumes, test_multiple_volumes_generative, test_multiple_volumes_generative2
+from utils import test_single_volume, test_multiple_volumes_sequencing, test_multiple_volumes_generative, test_multiple_volumes_generative2
 from networks.TransVNet_modeling import VisionTransformer as Net
 from networks.TransVNet_modeling import CONFIGS, CONFIGS3D
 from torchvision import transforms
@@ -93,24 +93,26 @@ def inferrer_deg(args, model, test_save_path=None):
     logging.info("{} test iterations per epoch".format(len(testloader)))
     model.eval()
     # Matrix of the network performance: row: class; column: metric of performance (dice, hd95)
-    metric_list = np.zeros(shape=(args.num_classes-1, 2)) 
+    metric_avg = np.zeros(shape=(args.num_classes-1, 2)) 
     for i_batch, sampled_batch in tqdm(enumerate(testloader)):
         # h, w = sampled_batch["image"].size()[2:]
         image_batch, label_batch, time_batch, case_name_batch = sampled_batch["image"], sampled_batch["label"], sampled_batch["time"], sampled_batch['case_name']
         image_batch, time_batch, label_batch = image_batch.cuda(), time_batch.cuda(), label_batch.cuda()
         # Method in "utils.py" to run the model/network in the evaluation model on multiple inputs in parallel using GPU (at the end of it, the results are transferred to CPU for further calculations).
-        metric_batch = test_multiple_volumes(image_batch, label_batch, time_batch, model, classes=args.num_classes, patch_size=args.img_size,
-                                         test_save_path=test_save_path, case=case_name_batch, z_spacing=args.z_spacing)
+        name_batch, time_batch, metric_batch = test_multiple_volumes_sequencing(image_batch, label_batch, time_batch, model, classes=args.num_classes, patch_size=args.img_size,
+                                         test_save_path=test_save_path, name_batch=case_name_batch, z_spacing=args.z_spacing)
+        for i in range(len(name_batch)):
+            formatting_tuple = tuple([name_batch[i]] + [time_batch[i]] + [metric_batch[i, j] for j in range(metric_avg.shape[0] * metric_avg.shape[1])])
+            logging.info('name %7s time %8.6f dice_class1 %f hd95_class1 %f' % formatting_tuple)
         for i in range(1, args.num_classes):
-            logging.info('i_batch %d mean_dice %f mean_hd95 %f' % (i_batch, metric_batch[i-1][0], metric_batch[i-1][1]))
-        metric_list += np.array(metric_batch)
+            metric_avg[i - 1, :] += np.sum(metric_batch, axis=0)[2 * (i - 1):2 * (i - 1) + 2]
         # logging.info('idx %d case %s mean_dice %f mean_hd95 %f' % (i_batch, case_name, np.mean(metric_i, axis=0)[0], np.mean(metric_i, axis=0)[1]))
-    metric_list = metric_list / len(db_test)
+    metric_avg = metric_avg / len(db_test)
     for i in range(1, args.num_classes):
-        logging.info('Mean class %d mean_dice %f mean_hd95 %f' % (i, metric_list[i-1][0], metric_list[i-1][1]))
-    performance = np.mean(metric_list, axis=0)[0]
-    mean_hd95 = np.mean(metric_list, axis=0)[1]
-    logging.info('Testing performance in best val model: mean_dice : %f mean_hd95 : %f' % (performance, mean_hd95))
+        logging.info('Mean metrics in class %d: dice: %f hd95: %f' % (i, metric_avg[i-1][0], metric_avg[i-1][1]))
+    performance = np.mean(metric_avg, axis=0)[0]
+    mean_hd95 = np.mean(metric_avg, axis=0)[1]
+    logging.info('Testing performance in best val model: dice: %f hd95: %f' % (performance, mean_hd95))
     return "Testing Finished!"
 
 
@@ -202,7 +204,7 @@ if __name__ == "__main__":
             'prefix': 'TU', # TransUNet
         },
         'Degradation_local': {
-            'dataset_name': 'Degradation',
+            'dataset_name': 'Degradation_local',
             'Dataset': Degradation_dataset,
             'volume_path': '../data/deg/Selected',
             'list_dir': './lists/lists_Degradation',
@@ -222,7 +224,7 @@ if __name__ == "__main__":
             'prefix': 'TVD', # TransVNetDegradation
         },
         'Design_local': {
-            'dataset_name': 'Design',
+            'dataset_name': 'Design_local',
             'Dataset': Design_dataset,
             # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
             'volume_path': '../data/mat/Results', # On my local machine or CyBox
@@ -244,7 +246,7 @@ if __name__ == "__main__":
             'prefix': 'TVG', # TransVNetGenerative
         },
         'Design2_local': {
-            'dataset_name': 'Design',
+            'dataset_name': 'Design_local',
             'Dataset': Design_dataset,
             # 'volume_path': '/work/sheidaei/mhashemi/data/mat',
             'volume_path': '../data/mat/Results', # On my local machine or CyBox
@@ -395,6 +397,6 @@ if __name__ == "__main__":
     else:
         test_save_path = None
 
-    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Design': inferrer_mat, 'Design_local': inferrer_mat2, 'Design2': inferrer_mat2, 'Design2_local': inferrer_mat2}
+    inferrer = {'Synapse': inferrer_synapse, 'Degradation': inferrer_deg, 'Degradation_local': inferrer_deg, 'Design': inferrer_mat2, 'Design_local': inferrer_mat2, 'Design2': inferrer_mat2, 'Design2_local': inferrer_mat2}
     inferrer[dataset_name](args, net, test_save_path)
     # sys.exit(0)
