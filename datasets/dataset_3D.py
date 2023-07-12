@@ -160,13 +160,13 @@ class Degradation_dataset(Dataset):
             time = int(time)
             file_path = os.path.join(self.data_dir, volume_name)
             data = h5py.File(file_path, 'r').get('Adapted_Binary_Matrix_Degradation')
-            image, label = data[:, :, :, time-1], data[:, :, :, time]
+            image, label = data[:, :, :, time-4], data[:, :, :, time]
         else:
             volume_name, time = self.sample_list[idx].strip('\n').split()
             time = int(time)
             file_path = os.path.join(self.data_dir, volume_name)
             data = h5py.File(file_path, 'r').get('Adapted_Binary_Matrix_Degradation')
-            image, label = data[:, :, :, time-1], data[:, :, :, time]
+            image, label = data[:, :, :, time-4], data[:, :, :, time]
 
         sample = {'image': image, 'time': (float)(time-1)/(float)(36), 'label': label}
         if self.transform:

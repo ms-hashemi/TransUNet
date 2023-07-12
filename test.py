@@ -337,6 +337,8 @@ if __name__ == "__main__":
         for i in range(test_config[dataset_name]['dimension']):
             grid.append(int((args.img_size[i] // (2**(len(config.encoder_channels) - 1))) / args.vit_patches_size[i]))
         config.patches.grid = tuple(grid)
+    else: # No hybrid encoder or only ViT as the encoder
+        config.patches.size = args.vit_patches_size
 
     # DDP setting
     if "WORLD_SIZE" in os.environ:
