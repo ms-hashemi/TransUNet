@@ -184,7 +184,15 @@ if __name__ == "__main__":
         model.to(device)
         # raise NotImplementedError("Only DistributedDataParallel is supported.")
     if args.pretrained_net_path:
-        model.load_state_dict(torch.load(args.pretrained_net_path))
+        pretrained_dict = torch.load(args.pretrained_net_path)
+        model_dict = model.state_dict()
+        # 1. filter mismatched keys (mismatch either in the key name or its value shape) 
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if (k in model_dict) and (model_dict[k].shape == pretrained_dict[k].shape)}
+        # 2. overwrite entries in the existing state dict
+        model_dict.update(pretrained_dict) 
+        # 3. load the new state dict
+        model.load_state_dict(model_dict)
+        # model.load_state_dict(torch.load(args.pretrained_net_path))
     if args.is_encoder_pretrained:
         if hasattr(model, "module"):
             model.module.load_from(weights=np.load(config.pretrained_path)) # No gradient calculation in (parts of the) encoder if there is a config.pretrained_path
